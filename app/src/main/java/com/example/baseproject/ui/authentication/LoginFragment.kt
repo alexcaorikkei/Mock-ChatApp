@@ -62,6 +62,11 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                 }
             }
         }
+        viewModel.apply {
+            validator.observe(viewLifecycleOwner) { validator ->
+                binding.btnLogin.isEnabled = validator
+            }
+        }
     }
 
     override fun bindingAction() {

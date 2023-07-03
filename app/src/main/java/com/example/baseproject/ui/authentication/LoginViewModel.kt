@@ -26,7 +26,6 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-
     private var _validator: MutableLiveData<Boolean> = MutableLiveData()
     val validator: LiveData<Boolean> get() = _validator
     private var _isValidEmail = false
