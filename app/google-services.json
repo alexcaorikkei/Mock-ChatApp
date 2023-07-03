@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "23424517738",
+    "project_id": "mock-chat-7a457",
+    "storage_bucket": "mock-chat-7a457.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:23424517738:android:661bd932a32159a3d66c13",
+        "android_client_info": {
+          "package_name": "com.example.baseproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "23424517738-fueof0eo11o3krhvrvcom4c0v8h819nh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDxmQTsIEUSGX3jhWu39-6o-QuIDBjI7w4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "23424517738-fueof0eo11o3krhvrvcom4c0v8h819nh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
