@@ -38,6 +38,30 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
 
     override fun bindingStateView() {
         super.bindingStateView()
+        binding.apply {
+            etEmail.validate { email ->
+                if(email.isEmpty()) {
+                    binding.etEmail.error = getString(R.string.email_is_empty)
+                    viewModel.setValidState(isValidEmail = false)
+                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    binding.etEmail.error = getString(R.string.email_is_invalid)
+                    viewModel.setValidState(isValidEmail = false)
+                }
+                else {
+                    binding.etEmail.error = null
+                    viewModel.setValidState(isValidEmail = true)
+                }
+            }
+            etPassword.validate { password ->
+                if(password.isEmpty()) {
+                    binding.etPassword.error = getString(R.string.password_is_empty)
+                    viewModel.setValidState(isValidPassword = false)
+                } else {
+                    binding.etPassword.error = null
+                    viewModel.setValidState(isValidPassword = true)
+                }
+            }
+        }
     }
 
     override fun bindingAction() {
