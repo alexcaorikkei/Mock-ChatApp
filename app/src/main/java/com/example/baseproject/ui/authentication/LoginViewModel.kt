@@ -25,4 +25,16 @@ class LoginViewModel @Inject constructor(
             _signInResponse.value = authRepository.firebaseLogin(email, password)
         }
     }
+
+    private var _validator: MutableLiveData<Boolean> = MutableLiveData()
+    val validator: LiveData<Boolean> get() = _validator
+    private var _isValidEmail = false
+    private var _isValidPassword = false
+    fun setValidState(
+        isValidEmail: Boolean? = _isValidEmail,
+        isValidPassword: Boolean? = _isValidPassword) {
+        _isValidEmail = isValidEmail!!
+        _isValidPassword = isValidPassword!!
+        _validator.value = _isValidEmail && _isValidPassword
+    }
 }

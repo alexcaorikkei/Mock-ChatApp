@@ -65,15 +65,12 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                             is FirebaseAuthUserCollisionException -> {
                                 resources.getString(R.string.email_already_exists).toast(requireContext())
                             }
-
                             is IllegalArgumentException -> {
                                 resources.getString(R.string.email_or_password_is_empty).toast(requireContext())
                             }
-
                             is FirebaseNetworkException -> {
                                 resources.getString(R.string.no_internet_connection).toast(requireContext())
                             }
-
                             else -> {
                                 response.e.toString().toast(requireContext())
                             }
@@ -96,7 +93,6 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = false
                         binding.includeProgress.visibility = View.VISIBLE
                     }
-
                     is Response.Success -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
@@ -104,7 +100,6 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = true
                         binding.includeProgress.visibility = View.GONE
                     }
-
                     is Response.Failure -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
@@ -113,6 +108,48 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.includeProgress.visibility = View.GONE
                     }
                 }
+            }
+            validator.observe(viewLifecycleOwner) { validator ->
+                binding.btnRegister.isEnabled = validator
+            }
+        }
+
+        binding.apply {
+            etEmail.validate { email ->
+                if (email.isEmpty()) {
+                    binding.etEmail.error = getString(R.string.email_is_empty)
+                    viewModel.setValidState(isValidEmail = false)
+                } else if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                    binding.etEmail.error = getString(R.string.email_is_invalid)
+                    viewModel.setValidState(isValidEmail = false)
+                } else {
+                    binding.etEmail.error = null
+                    viewModel.setValidState(isValidEmail = true)
+                }
+            }
+            etName.validate { name ->
+                if (name.isEmpty()) {
+                    binding.etName.error = getString(R.string.name_is_empty)
+                    viewModel.setValidState(isValidDisplayName = false)
+                } else {
+                    binding.etName.error = null
+                    viewModel.setValidState(isValidDisplayName = true)
+                }
+            }
+            etPassword.validate { password ->
+                if (password.isEmpty()) {
+                    binding.etPassword.error = getString(R.string.password_is_empty)
+                    viewModel.setValidState(isValidPassword = false)
+                } else if (password.length < 6) {
+                    binding.etPassword.error = getString(R.string.password_is_to_weak)
+                    viewModel.setValidState(isValidPassword = false)
+                } else {
+                    binding.etPassword.error = null
+                    viewModel.setValidState(isValidPassword = true)
+                }
+            }
+            cbPoliciesAndTerms.setOnCheckedChangeListener { _, isChecked ->
+                viewModel.setValidState(isChecked = isChecked)
             }
         }
     }
