@@ -84,7 +84,7 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
     override fun bindingStateView() {
         super.bindingStateView()
         viewModel.apply {
-            signUpResponse.observe(this@RegisterFragment) { response ->
+            signUpResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
                         binding.btnRegister.isEnabled = false

@@ -11,15 +11,25 @@ class FriendsRecycleViewHolder(var binding: ItemFriendBinding): RecyclerView.Vie
 
 }
 
-class FriendsRecycleViewAdapter(private val listFriends: List<FriendModel>): RecyclerView.Adapter<FriendsRecycleViewHolder>() {
+class FriendsRecycleViewAdapter(private val listFriends: List<FriendModel>, val states: List<FriendState>): RecyclerView.Adapter<FriendsRecycleViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsRecycleViewHolder {
         return FriendsRecycleViewHolder(
             ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         )
     }
-    override fun getItemCount() = listFriends.size
+
+    private var listFriendsInternal = mutableListOf<FriendModel>()
+    init {
+        listFriends.forEach() {friend ->
+            if(friend.state in states) {
+                listFriendsInternal.add(friend)
+            }
+        }
+    }
+
+    override fun getItemCount() = listFriendsInternal.size
     override fun onBindViewHolder(holder: FriendsRecycleViewHolder, position: Int) {
-        val friendData = listFriends[position]
+        val friendData = listFriendsInternal[position]
         with(holder.binding) {
 //           ivAvatar =
             tvName.text = friendData.displayName

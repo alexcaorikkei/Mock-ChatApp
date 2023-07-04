@@ -11,5 +11,13 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             tools:listitem="@layout/item_friend"/>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_position"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text=""/>
     </FrameLayout>
 </layout>

@@ -1,7 +1,6 @@
 package com.example.baseproject.ui.home.friends
 
 
-import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import com.example.baseproject.R
@@ -35,19 +34,17 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
 
     override fun bindingAction() {
         super.bindingAction()
+        binding.apply {
+
+        }
     }
 
     override fun setOnClick() {
-//        binding.apply {
-//            etSearch.addTextChangedListener {
-//                when(binding.friendsViewPager.currentItem) {
-//                    0 -> viewModel.searchFriends(it.toString())
-//                    1 -> viewModel.searchAllUser(it.toString())
-//                    2 -> viewModel.searchRequest(it.toString())
-//                    else -> viewModel.searchFriends(it.toString())
-//                }
-//            }
-//        }
+        binding.apply {
+            etSearch.addTextChangedListener {
+                viewModel.searchAllUserWithCurrentAccount(it.toString())
+            }
+        }
     }
 }
 
