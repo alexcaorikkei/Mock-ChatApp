@@ -1,6 +1,7 @@
 package com.example.baseproject.ui.home.messages
 
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentMessagesBinding
 import com.example.baseproject.navigation.AppNavigation
@@ -18,7 +19,7 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
 
     override fun bindingStateView() {
         super.bindingStateView()
-        binding.rvMessages.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
+        binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMessages.adapter = MessageAdapter(listOf(
             MessageModel(1, "Nguyen Van A", "Hello", "10:00", "", false),
             MessageModel(2, "Nguyen Van B", "Hello", "10:00", "", true),

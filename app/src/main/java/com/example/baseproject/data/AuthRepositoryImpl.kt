@@ -29,6 +29,7 @@ class AuthRepositoryImpl : AuthRepository {
         } catch (e: Exception) {
             Response.Failure(e)
         }
+
     }
 
     private fun createDemoData() {

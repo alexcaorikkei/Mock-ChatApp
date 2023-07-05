@@ -45,4 +45,8 @@
     <string name="ok">Ok</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
+    <string name="a">A</string>
+    <string name="friend_request">Friend Request</string>
+    <string name="friend_added">Friend Added</string>
+    <string name="there_is_no_result">There is no result</string>
 </resources>

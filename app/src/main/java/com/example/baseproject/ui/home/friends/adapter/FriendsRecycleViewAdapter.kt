@@ -4,37 +4,71 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.databinding.ItemFriendBinding
-import com.example.baseproject.ui.home.friends.model.FriendModel
+import com.example.baseproject.databinding.ItemFriendHeaderBinding
 import com.example.baseproject.ui.home.friends.model.FriendState
+import com.example.baseproject.ui.home.friends.model.FriendItemModel
 
 class FriendsRecycleViewHolder(var binding: ItemFriendBinding): RecyclerView.ViewHolder(binding.root) {
 
 }
+class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding): RecyclerView.ViewHolder(binding.root) {
 
-class FriendsRecycleViewAdapter(private val listFriends: List<FriendModel>): RecyclerView.Adapter<FriendsRecycleViewHolder>() {
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FriendsRecycleViewHolder {
-        return FriendsRecycleViewHolder(
-            ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        )
+}
+
+class FriendsRecycleViewAdapter(private val listViewFriends: List<FriendItemModel>): RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    override fun getItemCount() = listViewFriends.size
+    override fun getItemViewType(position: Int): Int {
+        return listViewFriends[position].viewType
     }
-    override fun getItemCount() = listFriends.size
-    override fun onBindViewHolder(holder: FriendsRecycleViewHolder, position: Int) {
-        val friendData = listFriends[position]
-        with(holder.binding) {
-//           ivAvatar =
-            tvName.text = friendData.displayName
-            when(friendData.state) {
-                FriendState.FRIEND -> {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        return when(viewType) {
+            0 -> {
+                val binding = ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                FriendsRecycleViewHolder(binding)
+            }
+            else -> {
+                val binding = ItemFriendHeaderBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                FriendHeaderViewHolder(binding)
+            }
+        }
+    }
 
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        when(holder) {
+            is FriendsRecycleViewHolder -> {
+                val friendData = listViewFriends[position].friendModel
+                holder.binding.apply {
+                    tvName.text = friendData!!.displayName
+                    when(friendData.state) {
+                        FriendState.FRIEND -> {
+                            btnCancel.visibility = ViewGroup.INVISIBLE
+                            btnAccept.visibility = ViewGroup.INVISIBLE
+                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
+                        }
+                        FriendState.ADDED -> {
+                            btnCancel.visibility = ViewGroup.VISIBLE
+                            btnAccept.visibility = ViewGroup.INVISIBLE
+                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
+                        }
+                        FriendState.REQUEST -> {
+                            btnCancel.visibility = ViewGroup.INVISIBLE
+                            btnAccept.visibility = ViewGroup.VISIBLE
+                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
+                        }
+                        FriendState.NONE -> {
+                            btnCancel.visibility = ViewGroup.INVISIBLE
+                            btnAccept.visibility = ViewGroup.INVISIBLE
+                            btnAddNewFriend.visibility = ViewGroup.VISIBLE
+                        }
+                    }
                 }
-                FriendState.ADDED -> {
-                    btnCancel.visibility = ViewGroup.VISIBLE
-                }
-                FriendState.REQUEST -> {
-                    btnAccept.visibility = ViewGroup.VISIBLE
-                }
-                FriendState.NONE -> {
-                    btnAddNewFriend.visibility = ViewGroup.VISIBLE
+            }
+            is FriendHeaderViewHolder -> {
+                if(listViewFriends[position].header!!.length == 1) {
+                    holder.binding.tvHeader.text = listViewFriends[position].header
+                } else {
+                    holder.binding.tvHeader.text = holder.binding.tvHeader.context.getString(listViewFriends[position].header!!.toInt())
                 }
             }
         }
