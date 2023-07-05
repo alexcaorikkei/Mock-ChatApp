@@ -30,13 +30,11 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 else -> "Friends"
             }
         }.attach()
+        viewModel.searchAllUserWithCurrentAccount("")
     }
 
     override fun bindingAction() {
         super.bindingAction()
-        binding.apply {
-
-        }
     }
 
     override fun setOnClick() {
