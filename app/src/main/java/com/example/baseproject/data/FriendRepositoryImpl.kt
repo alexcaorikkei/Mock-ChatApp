@@ -105,7 +105,9 @@ class FriendRepositoryImpl : FriendRepository {
     private suspend fun searchAll(query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").get().await()
         friends.children.forEach { userSnapshot ->
-            if(userSnapshot.key.toString().notIn(listFriends) && userSnapshot.child("profile").child("display_name").value.toString().contains(query)) {
+            if(userSnapshot.key.toString().notIn(listFriends)
+                && userSnapshot.child("profile").child("display_name").value.toString().contains(query)
+                && userSnapshot.key.toString() != auth.uid!!) {
                 listFriends.add(
                     FriendModel(
                         userSnapshot.key.toString(),
