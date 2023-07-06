@@ -1,5 +1,6 @@
 package com.example.baseproject.data
 
+import com.example.baseproject.R
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
 import com.example.baseproject.ui.home.friends.model.FriendModel
@@ -24,7 +25,7 @@ class FriendRepositoryImpl : FriendRepository {
         }
     }
 
-    override suspend fun sendFriendRequest(friendId: String): Response<Boolean> {
+    override suspend fun sendFriendRequest(friendId: String): Response<String> {
         return try {
             database.reference.child("users").apply {
                 val userProfile = child(auth.uid!!).child("profile").get().await()
@@ -38,13 +39,13 @@ class FriendRepositoryImpl : FriendRepository {
                     child("profile_picture").setValue(userProfile.child("profile_picture").value)
                 }
             }
-            Response.Success(true)
+            Response.Success(R.string.friend_request_sent.toString())
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun acceptFriendRequest(friendId: String): Response<Boolean> {
+    override suspend fun acceptFriendRequest(friendId: String): Response<String> {
         return try {
             database.reference.child("users").apply {
                 val userProfile = child(friendId).child("added").child(auth.uid!!).get().await()
@@ -60,19 +61,19 @@ class FriendRepositoryImpl : FriendRepository {
                     child("profile_picture").setValue(userProfile.child("profile_picture").value)
                 }
             }
-            Response.Success(true)
+            Response.Success(R.string.friend_request_accepted.toString())
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun cancelFriendRequest(friendId: String): Response<Boolean> {
+    override suspend fun cancelFriendRequest(friendId: String): Response<String> {
         return try {
             database.reference.child("users").apply {
                 child(auth.uid!!).child("added").child(friendId).setValue(null)
                 child(friendId).child("request").child(auth.uid!!).setValue(null)
             }
-            Response.Success(true)
+            Response.Success(R.string.friend_request_canceled.toString())
         } catch (e: Exception) {
             Response.Failure(e)
         }

@@ -27,8 +27,8 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private val _friendChangeStateResponse = MutableLiveData<Response<Boolean>>()
-    val friendChangeStateResponse: LiveData<Response<Boolean>> = _friendChangeStateResponse
+    private val _friendChangeStateResponse = MutableLiveData<Response<String>>()
+    val friendChangeStateResponse: LiveData<Response<String>> = _friendChangeStateResponse
 
     fun acceptFriend(uid: String) {
         viewModelScope.launch {

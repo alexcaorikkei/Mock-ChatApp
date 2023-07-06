@@ -8,8 +8,8 @@ enum class SortType {
     SORT_BY_STATE
 }
 
-fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendModel>): List<FriendItemModel> {
-    if(listFriend.isEmpty()) return listOf()
+fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendModel>): MutableList<FriendItemModel> {
+    if(listFriend.isEmpty()) return mutableListOf()
     return when(sortType) {
         SortType.SORT_BY_NAME -> {
             val result = mutableListOf<FriendItemModel>()

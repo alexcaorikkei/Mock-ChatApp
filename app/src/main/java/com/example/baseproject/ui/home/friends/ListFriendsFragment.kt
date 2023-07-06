@@ -30,7 +30,7 @@ class ListFriendsFragment(private val states: List<FriendState>) :
     @Inject
     lateinit var appNavigation: AppNavigation
     private val viewModel: FriendsViewModel by activityViewModels()
-    private var listFriendItemModel = listOf<FriendItemModel>()
+    private var listFriendItemModel = mutableListOf<FriendItemModel>()
     override fun getVM() = viewModel
 
     override fun bindingStateView() {
@@ -74,6 +74,22 @@ class ListFriendsFragment(private val states: List<FriendState>) :
                 }
             }
         }
+        viewModel.friendChangeStateResponse.observe(viewLifecycleOwner) {
+            when (it) {
+                is Response.Loading -> {
+                    binding.progressCircular.visibility = View.VISIBLE
+                }
+                is Response.Failure -> {
+                    binding.progressCircular.visibility = View.INVISIBLE
+                    "Error: ${it.e}".toast(requireContext())
+                }
+                is Response.Success -> {
+                    binding.progressCircular.visibility = View.INVISIBLE
+                    binding.rvFriends.context.getString(it.data.toInt()).toast(requireContext())
+
+                }
+            }
+        }
     }
 
 
@@ -83,13 +99,31 @@ class ListFriendsFragment(private val states: List<FriendState>) :
 
     override fun onAcceptClicked(position: Int, view: ItemFriendBinding) {
         viewModel.acceptFriend(listFriendItemModel[position].friendModel!!.uid)
+        listFriendItemModel[position] = listFriendItemModel[position].copy(
+            friendModel = listFriendItemModel[position].friendModel!!.copy(
+                state = FriendState.FRIEND
+            )
+        )
+        binding.rvFriends.adapter?.notifyItemChanged(position)
     }
 
     override fun onCancelClicked(position: Int, view: ItemFriendBinding) {
         viewModel.cancelFriend(listFriendItemModel[position].friendModel!!.uid)
+        listFriendItemModel[position] = listFriendItemModel[position].copy(
+            friendModel = listFriendItemModel[position].friendModel!!.copy(
+                state = FriendState.NONE
+            )
+        )
+        binding.rvFriends.adapter?.notifyItemChanged(position)
     }
 
     override fun onAddNewFriendClicked(position: Int, view: ItemFriendBinding) {
         viewModel.addFriend(listFriendItemModel[position].friendModel!!.uid)
+        listFriendItemModel[position] = listFriendItemModel[position].copy(
+            friendModel = listFriendItemModel[position].friendModel!!.copy(
+                state = FriendState.ADDED
+            )
+        )
+        binding.rvFriends.adapter?.notifyItemChanged(position)
     }
 }
