@@ -69,8 +69,8 @@ class FriendRepositoryImpl : FriendRepository {
     override suspend fun cancelFriendRequest(friendId: String): Response<Boolean> {
         return try {
             database.reference.child("users").apply {
-                child(auth.uid!!).child("request").child(friendId).setValue(null)
-                child(friendId).child("added").child(auth.uid!!).setValue(null)
+                child(auth.uid!!).child("added").child(friendId).setValue(null)
+                child(friendId).child("request").child(auth.uid!!).setValue(null)
             }
             Response.Success(true)
         } catch (e: Exception) {
