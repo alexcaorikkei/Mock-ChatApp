@@ -26,4 +26,28 @@ class FriendsViewModel @Inject constructor(
             _searchResponse.value = friendRepository.searchAllUserWithCurrentAccount(query)
         }
     }
+
+    private val _friendChangeStateResponse = MutableLiveData<Response<Boolean>>()
+    val friendChangeStateResponse: LiveData<Response<Boolean>> = _friendChangeStateResponse
+
+    fun acceptFriend(uid: String) {
+        viewModelScope.launch {
+            _friendChangeStateResponse.value = Response.Loading
+            _friendChangeStateResponse.value = friendRepository.acceptFriendRequest(uid)
+        }
+    }
+
+    fun addFriend(uid: String) {
+        viewModelScope.launch {
+            _friendChangeStateResponse.value = Response.Loading
+            _friendChangeStateResponse.value = friendRepository.sendFriendRequest(uid)
+        }
+    }
+
+    fun cancelFriend(uid: String) {
+        viewModelScope.launch {
+            _friendChangeStateResponse.value = Response.Loading
+            _friendChangeStateResponse.value = friendRepository.cancelFriendRequest(uid)
+        }
+    }
 }

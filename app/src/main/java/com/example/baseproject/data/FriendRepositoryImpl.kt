@@ -23,9 +23,64 @@ class FriendRepositoryImpl : FriendRepository {
             Response.Failure(e)
         }
     }
+
+    override suspend fun sendFriendRequest(friendId: String): Response<Boolean> {
+        return try {
+            database.reference.child("users").apply {
+                val userProfile = child(auth.uid!!).child("profile").get().await()
+                val friendProfile = child(friendId).child("profile").get().await()
+                child(auth.uid!!).child("added").child(friendId).apply {
+                    child("display_name").setValue(friendProfile.child("display_name").value)
+                    child("profile_picture").setValue(friendProfile.child("profile_picture").value)
+                }
+                child(friendId).child("request").child(auth.uid!!).apply {
+                    child("display_name").setValue(userProfile.child("display_name").value)
+                    child("profile_picture").setValue(userProfile.child("profile_picture").value)
+                }
+            }
+            Response.Success(true)
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
+    override suspend fun acceptFriendRequest(friendId: String): Response<Boolean> {
+        return try {
+            database.reference.child("users").apply {
+                val userProfile = child(friendId).child("added").child(auth.uid!!).get().await()
+                val friendProfile = child(auth.uid!!).child("request").child(friendId).get().await()
+                child(auth.uid!!).child("request").child(friendId).setValue(null)
+                child(auth.uid!!).child("friends").child(friendId).apply {
+                    child("display_name").setValue(friendProfile.child("display_name").value)
+                    child("profile_picture").setValue(friendProfile.child("profile_picture").value)
+                }
+                child(friendId).child("added").child(auth.uid!!).setValue(null)
+                child(friendId).child("friends").child(auth.uid!!).apply {
+                    child("display_name").setValue(userProfile.child("display_name").value)
+                    child("profile_picture").setValue(userProfile.child("profile_picture").value)
+                }
+            }
+            Response.Success(true)
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
+    override suspend fun cancelFriendRequest(friendId: String): Response<Boolean> {
+        return try {
+            database.reference.child("users").apply {
+                child(auth.uid!!).child("request").child(friendId).setValue(null)
+                child(friendId).child("added").child(auth.uid!!).setValue(null)
+            }
+            Response.Success(true)
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
     private fun String.notIn(listFriends: List<FriendModel>): Boolean {
         listFriends.forEach {
-            if (it.displayName == this) {
+            if (it.uid == this) {
                 return false
             }
         }

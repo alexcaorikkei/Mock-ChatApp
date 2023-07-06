@@ -33,10 +33,6 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
         viewModel.searchAllUserWithCurrentAccount("")
     }
 
-    override fun bindingAction() {
-        super.bindingAction()
-    }
-
     override fun setOnClick() {
         binding.apply {
             etSearch.addTextChangedListener {
