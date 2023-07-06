@@ -2,6 +2,8 @@ package com.example.baseproject.ui.home.friends
 
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
@@ -12,6 +14,8 @@ import com.example.baseproject.ui.home.friends.adapter.FriendsNavigationAdapter
 import com.example.core.base.fragment.BaseFragment
 import com.google.android.material.tabs.TabLayoutMediator
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Timer
+import java.util.TimerTask
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -35,9 +39,16 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
     }
 
     override fun setOnClick() {
+        var timer = Timer()
         binding.apply {
             etSearch.addTextChangedListener {
-                viewModel.searchAllUserWithCurrentAccount(it.toString())
+                timer.cancel()
+                timer = Timer()
+                timer.schedule(object : TimerTask() {
+                    override fun run() {
+                        viewModel.searchAllUserWithCurrentAccount(it.toString())
+                    }
+                }, 500)
             }
         }
     }
