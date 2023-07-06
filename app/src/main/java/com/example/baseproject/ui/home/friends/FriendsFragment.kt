@@ -1,6 +1,8 @@
 package com.example.baseproject.ui.home.friends
 
 
+import android.os.Bundle
+import android.view.View
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import com.example.baseproject.R
@@ -18,7 +20,6 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
     lateinit var appNavigation: AppNavigation
     private val viewModel: FriendsViewModel by activityViewModels()
     override fun getVM() = viewModel
-
     override fun bindingStateView() {
         super.bindingStateView()
         binding.friendsViewPager.adapter = FriendsNavigationAdapter(this)
