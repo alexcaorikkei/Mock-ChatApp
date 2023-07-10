@@ -53,4 +53,6 @@
     <string name="friend_request_sent">Friend request is sent</string>
     <string name="friend_request_accepted">Friend request is accepted</string>
     <string name="friend_request_canceled">Friend request was canceled</string>
+    <string name="password_is_incorrect">Password is incorrect</string>
+    <string name="email_is_not_registered">Email is nit registered</string>
 </resources>

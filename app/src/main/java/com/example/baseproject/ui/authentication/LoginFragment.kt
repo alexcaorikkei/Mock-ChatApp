@@ -15,6 +15,7 @@ import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -44,6 +45,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
             val email = rxPreferences.getEmail()
             if(email.first() != null) {
                 binding.etEmail.setText(email.first().toString())
+                viewModel.setValidState(isValidEmail = true)
             }
         }
     }
@@ -106,13 +108,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                         binding.includeProgress.visibility = View.GONE
                         when(response.e) {
                             is FirebaseAuthInvalidCredentialsException -> {
-                                resources.getString(R.string.email_or_password_is_incorrect).toast(requireContext())
+                                resources.getString(R.string.password_is_incorrect).toast(requireContext())
                             }
                             is IllegalArgumentException -> {
                                 resources.getString(R.string.email_or_password_is_empty).toast(requireContext())
                             }
                             is FirebaseNetworkException -> {
                                 resources.getString(R.string.no_internet_connection).toast(requireContext())
+                            }
+                            is FirebaseAuthInvalidUserException -> {
+                                resources.getString(R.string.email_is_not_registered).toast(requireContext())
                             }
                             else -> {
                                 response.e.toString().toast(requireContext())
@@ -121,6 +126,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     }
                 }
             }
+        }
+        if(viewModel.isLogin) {
+            appNavigation.openLoginToHomeScreen()
         }
     }
 
