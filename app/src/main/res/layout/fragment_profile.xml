@@ -14,7 +14,8 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_cover"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                app:layout_constraintDimensionRatio="1:1"
+                android:layout_height="0dp"
                 android:scaleType="centerCrop"
                 android:src="@drawable/img_demo_cover"
                 app:layout_constraintTop_toTopOf="parent"/>
@@ -22,11 +23,11 @@
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_profile_background"
                 android:layout_width="match_parent"
-                android:layout_height="1000dp"
+                android:layout_height="0dp"
                 android:layout_marginTop="300dp"
                 android:src="@drawable/img_profile_background"
                 app:layout_constraintTop_toTopOf="parent"
-                tools:layout_editor_absoluteX="0dp" />
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/iv_avatar"
