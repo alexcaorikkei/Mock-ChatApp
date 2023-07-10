@@ -53,4 +53,5 @@
     <string name="friend_request_accepted">Friend request was accepted</string>
     <string name="friend_request_canceled">Friend request was canceled</string>
     <string name="dd_mm_yyyy">dd/mm/yyyy</string>
+    <string name="phone_number_is_empty">Phone number is empty</string>
 </resources>
