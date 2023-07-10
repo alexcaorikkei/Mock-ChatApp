@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentRegisterBinding
 import com.example.baseproject.domain.model.Response
@@ -11,10 +12,12 @@ import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
 import com.example.core.base.fragment.BaseFragment
+import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
@@ -25,6 +28,8 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
     lateinit var appNavigation: AppNavigation
     private val viewModel: RegisterViewModel by viewModels()
     override fun getVM() = viewModel
+    @Inject
+    lateinit var rxPreferences: RxPreferences
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -162,6 +167,9 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                     binding.etPassword.text.toString(),
                     binding.etName.text.toString()
                 )
+                lifecycleScope.launch {
+                    rxPreferences.setEmail(binding.etEmail.text.toString())
+                }
             }
 
             btnBack.setOnClickListener {
