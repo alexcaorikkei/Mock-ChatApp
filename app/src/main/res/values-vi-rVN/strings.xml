@@ -44,18 +44,16 @@
     <string name="password_is_empty">Mật khẩu không được để trống</string>
     <string name="password_is_to_weak">Mật khẩu quá yếu</string>
     <string name="ok">Ok</string>
-    <string name="accept">Accept</string>
-    <string name="cancel">Cancel</string>
-    <string name="enter_message">Nhập tin nhắn...</string>
     <string name="accept">Chấp nhận</string>
     <string name="cancel">Hủy</string>
     <string name="a">a</string>
     <string name="friend_request">Lời mời kết bạn</string>
     <string name="friend_added">Đã gửi kết bạn</string>
     <string name="there_is_no_result">Không tìm thấy kết quả phù hợp</string>
-    <string name="password_is_incorrect">Mật khẩu không đúng</string>
-    <string name="email_is_not_registered">Email chưa được đăng kí</string>
     <string name="friend_request_sent">Đã gửi lời mời kết bạn</string>
     <string name="friend_request_accepted">Đã chấp nhận lời mời kết bạn</string>
     <string name="friend_request_canceled">Đã hủy lời mời kết bạn</string>
+    <string name="enter_message">Đang nhập tin nhắn…</string>
+    <string name="password_is_incorrect">Mật khẩu không đúng</string>
+    <string name="email_is_not_registered">Email chưa được đăng kí</string>
 </resources>
