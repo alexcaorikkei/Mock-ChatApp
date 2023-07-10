@@ -19,7 +19,10 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
 
     override fun bindingStateView() {
         super.bindingStateView()
-        binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
+        binding.tvTitle.setOnClickListener {
+            appNavigation.openHomeToChatScreen()
+        }
+        binding.rvMessages.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
         binding.rvMessages.adapter = MessageAdapter(listOf(
             MessageModel(1, "Nguyen Van A", "Hello", "10:00", "", false),
             MessageModel(2, "Nguyen Van B", "Hello", "10:00", "", true),

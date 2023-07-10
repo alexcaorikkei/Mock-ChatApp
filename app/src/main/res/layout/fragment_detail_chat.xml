@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/viewChatParent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/white">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvInfor"
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:background="#74F6EFEF"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvChat"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="5dp"
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintBottom_toTopOf="@+id/clChatSend"
+            app:layout_constraintTop_toBottomOf="@id/tvInfor"
+            app:stackFromEnd="true" />
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivBack"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="14dp"
+            android:src="@drawable/ic_back"
+            app:layout_constraintBottom_toBottomOf="@id/cvAvatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@id/cvAvatar" />
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cvAvatar"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="6dp"
+            app:layout_constraintBottom_toBottomOf="@id/tvInfor"
+            app:layout_constraintStart_toEndOf="@id/ivBack">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_avatar_unknown" />
+        </androidx.cardview.widget.CardView>
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tvUserReceive"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="13dp"
+            android:lineHeight="21dp"
+            android:text="Dr.Thân Mạnh Hùng"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/cvAvatar"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/cvAvatar"
+            app:layout_constraintTop_toTopOf="@id/cvAvatar" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clChatSend"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/white"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:background="@drawable/ic_gallery_no_click"
+                app:layout_constraintBottom_toBottomOf="@id/edtChat"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChat" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edtChat"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="5dp"
+                android:background="@drawable/edt_chat"
+                android:drawableEnd="@drawable/ic_smile"
+                android:hint="@string/enter_message"
+                android:lineHeight="19dp"
+                android:maxLines="3"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="16dp"
+                android:singleLine="false"
+                android:textColor="@color/black"
+                android:textFontWeight="500"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivSendChat"
+                app:layout_constraintStart_toEndOf="@id/ivGallery" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSendChat"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
+                android:paddingHorizontal="15dp"
+                android:src="@drawable/ic_send"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edtChat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChat" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/clChatSendBottomSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="300dp"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivGalleryBottomSheet"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginStart="14dp"
+                android:paddingHorizontal="15dp"
+                android:src="@drawable/ic_gallery_clicked"
+                app:layout_constraintBottom_toBottomOf="@id/edtChatBottomSheet"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChatBottomSheet" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/edtChatBottomSheet"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="10dp"
+                android:layout_marginVertical="5dp"
+                android:background="@drawable/edt_chat"
+                android:drawableEnd="@drawable/ic_smile"
+                android:enabled="false"
+                android:hint="@string/enter_message"
+                android:lineHeight="19dp"
+                android:maxLines="3"
+                android:paddingHorizontal="20dp"
+                android:paddingVertical="16dp"
+                android:singleLine="false"
+                android:textColor="@color/black"
+                android:textFontWeight="500"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/ivSendChatBottomSheet"
+                app:layout_constraintStart_toEndOf="@id/ivGalleryBottomSheet" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSendChatBottomSheet"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="12dp"
+                android:paddingHorizontal="15dp"
+                android:src="@drawable/ic_send"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edtChatBottomSheet"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChatBottomSheet" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_horizontal_0_6"
+            android:layout_width="@dimen/_1dp"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.6" />
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinatorLayoutGallery"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_0_6">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clBottomSheet"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:behavior_hideable="true"
+                app:layout_behavior="@string/bottom_sheet_behavior">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvPhotoList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:paddingTop="3dp"
+                    tools:layout_editor_absoluteX="16dp"
+                    tools:layout_editor_absoluteY="-182dp"
+                    tools:listitem="@layout/item_photo" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

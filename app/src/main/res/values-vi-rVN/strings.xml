@@ -55,4 +55,7 @@
     <string name="friend_request_canceled">Đã hủy lời mời kết bạn</string>
     <string name="dd_mm_yyyy">dd/mm/yyyy</string>
     <string name="phone_number_is_empty">Số điện thoại không được trống</string>
+    <string name="enter_message">Đang nhập tin nhắn…</string>
+    <string name="password_is_incorrect">Mật khẩu không đúng</string>
+    <string name="email_is_not_registered">Email chưa được đăng kí</string>
 </resources>
