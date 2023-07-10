@@ -45,6 +45,7 @@
     <string name="ok">OK</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
+    <string name="enter_message">Enter message...</string>
     <string name="a">A</string>
     <string name="friend_request">Friend Request</string>
     <string name="friend_added">Friend Added</string>
