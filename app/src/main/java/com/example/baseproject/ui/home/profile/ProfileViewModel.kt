@@ -36,4 +36,10 @@ class ProfileViewModel @Inject constructor(
             _profileResponse.value = profileRepository.getProfile()
         }
     }
+
+    fun updateProfile(user: UserModel) {
+        viewModelScope.launch {
+            profileRepository.updateProfile(user)
+        }
+    }
 }

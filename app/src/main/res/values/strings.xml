@@ -23,7 +23,7 @@
     <string name="add_friend">Add friend</string>
     <string name="all">All</string>
     <string name="request">Request</string>
-    <string name="email_demo">alexcao194@gmail.com\n</string>
+    <string name="email_demo">alexcao194@gmail.com</string>
     <string name="languages">Languages</string>
     <string name="logout">Logout</string>
     <string name="version_demo">1.0.0</string>
@@ -52,4 +52,5 @@
     <string name="friend_request_sent">Friend request was sent</string>
     <string name="friend_request_accepted">Friend request was accepted</string>
     <string name="friend_request_canceled">Friend request was canceled</string>
+    <string name="dd_mm_yyyy">dd/mm/yyyy</string>
 </resources>

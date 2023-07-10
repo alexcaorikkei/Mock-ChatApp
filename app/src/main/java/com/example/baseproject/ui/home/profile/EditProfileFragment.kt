@@ -1,12 +1,18 @@
 package com.example.baseproject.ui.home.profile
 
 
+import android.app.DatePickerDialog
+import android.icu.text.SimpleDateFormat
+import android.view.View
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.databinding.adapters.DatePickerBindingAdapter
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentEditProfileBinding
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.ui.home.profile.model.UserModel
 import com.example.core.base.fragment.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,6 +36,36 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
                     binding.tvBirthday.text = response.data.birthday
                 }
             }
+        }
+    }
+
+    override fun setOnClick() {
+        super.setOnClick()
+        binding.apply {
+            tvSave.setOnClickListener() {
+                viewModel.updateProfile(
+                    UserModel(
+                        displayName = etName.text.toString(),
+                        phoneNumber = etPhoneNumber.text.toString(),
+                        birthday = tvBirthday.text.toString(),
+                    )
+                )
+            }
+            etBirthday.setOnFocusChangeListener { v, hasFocus ->
+                if(hasFocus) {
+                    openDatePickerDialog(tvBirthday)
+                }
+            }
+            btnBack.setOnClickListener {
+                appNavigaiton.openEditProfileToProfileScreen()
+            }
+        }
+    }
+
+    private fun openDatePickerDialog(tvBirthday: AppCompatTextView) {
+        val datePickerDialog = DatePickerDialog(requireContext())
+        datePickerDialog.setOnDateSetListener { view, year, month, dayOfMonth ->
+            tvBirthday.setText("$dayOfMonth/${month + 1}/$year")
         }
     }
 }

@@ -23,6 +23,7 @@ class AuthRepositoryImpl : AuthRepository {
                     child("display_name").setValue(displayName)
                     child("profile_picture").setValue("")
                     child("birthday").setValue("")
+                    child("phone_number").setValue("")
                 }
                 createDemoData()
             Response.Success(true)

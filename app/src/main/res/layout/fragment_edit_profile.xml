@@ -141,13 +141,14 @@
             app:layout_constraintStart_toStartOf="parent"/>
 
         <androidx.appcompat.widget.AppCompatEditText
-            android:id="@+id/et_password"
+            android:id="@+id/et_birthday"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="25dp"
             android:layout_marginTop="7dp"
             android:drawableEnd="@drawable/ic_birthday_cake"
             android:inputType="date"
+            android:hint="@string/dd_mm_yyyy"
             android:textColor="@color/black"
             android:textColorHint="#676767"
             android:textSize="18sp"

@@ -11,7 +11,6 @@ class ProfileRepositoryImpl : ProfileRepository {
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
     override suspend fun updateProfile(user: UserModel): Response<Boolean> {
-        TODO("Not yet implemented")
         return try {
             database.reference.child("users").child(auth.uid!!).child("profile").apply {
                 child("display_name").setValue(user.displayName)

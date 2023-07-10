@@ -10,4 +10,5 @@ interface AppNavigation : BaseNavigator {
     fun openLoginToHomeScreen(bundle: Bundle? = null)
     fun openHomeToEditProfileScreen(bundle: Bundle? = null)
     fun openHomeToLoginScreen(bundle: Bundle? = null)
+    fun openEditProfileToProfileScreen(bundle: Bundle? = null)
 }

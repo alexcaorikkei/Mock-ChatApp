@@ -1,6 +1,7 @@
 package com.example.baseproject.ui.home.profile
 
 import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.baseproject.R
@@ -20,7 +21,9 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        viewModel.getProfile()
+        if(viewModel.profileResponse.value == null) {
+            viewModel.getProfile()
+        }
     }
 
     override fun bindingStateView() {
@@ -51,11 +54,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
     }
     override fun setOnClick() {
         super.setOnClick()
-        binding.btnEditProfile.setOnClickListener() {
-            appNavigation.openHomeToEditProfileScreen()
-        }
-        binding.llLogout.setOnClickListener() {
-            viewModel.logOut()
+        binding.apply {
+            btnEditProfile.setOnClickListener() {
+                appNavigation.openHomeToEditProfileScreen()
+            }
+            llLogout.setOnClickListener() {
+                viewModel.logOut()
+            }
         }
     }
 }
