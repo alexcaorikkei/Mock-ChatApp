@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentRegisterBinding
 import com.example.baseproject.domain.model.Response
@@ -11,20 +12,26 @@ import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
 import com.example.core.base.fragment.BaseFragment
+import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewModel>(R.layout.fragment_register) {
+class RegisterFragment() :
+    BaseFragment<FragmentRegisterBinding, RegisterViewModel>(R.layout.fragment_register) {
     @Inject
     lateinit var appNavigation: AppNavigation
     private val viewModel: RegisterViewModel by viewModels()
     override fun getVM() = viewModel
+
+    @Inject
+    lateinit var rxPreferences: RxPreferences
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -65,12 +72,17 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                             is FirebaseAuthUserCollisionException -> {
                                 resources.getString(R.string.email_already_exists).toast(requireContext())
                             }
+
                             is IllegalArgumentException -> {
-                                resources.getString(R.string.email_or_password_is_empty).toast(requireContext())
+                                resources.getString(R.string.email_or_password_is_empty)
+                                    .toast(requireContext())
                             }
+
                             is FirebaseNetworkException -> {
-                                resources.getString(R.string.no_internet_connection).toast(requireContext())
+                                resources.getString(R.string.no_internet_connection)
+                                    .toast(requireContext())
                             }
+
                             else -> {
                                 response.e.toString().toast(requireContext())
                             }
@@ -93,6 +105,7 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = false
                         binding.includeProgress.visibility = View.VISIBLE
                     }
+
                     is Response.Success -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
@@ -100,6 +113,7 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = true
                         binding.includeProgress.visibility = View.GONE
                     }
+
                     is Response.Failure -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
@@ -162,6 +176,9 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                     binding.etPassword.text.toString(),
                     binding.etName.text.toString()
                 )
+                lifecycleScope.launch {
+                    rxPreferences.setEmail(binding.etEmail.text.toString())
+                }
             }
 
             btnBack.setOnClickListener {

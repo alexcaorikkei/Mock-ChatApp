@@ -3,6 +3,7 @@ package com.example.baseproject.ui.authentication
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentLoginBinding
 import com.example.baseproject.domain.model.Response
@@ -10,10 +11,14 @@ import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
 import com.example.core.base.fragment.BaseFragment
+import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
@@ -24,6 +29,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
     lateinit var appNavigation: AppNavigation
     private val viewModel: LoginViewModel by viewModels()
     override fun getVM() = viewModel
+    @Inject
+    lateinit var rxPreferences: RxPreferences
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
@@ -33,6 +40,13 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     appNavigation.openLoginToRegisterScreen()
                 })
             )
+        }
+        lifecycleScope.launch {
+            val email = rxPreferences.getEmail()
+            if(email.first() != null) {
+                binding.etEmail.setText(email.first().toString())
+                viewModel.setValidState(isValidEmail = true)
+            }
         }
     }
 
@@ -94,13 +108,16 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                         binding.includeProgress.visibility = View.GONE
                         when(response.e) {
                             is FirebaseAuthInvalidCredentialsException -> {
-                                resources.getString(R.string.email_or_password_is_incorrect).toast(requireContext())
+                                resources.getString(R.string.password_is_incorrect).toast(requireContext())
                             }
                             is IllegalArgumentException -> {
                                 resources.getString(R.string.email_or_password_is_empty).toast(requireContext())
                             }
                             is FirebaseNetworkException -> {
                                 resources.getString(R.string.no_internet_connection).toast(requireContext())
+                            }
+                            is FirebaseAuthInvalidUserException -> {
+                                resources.getString(R.string.email_is_not_registered).toast(requireContext())
                             }
                             else -> {
                                 response.e.toString().toast(requireContext())
@@ -109,6 +126,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     }
                 }
             }
+        }
+        if(viewModel.isLogin) {
+            appNavigation.openLoginToHomeScreen()
         }
     }
 
@@ -119,6 +139,9 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     etEmail.text.toString(),
                     etPassword.text.toString()
                 )
+                lifecycleScope.launch {
+                    rxPreferences.setEmail(binding.etEmail.text.toString())
+                }
             }
         }
     }

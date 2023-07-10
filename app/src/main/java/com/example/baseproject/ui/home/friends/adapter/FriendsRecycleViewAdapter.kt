@@ -39,7 +39,6 @@ class FriendsRecycleViewHolder(var binding: ItemFriendBinding, onItemClickListen
 
 class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
     RecyclerView.ViewHolder(binding.root) {
-
 }
 
 class FriendsRecycleViewAdapter(

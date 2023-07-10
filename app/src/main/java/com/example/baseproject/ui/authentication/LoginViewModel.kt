@@ -37,4 +37,6 @@ class LoginViewModel @Inject constructor(
         _isValidPassword = isValidPassword!!
         _validator.value = _isValidEmail && _isValidPassword
     }
+    val isLogin: Boolean
+        get() = authRepository.isLogin()
 }
