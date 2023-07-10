@@ -56,6 +56,10 @@
             app:popUpToInclusive="true"
             app:popUpTo="@id/homeFragment"
             app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_homeFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+
     </fragment>
 
     <fragment
@@ -63,5 +67,10 @@
         android:name="com.example.baseproject.ui.home.profile.EditProfileFragment"
         tools:layout="@layout/fragment_edit_profile"
         android:label="EditProfileFragment" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.baseproject.ui.home.detailchat.ChatFragment"
+        tools:layout="@layout/fragment_detail_chat"
+        android:label="ChatFragment" />
 
 </navigation>
