@@ -23,11 +23,13 @@ import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewModel>(R.layout.fragment_register) {
+class RegisterFragment() :
+    BaseFragment<FragmentRegisterBinding, RegisterViewModel>(R.layout.fragment_register) {
     @Inject
     lateinit var appNavigation: AppNavigation
     private val viewModel: RegisterViewModel by viewModels()
     override fun getVM() = viewModel
+
     @Inject
     lateinit var rxPreferences: RxPreferences
 
@@ -70,12 +72,17 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                             is FirebaseAuthUserCollisionException -> {
                                 resources.getString(R.string.email_already_exists).toast(requireContext())
                             }
+
                             is IllegalArgumentException -> {
-                                resources.getString(R.string.email_or_password_is_empty).toast(requireContext())
+                                resources.getString(R.string.email_or_password_is_empty)
+                                    .toast(requireContext())
                             }
+
                             is FirebaseNetworkException -> {
-                                resources.getString(R.string.no_internet_connection).toast(requireContext())
+                                resources.getString(R.string.no_internet_connection)
+                                    .toast(requireContext())
                             }
+
                             else -> {
                                 response.e.toString().toast(requireContext())
                             }
@@ -98,6 +105,7 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = false
                         binding.includeProgress.visibility = View.VISIBLE
                     }
+
                     is Response.Success -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
@@ -105,6 +113,7 @@ class RegisterFragment() : BaseFragment<FragmentRegisterBinding, RegisterViewMod
                         binding.etName.isEnabled = true
                         binding.includeProgress.visibility = View.GONE
                     }
+
                     is Response.Failure -> {
                         binding.btnRegister.isEnabled = true
                         binding.etEmail.isEnabled = true
