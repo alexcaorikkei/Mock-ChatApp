@@ -44,8 +44,9 @@ class ChatFragment :
     private lateinit var bottomSheetGalleryBehavior: BottomSheetBehavior<View>
 
     @SuppressLint("NotifyDataSetChanged")
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+
         setEdittextUsableWhenFullScreen()
         setPermission()
         setRecyclerViewChat()
@@ -66,8 +67,8 @@ class ChatFragment :
         bottomSheetGalleryBehavior.peekHeight = peekHeight
     }
 
-    override fun bindingAction() {
-        super.bindingAction()
+    override fun setOnClick() {
+        super.setOnClick()
         binding.ivGalleryBottomSheet.setOnClickListener {
             bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
             binding.coordinatorLayoutGallery.visibility = View.GONE
@@ -104,6 +105,31 @@ class ChatFragment :
                 getTextSend(),
                 "OVC9HAzZmFPmHrfYi7IZNExg8Us2"
             )
+        }
+    }
+
+    override fun bindingStateView() {
+        super.bindingStateView()
+//        viewModel.getListMessage()
+        viewModel.apply {
+            sendChatResponse.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                    }
+
+                    is Response.Success -> {
+                    }
+
+                    is Response.Failure -> {
+                        response.e.toString().toast(requireContext())
+                    }
+                }
+            }
+        }
+
+        viewModel.messageListLiveData.observe(viewLifecycleOwner) {
+            chatAdapter.submitList(it.toMutableList())
+            binding.rvChat.smoothScrollToPosition(it.size)
         }
     }
 
@@ -203,30 +229,6 @@ class ChatFragment :
                     View.VISIBLE
                 else binding.ivSendChatBottomSheet.visibility = View.GONE
             }
-        }
-    }
-
-    override fun bindingStateView() {
-        super.bindingStateView()
-        viewModel.apply {
-            sendChatResponse.observe(viewLifecycleOwner) { response ->
-                when (response) {
-                    is Response.Loading -> {
-                    }
-
-                    is Response.Success -> {
-                    }
-
-                    is Response.Failure -> {
-                        response.e.toString().toast(requireContext())
-                    }
-                }
-            }
-        }
-
-        viewModel.messageListLiveData.observe(viewLifecycleOwner) {
-            chatAdapter.submitList(it.toMutableList())
-            binding.rvChat.smoothScrollToPosition(it.size)
         }
     }
 

@@ -8,16 +8,18 @@ import com.example.baseproject.databinding.ItemPhotoReceiveBinding
 import com.example.baseproject.databinding.ItemPhotoSendBinding
 import com.example.baseproject.extension.*
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.baseproject.databinding.ItemChatDateBinding
 
 enum class ChatAction2(val original: Int) {
     RECEIVE(NO_SEND_TEXT), SEND(SEND_TEXT), RECEIVE_PHOTO(NO_SEND_PHOTOS), SEND_PHOTO(SEND_PHOTOS),
-    SEND_MULTIPHOTO(SEND_MULTIPHOTOS), RECEIVE_MULTIPHOTO(NO_SEND_MULTIPHOTOS)
+    SEND_MULTIPHOTO(SEND_MULTIPHOTOS), RECEIVE_MULTIPHOTO(NO_SEND_MULTIPHOTOS), DATE(6)
 }
 
 class ChatAdapter2(
@@ -33,10 +35,23 @@ class ChatAdapter2(
         super.submitList(result)
     }
 
+    class ItemChatDateVH(private val binding: ItemChatDateBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: Chat) {
+            binding.tvDate.text = convertToDay(item.date)
+        }
+    }
+
     class ItemChatReceiveVH(private val binding: ItemChatReceiveBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Chat) {
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
+            binding.tvItemchatMess.text = item.text
             binding.tvItemchatMess.text = item.text
         }
     }
@@ -45,15 +60,21 @@ class ChatAdapter2(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Chat) {
-           if(item.photoList?.size!! >0){
-               Glide.with(binding.ivItemOnepicture)
-                   .load(item.photoList?.get(0))
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
+
+            if (item.photoList?.size!! > 0) {
+                Glide.with(binding.ivItemOnepicture)
+                    .load(item.photoList[0])
 //                .override(
 //                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
 //                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
 //                )
-                   .into(binding.ivItemOnepicture)
-           }
+                    .into(binding.ivItemOnepicture)
+
+            }
         }
     }
 
@@ -62,6 +83,10 @@ class ChatAdapter2(
 
         fun bind(item: Chat) {
             binding.tvItemSendMess.text = item.text
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
         }
     }
 
@@ -69,6 +94,10 @@ class ChatAdapter2(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: Chat) {
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
             Glide.with(binding.ivItemOnepicture)
                 .load(item.photoList?.get(0))
 //                .override(
@@ -85,6 +114,10 @@ class ChatAdapter2(
         fun bind(item: Chat) {
             val pictureAdapter =
                 PhotoDisplayAdapter(item.photoList ?: listOf())
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
             binding.recycler.apply {
                 adapter = pictureAdapter
 
@@ -109,6 +142,10 @@ class ChatAdapter2(
         fun bind(item: Chat) {
             val pictureAdapter =
                 PhotoDisplayAdapter(item.photoList ?: listOf())
+            binding.tvDate.apply {
+                visibility = View.VISIBLE
+                text = convertToMinuteSecond(item.date)
+            }
             binding.recycler.apply {
                 adapter = pictureAdapter
 
@@ -137,6 +174,16 @@ class ChatAdapter2(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
+            ChatAction2.DATE.original -> {
+                val binding =
+                    ItemChatDateBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                return ItemChatDateVH(binding)
+            }
+
             ChatAction2.RECEIVE.original -> {
                 val binding =
                     ItemChatReceiveBinding.inflate(
@@ -202,6 +249,11 @@ class ChatAdapter2(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val chat = getItem(position)
         when (holder.itemViewType) {
+            ChatAction2.DATE.original -> {
+                val mHolder = holder as ItemChatDateVH
+                mHolder.bind(chat)
+            }
+
             ChatAction2.RECEIVE.original -> {
                 val mHolder = holder as ItemChatReceiveVH
                 mHolder.bind(chat)
@@ -235,6 +287,9 @@ class ChatAdapter2(
     }
 
     override fun getItemViewType(position: Int): Int {
+//        if (getItem(position).date.contains(",")) {
+//            return ChatAction2.DATE.original
+//        }
         if (getItem(position).isSendText == NO_SEND_TEXT) {
             return ChatAction2.RECEIVE.original
         }
