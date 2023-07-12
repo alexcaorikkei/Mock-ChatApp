@@ -42,8 +42,17 @@
     <string name="name_is_empty">Name is empty</string>
     <string name="password_is_empty">Password is empty</string>
     <string name="password_is_to_weak">Password is too weak</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
     <string name="enter_message">Enter message...</string>
+    <string name="a">A</string>
+    <string name="friend_request">Friend Request</string>
+    <string name="friend_added">Friend Added</string>
+    <string name="there_is_no_result">There is no result</string>
+    <string name="friend_request_sent">Friend request was sent</string>
+    <string name="friend_request_accepted">Friend request was accepted</string>
+    <string name="friend_request_canceled">Friend request was canceled</string>
+    <string name="password_is_incorrect">Password is incorrect</string>
+    <string name="email_is_not_registered">Email is not registered</string>
 </resources>

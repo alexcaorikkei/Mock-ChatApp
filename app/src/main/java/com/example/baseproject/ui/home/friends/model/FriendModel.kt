@@ -5,7 +5,6 @@ enum class FriendState {
     ADDED,
     REQUEST,
     NONE;
-
     override fun toString(): String {
         return when(this) {
             FRIEND -> "friends"

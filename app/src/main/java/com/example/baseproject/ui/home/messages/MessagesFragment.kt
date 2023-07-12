@@ -1,6 +1,7 @@
 package com.example.baseproject.ui.home.messages
 
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentMessagesBinding
 import com.example.baseproject.navigation.AppNavigation

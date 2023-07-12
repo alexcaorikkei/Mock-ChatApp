@@ -2,6 +2,7 @@ package com.example.baseproject.data
 
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.AuthRepository
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
@@ -128,5 +129,9 @@ class AuthRepositoryImpl : AuthRepository {
         } catch (e: Exception) {
             Response.Failure(e)
         }
+    }
+
+    override fun isLogin(): Boolean {
+        return auth.currentUser != null
     }
 }

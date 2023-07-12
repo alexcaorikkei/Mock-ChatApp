@@ -3,6 +3,7 @@ package com.example.baseproject.ui.home.friends.adapter
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.baseproject.ui.home.friends.ListFriendsFragment
+import com.example.baseproject.ui.home.friends.model.FriendState
 
 class FriendsNavigationAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {
@@ -10,6 +11,11 @@ class FriendsNavigationAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
     }
 
     override fun createFragment(position: Int): Fragment {
-        return ListFriendsFragment(position)
+        val states = when(position) {
+            0 -> listOf(FriendState.FRIEND)
+            1 -> listOf(FriendState.NONE, FriendState.ADDED, FriendState.REQUEST, FriendState.FRIEND)
+            else -> listOf(FriendState.REQUEST, FriendState.ADDED)
+        }
+        return ListFriendsFragment(states)
     }
 }
