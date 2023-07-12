@@ -1,5 +1,6 @@
 package com.example.baseproject.ui.home.profile
 
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -37,10 +38,10 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(user: UserModel) {
+    fun updateProfile(user: UserModel, profilePictureUri: Uri?) {
         viewModelScope.launch {
-            profileRepository.updateProfile(user)
             _profileResponse.value = Response.Loading
+            profileRepository.updateProfile(user, profilePictureUri)
             _profileResponse.value = profileRepository.getProfile()
         }
     }
