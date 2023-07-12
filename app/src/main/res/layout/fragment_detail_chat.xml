@@ -46,18 +46,20 @@
             android:layout_height="42dp"
             android:layout_marginStart="12dp"
             android:layout_marginBottom="6dp"
+            app:cardCornerRadius="50dp"
             app:layout_constraintBottom_toBottomOf="@id/tvInfor"
             app:layout_constraintStart_toEndOf="@id/ivBack">
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivAvatar"
+                android:id="@+id/ivAvatarReceiver"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:scaleType="centerCrop"
                 android:src="@drawable/ic_avatar_unknown" />
         </androidx.cardview.widget.CardView>
 
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvUserReceive"
+            android:id="@+id/tvNameReceiver"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="13dp"
@@ -76,7 +78,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/white"
-            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/coordinatorLayoutGallery"
             app:layout_constraintStart_toStartOf="parent">
 
             <androidx.appcompat.widget.AppCompatImageView
@@ -96,13 +98,11 @@
                 android:layout_marginHorizontal="10dp"
                 android:layout_marginVertical="5dp"
                 android:background="@drawable/edt_chat"
-                android:drawableEnd="@drawable/ic_smile"
                 android:hint="@string/enter_message"
                 android:lineHeight="19dp"
                 android:maxLines="3"
                 android:paddingHorizontal="20dp"
                 android:paddingVertical="16dp"
-                android:singleLine="false"
                 android:textColor="@color/black"
                 android:textFontWeight="500"
                 android:textSize="16sp"
@@ -111,11 +111,45 @@
                 app:layout_constraintStart_toEndOf="@id/ivGallery" />
 
             <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="15dp"
+                android:background="@drawable/ic_smile_no_click"
+                app:layout_constraintBottom_toBottomOf="@id/edtChat"
+                app:layout_constraintEnd_toStartOf="@id/ivSendChat"
+                app:layout_constraintTop_toTopOf="@id/edtChat" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSendGallery"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="10dp"
+                android:paddingHorizontal="5dp"
+                android:src="@drawable/ic_send"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edtChat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChat" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/ivSendEmoji"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginEnd="10dp"
+                android:paddingHorizontal="5dp"
+                android:src="@drawable/ic_send"
+                android:visibility="gone"
+                app:layout_constraintBottom_toBottomOf="@id/edtChat"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@id/edtChat" />
+
+            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivSendChat"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
-                android:layout_marginEnd="12dp"
-                android:paddingHorizontal="15dp"
+                android:layout_marginEnd="10dp"
+                android:paddingHorizontal="5dp"
                 android:src="@drawable/ic_send"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="@id/edtChat"
@@ -123,95 +157,54 @@
                 app:layout_constraintTop_toTopOf="@id/edtChat" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/clChatSendBottomSheet"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="300dp"
-            android:background="@color/white"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivGalleryBottomSheet"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginStart="14dp"
-                android:paddingHorizontal="15dp"
-                android:src="@drawable/ic_gallery_clicked"
-                app:layout_constraintBottom_toBottomOf="@id/edtChatBottomSheet"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="@id/edtChatBottomSheet" />
-
-            <androidx.appcompat.widget.AppCompatEditText
-                android:id="@+id/edtChatBottomSheet"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="10dp"
-                android:layout_marginVertical="5dp"
-                android:background="@drawable/edt_chat"
-                android:drawableEnd="@drawable/ic_smile"
-                android:enabled="false"
-                android:hint="@string/enter_message"
-                android:lineHeight="19dp"
-                android:maxLines="3"
-                android:paddingHorizontal="20dp"
-                android:paddingVertical="16dp"
-                android:singleLine="false"
-                android:textColor="@color/black"
-                android:textFontWeight="500"
-                android:textSize="16sp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/ivSendChatBottomSheet"
-                app:layout_constraintStart_toEndOf="@id/ivGalleryBottomSheet" />
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivSendChatBottomSheet"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginEnd="12dp"
-                android:paddingHorizontal="15dp"
-                android:src="@drawable/ic_send"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/edtChatBottomSheet"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/edtChatBottomSheet" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_horizontal_0_6"
-            android:layout_width="@dimen/_1dp"
-            android:layout_height="match_parent"
-            android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.6" />
-
         <androidx.coordinatorlayout.widget.CoordinatorLayout
             android:id="@+id/coordinatorLayoutGallery"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
+            android:layout_height="200dp"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/guideline_horizontal_0_6">
+            app:layout_constraintBottom_toBottomOf="parent">
 
             <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/clBottomSheet"
+                android:id="@+id/clBottomSheetGallery"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:behavior_hideable="true"
                 app:layout_behavior="@string/bottom_sheet_behavior">
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/rvPhotoList"
+                    android:id="@+id/rvGallery"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@color/white"
                     android:paddingTop="3dp"
-                    tools:layout_editor_absoluteX="16dp"
-                    tools:layout_editor_absoluteY="-182dp"
                     tools:listitem="@layout/item_photo" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/coordinatorLayoutEmoji"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clBottomSheetEmoji"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:behavior_hideable="true"
+                app:layout_behavior="@string/bottom_sheet_behavior">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvEmojiList"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/white"
+                    android:paddingTop="3dp"
+                    tools:listitem="@layout/item_photo" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

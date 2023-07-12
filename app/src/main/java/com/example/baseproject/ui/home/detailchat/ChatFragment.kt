@@ -3,16 +3,18 @@ package com.example.baseproject.ui.home.detailchat
 import android.Manifest
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
@@ -37,80 +39,87 @@ class ChatFragment :
     private val viewModel: ChatViewModel by viewModels()
     override fun getVM() = viewModel
 
-    private lateinit var photoAdapter: PhotoAdapter
-    private lateinit var chatAdapter: ChatAdapter2
-    var photoListClicked = ArrayList<Photo>()
-
     private lateinit var bottomSheetGalleryBehavior: BottomSheetBehavior<View>
+    private lateinit var bottomSheetEmojiBehavior: BottomSheetBehavior<View>
+
+    private lateinit var photoAdapter: PhotoAdapter
+    private lateinit var emojiAdapter: PhotoAdapter
+    private lateinit var chatAdapter: ChatAdapter2
+
+    private var photoListClicked = ArrayList<Photo>()
+    private var emojiListClicked = ArrayList<Photo>()
+
+    private var isOpenGallery = true
+    private var isOpenEmoji = true
 
     @SuppressLint("NotifyDataSetChanged")
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
 
+        setUpViewReceiver()
         setEdittextUsableWhenFullScreen()
-        setPermission()
         setRecyclerViewChat()
-        binding.edtChat.validate { textInputUser ->
-            if (textInputUser.isNullOrBlank()) {
-                binding.ivSendChat.visibility = View.GONE
-            } else {
-                binding.ivSendChat.visibility = View.VISIBLE
-            }
-        }
-
-        bottomSheetGalleryBehavior = BottomSheetBehavior.from(binding.clBottomSheet)
-
-        val displayMetrics = DisplayMetrics()
-        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
-        val peekHeight = displayMetrics.heightPixels * 2 / 5
-
-        bottomSheetGalleryBehavior.peekHeight = peekHeight
+        listenEdittextChat()
+        setUpBottomSheetGalleryAndEmoji()
     }
 
     override fun setOnClick() {
         super.setOnClick()
-        binding.ivGalleryBottomSheet.setOnClickListener {
-            bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            binding.coordinatorLayoutGallery.visibility = View.GONE
-            binding.clChatSendBottomSheet.visibility = View.GONE
-            binding.clChatSend.visibility = View.VISIBLE
-        }
 
-        binding.ivGallery.setOnClickListener {
-            photoListClicked.clear()
-            openGallery()
-            bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-            bottomSheetGalleryBehavior.isHideable = false
-            binding.coordinatorLayoutGallery.visibility = View.VISIBLE
-            binding.clChatSendBottomSheet.visibility = View.VISIBLE
-            binding.clChatSend.visibility = View.GONE
-        }
+        binding.apply {
+            ivBack.setOnClickListener {
+                appNavigation.navigateUp()
+            }
 
-        binding.ivBack.setOnClickListener {
-            appNavigation.navigateUp()
-        }
+            ivGallery.setOnClickListener {
+                coordinatorLayoutEmoji.gone()
+                hideKeyboard()
+                ivGallery.setImageResource(R.drawable.ic_gallery_clicked)
 
-        binding.ivSendChatBottomSheet.setOnClickListener {
-            binding.coordinatorLayoutGallery.visibility = View.GONE
-            binding.clChatSendBottomSheet.visibility = View.GONE
-            binding.clChatSend.visibility = View.VISIBLE
-            bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                if (!isOpenEmoji) closeEmoji()
+                if (isOpenGallery) openGallery() else closeGallery()
+            }
+
+            ivSendGallery.setOnClickListener {
+                bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                coordinatorLayoutGallery.gone()
+                ivSendGallery.gone()
+                edtChat.isEnabled = true
                 getListPhotoClicked()
             }
-        }
 
-        binding.ivSendChat.setOnClickListener {
-            viewModel.sendMessage(
-                getTextSend(),
-                "OVC9HAzZmFPmHrfYi7IZNExg8Us2"
-            )
+            ivEmoji.setOnClickListener {
+                hideKeyboard()
+                ivEmoji.setImageResource(R.drawable.ic_smile_clicked)
+
+                if (!isOpenGallery) closeGallery()
+                if (isOpenEmoji) openEmoji() else closeEmoji()
+            }
+
+            ivSendEmoji.setOnClickListener {
+                bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                coordinatorLayoutEmoji.gone()
+                coordinatorLayoutGallery.gone()
+                ivSendEmoji.gone()
+                edtChat.isEnabled = true
+                getListEmojiClicked()
+            }
+
+            ivSendChat.setOnClickListener {
+                viewModel.sendMessage(
+                    getTextSend(),
+                    ID_RECEIVE_N
+                )
+            }
         }
     }
 
     override fun bindingStateView() {
         super.bindingStateView()
-//        viewModel.getListMessage()
+        viewModel.getListMessage()
+        viewModel.uid.observe(viewLifecycleOwner) {
+            chatAdapter.setUid(it)
+        }
         viewModel.apply {
             sendChatResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
@@ -133,101 +142,186 @@ class ChatFragment :
         }
     }
 
-    private fun setEdittextUsableWhenFullScreen() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.viewChatParent) { v, insets ->
-            val animator =
-                ValueAnimator.ofInt(0, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
-            animator.addUpdateListener { valueAnimator ->
-                v.setPadding(0, 0, 0, valueAnimator.animatedValue as? Int ?: 0)
-            }
-            animator.duration = 200
-            animator.start()
-            insets
-        }
-    }
-
     private fun getListPhotoClicked() {
-        val photoList: ArrayList<Uri> = ArrayList()
-        if (photoListClicked.size > 1) {
-            photoListClicked.forEach {
-                photoList.add(it.uri)
+        val myChat = viewModel.uid.value?.let {
+            Chat(
+                FirebaseDatabase.getInstance().reference.push().key.toString(),
+                it,
+                getTimeCurrent(),
+                photoListClicked[0].uri.toString(),
+            )
+        }
+        viewModel.sendPhoto(myChat!!, ID_RECEIVE_N)
+        binding.ivSendChat.gone()
+        binding.ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
+        isOpenGallery = !isOpenGallery
+    }
+
+    private fun getListEmojiClicked() {
+        val myChat = viewModel.uid.value?.let {
+            Chat(
+                FirebaseDatabase.getInstance().reference.push().key.toString(),
+                it,
+                getTimeCurrent(),
+                emojiListClicked[0].uri.toString(),
+            )
+        }
+        viewModel.sendPhoto(myChat!!, ID_RECEIVE_N)
+        binding.ivSendChat.gone()
+        binding.ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
+        isOpenEmoji = !isOpenEmoji
+    }
+
+    private fun closeEmoji() {
+        bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        binding.apply {
+            coordinatorLayoutEmoji.gone()
+            coordinatorLayoutGallery.gone()
+            ivSendEmoji.gone()
+            ivSendChat.gone()
+            edtChat.isEnabled = true
+            ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
+        }
+        isOpenEmoji = !isOpenEmoji
+    }
+
+    private fun openEmoji() {
+        bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetGalleryBehavior.isHideable = false
+        binding.apply {
+            coordinatorLayoutGallery.invisible()
+            coordinatorLayoutEmoji.visible()
+            ivSendChat.gone()
+            edtChat.isEnabled = false
+        }
+        isOpenEmoji = !isOpenEmoji
+        loadEmoji()
+    }
+
+    private fun loadEmoji() {
+        emojiListClicked.clear()
+
+        binding.apply {
+            val layoutManager = GridLayoutManager(requireActivity(), 3)
+            rvEmojiList.layoutManager = layoutManager
+
+            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
+            rvEmojiList.addItemDecoration(divider)
+
+            val emojiStringList = ArrayList<String>()
+            emojiStringList.addAll(emojiList)
+
+            val emojiObjectList = ArrayList<Photo>()
+            emojiStringList.forEach {
+                emojiObjectList.add(Photo(it.toUri(), false))
             }
-            val myChat = Chat(
-                FirebaseDatabase.getInstance().reference.push().key.toString(),
-                null,
-                null,
-                SEND_PHOTOS,
-                getTimeCurrent(),
-                null,
-                photoList
-            )
-            viewModel.sendPhoto(myChat, "OVC9HAzZmFPmHrfYi7IZNExg8Us2")
+            emojiAdapter = PhotoAdapter(requireActivity(), emojiObjectList)
+            rvEmojiList.adapter = emojiAdapter
+            emojiAdapter.notifyDataSetChanged()
 
-        } else if (photoListClicked.size == 1) {
-            photoList.add(photoListClicked[0].uri)
-            val myChat = Chat(
-                FirebaseDatabase.getInstance().reference.push().key.toString(),
-                null,
-                SEND_PHOTOS,
-                null,
-                getTimeCurrent(),
-                null,
-                photoList
-            )
-            viewModel.sendPhoto(myChat, "OVC9HAzZmFPmHrfYi7IZNExg8Us2")
-
+            emojiAdapter.onClickListener = object : OnPhotoAdapterListener {
+                override fun pickPhoto(position: Int) {
+                    val emoji = emojiObjectList[position]
+                    val isClicked = emoji.isClicked
+                    if (isClicked) {
+                        emoji.isClicked = false
+                        emojiListClicked.remove(emoji)
+                    }
+                    if (!isClicked) {
+                        emoji.isClicked = true
+                        emojiListClicked.add(emoji)
+                    }
+                    emojiAdapter.notifyItemChanged(position)
+                    if (emojiListClicked.size > 0) {
+                        ivSendEmoji.visible()
+                        ivSendChat.invisible()
+                    } else {
+                        ivSendEmoji.gone()
+                        ivSendChat.gone()
+                    }                }
+            }
         }
     }
 
-    private fun setRecyclerViewChat() {
-        binding.rvChat.apply {
-            chatAdapter = ChatAdapter2()
-            adapter = chatAdapter
+    private fun closeGallery() {
+        bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        binding.apply {
+            coordinatorLayoutGallery.gone()
+            ivSendGallery.gone()
+            ivSendChat.gone()
+            edtChat.isEnabled = true
+            ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
         }
+        isOpenGallery = !isOpenGallery
     }
 
-    private fun setPermission() {
-        if (ActivityCompat.checkSelfPermission(
-                requireActivity(), Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED
+    private fun openGallery() {
+        bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+        bottomSheetGalleryBehavior.isHideable = false
+        binding.apply {
+            coordinatorLayoutGallery.visible()
+            ivSendChat.gone()
+            edtChat.isEnabled = false
+        }
+        isOpenGallery = !isOpenGallery
+        checkPermission()
+    }
+
+    private fun checkPermission() {
+        if (context?.let {
+                ContextCompat.checkSelfPermission(it, Manifest.permission.READ_EXTERNAL_STORAGE)
+            } != PackageManager.PERMISSION_GRANTED
         ) {
-            requestPermissions(arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE), 123)
+            ActivityCompat.requestPermissions(
+                (context as Activity?)!!,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                123
+            )
+        } else {
+            loadGallery()
         }
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    private fun openGallery() {
-        val layoutManager = GridLayoutManager(requireActivity(), 3)
-        binding.rvPhotoList.layoutManager = layoutManager
+    private fun loadGallery() {
+        photoListClicked.clear()
+        binding.apply {
+            val layoutManager = GridLayoutManager(requireActivity(), 3)
+            rvGallery.layoutManager = layoutManager
 
-        val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
-        binding.rvPhotoList.addItemDecoration(divider)
+            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
+            rvGallery.addItemDecoration(divider)
 
-        val gallery = getAllImagesFromDevice(requireContext())
-        val photoList = ArrayList<Photo>()
-        for (photo in gallery) {
-            photoList.add(Photo(photo, false))
-        }
-        photoAdapter = PhotoAdapter(requireActivity(), photoList)
-        binding.rvPhotoList.adapter = photoAdapter
-        photoAdapter.notifyDataSetChanged()
+            val gallery = getAllImagesFromDevice(requireContext())
+            val photoList = ArrayList<Photo>()
+            for (photo in gallery) {
+                photoList.add(Photo(photo, false))
+            }
+            photoAdapter = PhotoAdapter(requireActivity(), photoList)
+            rvGallery.adapter = photoAdapter
+            photoAdapter.notifyDataSetChanged()
 
-        photoAdapter.onClickListener = object : OnPhotoAdapterListener {
-            override fun pickPhoto(position: Int) {
-                val photo = photoList[position]
-                val checkPhotoClicked = photo.isClicked
-                if (checkPhotoClicked) {
-                    photo.isClicked = false
-                    photoListClicked.remove(photo)
+            photoAdapter.onClickListener = object : OnPhotoAdapterListener {
+                override fun pickPhoto(position: Int) {
+                    val photo = photoList[position]
+                    val checkPhotoClicked = photo.isClicked
+                    if (checkPhotoClicked) {
+                        photo.isClicked = false
+                        photoListClicked.remove(photo)
+                    }
+                    if (!checkPhotoClicked) {
+                        photo.isClicked = true
+                        photoListClicked.add(photo)
+                    }
+                    photoAdapter.notifyItemChanged(position)
+                    if (photoListClicked.size > 0) {
+                        ivSendGallery.visible()
+                        ivSendChat.invisible()
+                    } else {
+                        ivSendGallery.gone()
+                        ivSendChat.gone()
+                    }
                 }
-                if (!checkPhotoClicked) {
-                    photo.isClicked = true
-                    photoListClicked.add(photo)
-                }
-                photoAdapter.notifyItemChanged(position)
-                if (photoListClicked.size > 0) binding.ivSendChatBottomSheet.visibility =
-                    View.VISIBLE
-                else binding.ivSendChatBottomSheet.visibility = View.GONE
             }
         }
     }
@@ -259,13 +353,67 @@ class ChatFragment :
     private fun getTextSend(): Chat {
         val textSendUser = binding.edtChat.text?.trim().toString()
         binding.edtChat.text?.clear()
-        return Chat(
-            FirebaseDatabase.getInstance().reference.push().key.toString(),
-            SEND_TEXT,
-            null,
-            null,
-            getTimeCurrent(),
-            textSendUser
-        )
+        val myChat = viewModel.uid.value?.let {
+            Chat(
+                FirebaseDatabase.getInstance().reference.push().key.toString(),
+                it,
+                getTimeCurrent(),
+                textSendUser
+            )
+        }
+        return myChat!!
+    }
+
+    private fun setUpBottomSheetGalleryAndEmoji() {
+        binding.apply {
+            bottomSheetGalleryBehavior = BottomSheetBehavior.from(clBottomSheetGallery)
+            bottomSheetEmojiBehavior = BottomSheetBehavior.from(clBottomSheetEmoji)
+        }
+        val displayMetrics = DisplayMetrics()
+        requireActivity().windowManager.defaultDisplay.getMetrics(displayMetrics)
+        val peekHeightBottomSheet = displayMetrics.heightPixels * 2 / 5
+
+        bottomSheetGalleryBehavior.peekHeight = peekHeightBottomSheet
+        bottomSheetEmojiBehavior.peekHeight = peekHeightBottomSheet
+
+    }
+
+    private fun listenEdittextChat() {
+        binding.apply {
+            edtChat.validate { textInputUser ->
+                if (textInputUser.isNullOrBlank()) {
+                    ivSendChat.gone()
+                } else {
+                    ivSendChat.visible()
+                }
+            }
+        }
+    }
+
+    private fun setEdittextUsableWhenFullScreen() {
+        ViewCompat.setOnApplyWindowInsetsListener(binding.viewChatParent) { v, insets ->
+            val animator =
+                ValueAnimator.ofInt(0, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
+            animator.addUpdateListener { valueAnimator ->
+                v.setPadding(0, 0, 0, valueAnimator.animatedValue as? Int ?: 0)
+            }
+            animator.duration = 200
+            animator.start()
+            insets
+        }
+    }
+
+    private fun setRecyclerViewChat() {
+        binding.rvChat.apply {
+            chatAdapter = ChatAdapter2()
+            adapter = chatAdapter
+        }
+    }
+
+    private fun setUpViewReceiver() {
+//        binding.tvNameReceiver.text =
+//        Glide.with(binding.ivAvatarReceiver)
+//            .load(item)
+//            .into(binding.ivAvatarReceiver)
     }
 }

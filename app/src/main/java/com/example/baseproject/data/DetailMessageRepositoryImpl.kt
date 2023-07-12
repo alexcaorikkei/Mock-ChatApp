@@ -1,5 +1,6 @@
 package com.example.baseproject.data
 
+import androidx.core.net.toUri
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.DetailMessageRepository
 import com.example.baseproject.extension.*
@@ -19,7 +20,7 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
         idReceive: String
     ): Response<Boolean> {
         database.reference.child("room")
-            .child(auth.currentUser?.uid + idReceive)
+            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
             .child(chat.id).setValue(chat)
 
         return try {
@@ -33,22 +34,21 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
         chat: Chat,
         idReceive: String
     ): Response<Boolean> {
-        chat.photoList?.forEach {
-            storage.reference.child("images/" + it.lastPathSegment)
-                .putFile(it)
+        chat.description?.let {
+            storage.reference.child("images/" + it.toUri().lastPathSegment)
+                .putFile(it.toUri())
                 .addOnSuccessListener { task ->
                     task.storage.downloadUrl.addOnSuccessListener { uri ->
-                        val myChat = Chat(
-                            database.reference.push().key.toString(),
-                            null,
-                            SEND_PHOTOS,
-                            null,
-                            getTimeCurrent(),
-                            uri.toString(),
-                            null
-                        )
+                        val myChat = auth.uid?.let { it1 ->
+                            Chat(
+                                database.reference.push().key.toString(),
+                                it1,
+                                getTimeCurrent(),
+                                uri.toString()
+                            )
+                        }
                         database.reference.child("room")
-                            .child(auth.currentUser?.uid + idReceive)
+                            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
                             .child(chat.id).setValue(myChat)
                     }
                 }
