@@ -2,8 +2,10 @@ package com.example.baseproject.ui.home.profile
 
 import android.os.Bundle
 import android.view.View
+import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentProfileBinding
 import com.example.baseproject.domain.model.Response
@@ -35,6 +37,11 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                 is Response.Success -> {
                     binding.tvName.text = response.data.displayName
                     binding.tvEmail.text = response.data.email
+                    if(response.data.profilePicture.isNotEmpty()) {
+                        Glide.with(requireContext())
+                            .load(response.data.profilePicture.toUri())
+                            .into(binding.ivProfile);
+                    }
                 }
             }
         }
