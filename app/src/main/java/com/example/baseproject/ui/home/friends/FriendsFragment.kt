@@ -29,10 +29,9 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
         binding.friendsViewPager.adapter = FriendsNavigationAdapter(this)
         TabLayoutMediator(binding.friendsNav, binding.friendsViewPager) { tab, position ->
             tab.text = when(position) {
-                0 -> "Friends"
-                1 -> "All"
-                2 -> "Requests"
-                else -> "Friends"
+                0 -> getString(R.string.friends)
+                1 -> getString(R.string.all)
+                else -> getString(R.string.request)
             }
         }.attach()
         viewModel.searchAllUserWithCurrentAccount("")
