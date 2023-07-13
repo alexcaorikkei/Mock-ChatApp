@@ -62,5 +62,5 @@
     <string name="choose_from_gallery">Chọn ảnh từ thư viện</string>
     <string name="english">Tiếng Anh</string>
     <string name="vietnamese">Tiếng Việt</string>
-    <string name="change_language_toast">Please restart app to apply change language</string>
+    <string name="change_language_toast">Vui lòng khởi động lại để hoàn tất thay đổi</string>
 </resources>
