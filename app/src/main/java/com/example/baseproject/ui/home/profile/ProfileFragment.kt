@@ -14,6 +14,7 @@ import com.example.core.pref.RxPreferences
 import com.example.core.utils.setLanguage
 import com.example.core.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,6 +31,16 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
         super.initView(savedInstanceState)
         if(viewModel.profileResponse.value == null) {
             viewModel.getProfile()
+        }
+        lifecycleScope.launch {
+            when(rxPreferences.getLanguage().first()) {
+                "en" -> {
+                    binding.tvLanguage.text = getString(R.string.english)
+                }
+                "vi" -> {
+                    binding.tvLanguage.text = getString(R.string.vietnamese)
+                }
+            }
         }
     }
 
