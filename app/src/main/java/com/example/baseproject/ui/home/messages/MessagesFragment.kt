@@ -1,9 +1,11 @@
 package com.example.baseproject.ui.home.messages
 
+import android.os.Bundle
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentMessagesBinding
+import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.messages.adapter.MessageAdapter
 import com.example.core.base.fragment.BaseFragment
@@ -17,31 +19,41 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
     private val viewModel: MessagesViewModel by viewModels()
     override fun getVM() = viewModel
 
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        if(savedInstanceState == null) {
+            viewModel.searchMessages("")
+        }
+    }
+
     override fun bindingStateView() {
         super.bindingStateView()
+        binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMessages.adapter = MessageAdapter(listOf())
+        viewModel.searchResponse.observe(viewLifecycleOwner) { listMessages ->
+            when(listMessages) {
+                is Response.Failure -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+                is Response.Loading -> {
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
+                is Response.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    binding.rvMessages.adapter = MessageAdapter(listMessages.data)
+                }
+
+            }
+        }
+    }
+
+    override fun setOnClick() {
+        super.setOnClick()
         binding.tvTitle.setOnClickListener {
             appNavigation.openHomeToChatScreen()
         }
-        binding.rvMessages.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(requireContext())
-        binding.rvMessages.adapter = MessageAdapter(listOf(
-            MessageModel(1, "Nguyen Van A", "Hello", "10:00", "", false),
-            MessageModel(2, "Nguyen Van B", "Hello", "10:00", "", true),
-            MessageModel(3, "Nguyen Van C", "Hello", "10:00", "", true),
-            MessageModel(4, "Nguyen Van D", "Hello", "10:00", "", false),
-            MessageModel(5, "Nguyen Van E", "Hello", "10:00", "", false),
-            MessageModel(6, "Nguyen Van F", "Hello", "10:00", "", true),
-            MessageModel(7, "Nguyen Van G", "Hello", "10:00", "", false),
-            MessageModel(8, "Nguyen Van H", "Hello", "10:00", "", true),
-            MessageModel(9, "Nguyen Van I", "Hello", "10:00", "", false),
-            MessageModel(10, "Nguyen Van J", "Hello", "10:00", "", true),
-            MessageModel(11, "Nguyen Van K", "Hello", "10:00", "", false),
-            MessageModel(12, "Nguyen Van L", "Hello", "10:00", "", true),
-            MessageModel(7, "Nguyen Van G", "Hello", "10:00", "", false),
-            MessageModel(8, "Nguyen Van H", "Hello", "10:00", "", true),
-            MessageModel(9, "Nguyen Van I", "Hello", "10:00", "", false),
-            MessageModel(10, "Nguyen Van J", "Hello", "10:00", "", true),
-            MessageModel(11, "Nguyen Van K", "Hello", "10:00", "", false),
-            MessageModel(12, "Nguyen Van L", "Hello", "10:00", "", true),
-        ))
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.searchMessages("")
+        }
     }
 }
