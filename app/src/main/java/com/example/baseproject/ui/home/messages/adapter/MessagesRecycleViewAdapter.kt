@@ -32,6 +32,11 @@ class MessageAdapter(private val listMessages: List<MessageModel>): RecyclerView
             } else {
                 tvMessage.setTextColor(tvMessage.context.getColor(android.R.color.black))
             }
+            if(position == listMessages.lastIndex) {
+                holder.binding.ivLine.visibility = android.view.View.GONE
+            } else {
+                holder.binding.ivLine.visibility = android.view.View.VISIBLE
+            }
         }
     }
 }
