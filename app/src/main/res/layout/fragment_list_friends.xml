@@ -1,44 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
-    <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_width="match_parent"
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/swipe_refresh_layout"
         android:layout_height="match_parent"
-        tools:context=".ui.home.friends.ListFriendsFragment">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_friends"
+        android:layout_width="match_parent">
+        <FrameLayout xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            tools:context=".ui.home.friends.ListFriendsFragment">
 
-        <include
-        android:id="@+id/include_progress"
-        layout="@layout/progress_friends" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_friends"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"/>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/empty_result"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_gravity="center">
-            <androidx.appcompat.widget.AppCompatImageView
-                android:layout_width="wrap_content"
+            <include
+                android:id="@+id/include_progress"
+                layout="@layout/progress_friends" />
+
+            <androidx.appcompat.widget.LinearLayoutCompat
+                android:id="@+id/empty_result"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/ic_search_empty"
-                android:layout_gravity="center"/>
-            <androidx.appcompat.widget.AppCompatTextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/there_is_no_result"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:layout_gravity="center"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_gravity="center">
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/ic_search_empty"
+                    android:layout_gravity="center"/>
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/there_is_no_result"
+                    android:textColor="@color/black"
+                    android:textSize="16sp"
+                    android:layout_gravity="center"/>
+            </androidx.appcompat.widget.LinearLayoutCompat>
 
-        <include
-            android:id="@+id/progress_circular"
-            layout="@layout/progress_layout" />
-    </FrameLayout>
+            <include
+                android:id="@+id/progress_circular"
+                layout="@layout/progress_layout" />
+        </FrameLayout>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </layout>
