@@ -20,8 +20,8 @@
                 android:layout_marginStart="25dp"
                 android:layout_marginTop="81dp"
                 android:background="@drawable/ic_logo"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_login"
@@ -33,8 +33,8 @@
                 android:textColor="@color/primary"
                 android:textSize="32sp"
                 android:textStyle="bold"
-                app:layout_constraintTop_toBottomOf="@id/iv_logo"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/iv_logo" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_email"
@@ -45,8 +45,8 @@
                 android:text="@string/email"
                 android:textColor="#999999"
                 android:textSize="14sp"
-                app:layout_constraintTop_toBottomOf="@id/tv_login"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_login" />
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/et_email"
@@ -57,11 +57,11 @@
                 android:drawableEnd="@drawable/ic_mail"
                 android:inputType="textEmailAddress"
                 android:maxLines="1"
+                android:text="ngoc@gmail.com"
                 android:textColor="@color/black"
                 android:textColorHint="#676767"
                 android:textSize="18sp"
-                app:layout_constraintTop_toBottomOf="@id/tv_email"
-                />
+                app:layout_constraintTop_toBottomOf="@id/tv_email" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_password"
@@ -72,8 +72,8 @@
                 android:text="@string/password"
                 android:textColor="#999999"
                 android:textSize="14sp"
-                app:layout_constraintTop_toBottomOf="@id/et_email"
-                app:layout_constraintStart_toStartOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/et_email" />
 
             <androidx.appcompat.widget.AppCompatEditText
                 android:id="@+id/et_password"
@@ -84,10 +84,11 @@
                 android:drawableEnd="@drawable/ic_password"
                 android:inputType="textPassword"
                 android:maxLines="1"
+                android:text="123456"
                 android:textColor="@color/black"
                 android:textColorHint="#676767"
                 android:textSize="18sp"
-                app:layout_constraintTop_toBottomOf="@id/tv_password"/>
+                app:layout_constraintTop_toBottomOf="@id/tv_password" />
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btn_login"
@@ -100,7 +101,7 @@
                 android:paddingVertical="16dp"
                 android:text="@string/login"
                 android:textColor="@color/white"
-                app:layout_constraintTop_toBottomOf="@id/et_password"/>
+                app:layout_constraintTop_toBottomOf="@id/et_password" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_title_no_account"
@@ -112,8 +113,8 @@
                 android:textColor="#999999"
                 android:textSize="14sp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <include
                 android:id="@+id/include_progress"

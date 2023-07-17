@@ -8,6 +8,7 @@ import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentListFriendsBinding
 import com.example.baseproject.databinding.ItemFriendBinding
 import com.example.baseproject.domain.model.Response
+import com.example.baseproject.extension.KEY_ID_RECEIVER
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.friends.adapter.FriendsRecycleViewAdapter
 import com.example.baseproject.ui.home.friends.adapter.OnItemClickListener
@@ -116,7 +117,9 @@ class ListFriendsFragment(private var states: List<FriendState>) :
     }
 
     override fun onItemClicked(position: Int, view: ItemFriendBinding) {
-        "onItemClicked: $position".toast(requireContext())
+        val bundle = Bundle()
+        bundle.putString(KEY_ID_RECEIVER, listFriendItemModel[position].friendModel!!.uid)
+        appNavigation.openHomeToChatScreen(bundle)
     }
 
     override fun onAcceptClicked(position: Int, view: ItemFriendBinding) {

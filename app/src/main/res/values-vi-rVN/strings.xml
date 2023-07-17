@@ -44,6 +44,7 @@
     <string name="password_is_empty">Mật khẩu không được để trống</string>
     <string name="password_is_to_weak">Mật khẩu quá yếu</string>
     <string name="ok">Ok</string>
+    <string name="enter_message">Nhập tin nhắn...</string>
     <string name="accept">Chấp nhận</string>
     <string name="cancel">Hủy</string>
     <string name="a">a</string>

@@ -43,6 +43,16 @@ enum class MessageType {
         get() {
             return this.name.lowercase()
         }
+//    val viewType: Int
+//        get() {
+//            return when (this) {
+//                NONE -> 1
+//                TEXT -> 2
+//                PHOTO -> 3
+//                EMOJI -> 4
+//                DATE -> 5
+//            }
+//        }
 }
 data class ChatModel(
     val id: String,

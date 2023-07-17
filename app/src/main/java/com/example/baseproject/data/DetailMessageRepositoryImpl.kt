@@ -1,12 +1,19 @@
 package com.example.baseproject.data
 
+import androidx.core.net.toUri
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.DetailMessageRepository
 import com.example.baseproject.extension.*
-import com.example.baseproject.ui.home.detailchat.Chat
+import com.example.baseproject.domain.model.ChatModel
+import com.example.baseproject.domain.model.FriendModel
+import com.example.baseproject.domain.model.MessageType
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.tasks.await
 
 
 class DetailMessageRepositoryImpl : DetailMessageRepository {
@@ -15,12 +22,12 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
     private val storage = FirebaseStorage.getInstance()
 
     override suspend fun sendMessage(
-        chat: Chat,
+        chatModel: ChatModel,
         idReceive: String
     ): Response<Boolean> {
         database.reference.child("room")
-            .child(auth.currentUser?.uid + idReceive)
-            .child(chat.id).setValue(chat)
+            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+            .child(chatModel.id).setValue(chatModel)
 
         return try {
             Response.Success(true)
@@ -30,26 +37,26 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
     }
 
     override suspend fun sendPhoto(
-        chat: Chat,
+        chatModel: ChatModel,
         idReceive: String
     ): Response<Boolean> {
-        chat.photoList?.forEach {
-            storage.reference.child("images/" + it.lastPathSegment)
-                .putFile(it)
+        chatModel.photo?.let {
+            storage.reference.child("images/" + it.toUri().lastPathSegment)
+                .putFile(it.toUri())
                 .addOnSuccessListener { task ->
                     task.storage.downloadUrl.addOnSuccessListener { uri ->
-                        val myChat = Chat(
-                            database.reference.push().key.toString(),
-                            null,
-                            SEND_PHOTOS,
-                            null,
-                            getTimeCurrent(),
-                            uri.toString(),
-                            null
-                        )
+                        val myChatModel = auth.uid?.let { it1 ->
+                            ChatModel(
+                                database.reference.push().key.toString(),
+                                it1,
+                                getTimeCurrent(),
+                                MessageType.PHOTO, null,
+                                uri.toString()
+                            )
+                        }
                         database.reference.child("room")
-                            .child(auth.currentUser?.uid + idReceive)
-                            .child(chat.id).setValue(myChat)
+                            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+                            .child(chatModel.id).setValue(myChatModel)
                     }
                 }
                 .addOnFailureListener { it2 ->
@@ -59,6 +66,49 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
 
         return try {
             Response.Success(true)
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
+    override suspend fun getInformationReceiver(idReceive: String): Response<FriendModel> {
+        return try {
+            val friend =
+                database.reference.child("users").child(idReceive).child("profile").get().await()
+            Response.Success(
+                FriendModel(
+                    friend.key.toString(),
+                    friend.child("display_name").value.toString(),
+                    friend.child("profile_picture").value.toString(),
+                )
+            )
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
+    override suspend fun getListMessage(idReceive: String): Response<List<ChatModel>> {
+        return try {
+            val messageListFirebase = mutableListOf<ChatModel>()
+
+            auth.uid?.let {
+                database.reference.child("room")
+                    .child(getIdRoom(it, ID_RECEIVE_N))
+                    .addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for (dataSnapshot in snapshot.children) {
+                                val message = dataSnapshot.getValue(ChatModel::class.java)
+                                if (message != null) {
+                                    messageListFirebase.add(message)
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+                    })
+            }
+            Response.Success(messageListFirebase)
         } catch (e: Exception) {
             Response.Failure(e)
         }

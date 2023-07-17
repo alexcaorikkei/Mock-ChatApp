@@ -1,9 +1,8 @@
 package com.example.baseproject.ui.home.detailchat
 
+import android.util.Log
 import com.example.baseproject.databinding.ItemChatReceiveBinding
 import com.example.baseproject.databinding.ItemChatSendBinding
-import com.example.baseproject.databinding.ItemMultiphotoReceiveBinding
-import com.example.baseproject.databinding.ItemMultiphotoSendBinding
 import com.example.baseproject.databinding.ItemPhotoReceiveBinding
 import com.example.baseproject.databinding.ItemPhotoSendBinding
 import com.example.baseproject.extension.*
@@ -11,95 +10,60 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.baseproject.databinding.ItemChatDateBinding
+import com.example.baseproject.R
+import com.example.baseproject.domain.model.ChatModel
+import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.domain.model.UserModel
 
-enum class ChatAction2(val original: Int) {
-    RECEIVE(NO_SEND_TEXT), SEND(SEND_TEXT), RECEIVE_PHOTO(NO_SEND_PHOTOS), SEND_PHOTO(SEND_PHOTOS),
-    SEND_MULTIPHOTO(SEND_MULTIPHOTOS), RECEIVE_MULTIPHOTO(NO_SEND_MULTIPHOTOS), DATE(6)
-}
-
-class ChatAdapter2(
-) : ListAdapter<Chat, RecyclerView.ViewHolder>(
+class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
     ExampleListDiffUtil()
 ) {
+    private var idSender: String? = null
+    private var receiver: UserModel? = null
+    fun setReceiver(receiver: UserModel?) {
+        this.receiver = receiver
+    }
 
-    override fun submitList(list: MutableList<Chat>?) {
-        val result = arrayListOf<Chat>()
+    fun setIdSender(idSender: String?) {
+        this.idSender = idSender
+    }
+
+    override fun submitList(list: MutableList<ChatModel>?) {
+        val result = arrayListOf<ChatModel>()
         list?.forEach {
             result.add(it.copy())
         }
         super.submitList(result)
     }
 
-    class ItemChatDateVH(private val binding: ItemChatDateBinding) :
+    inner class ItemChatReceiveVH(private val binding: ItemChatReceiveBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Chat) {
-            binding.tvDate.text = convertToDay(item.date)
-        }
-    }
-
-    class ItemChatReceiveVH(private val binding: ItemChatReceiveBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(item: Chat) {
+        fun bind(item: ChatModel) {
             binding.tvDate.apply {
+                text = convertToMinuteSecond(getTimeCurrent())
                 visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
             }
             binding.tvItemchatMess.text = item.text
-            binding.tvItemchatMess.text = item.text
+
+            Glide.with(binding.ivAvatar)
+                .load(receiver?.profilePicture)
+                .circleCrop()
+                .placeholder(R.drawable.ic_avatar_default)
+                .error(R.drawable.ic_avatar_default)
+                .into(binding.ivAvatar)
         }
     }
 
-    class ItemChatOnePhotoSendVH(private val binding: ItemPhotoSendBinding) :
+    inner class ItemChatOnePhotoSendVH(private val binding: ItemPhotoSendBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Chat) {
-            binding.tvDate.apply {
-                visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
-            }
-
-            if (item.photoList?.size!! > 0) {
-                Glide.with(binding.ivItemOnepicture)
-                    .load(item.photoList[0])
-//                .override(
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
-//                )
-                    .into(binding.ivItemOnepicture)
-
-            }
-        }
-    }
-
-    class ItemChatSendVH(private val binding: ItemChatSendBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(item: Chat) {
-            binding.tvItemSendMess.text = item.text
-            binding.tvDate.apply {
-                visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
-            }
-        }
-    }
-
-    class ItemChatOnePhotoReceiveVH(private val binding: ItemPhotoReceiveBinding) :
-        RecyclerView.ViewHolder(binding.root) {
-
-        fun bind(item: Chat) {
-            binding.tvDate.apply {
-                visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
-            }
+        fun bind(item: ChatModel) {
             Glide.with(binding.ivItemOnepicture)
-                .load(item.photoList?.get(0))
+                .load(item.photo)
 //                .override(
 //                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
 //                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
@@ -108,83 +72,93 @@ class ChatAdapter2(
         }
     }
 
-    class ItemChatMultiPhotoSendVH(private val binding: ItemMultiphotoSendBinding) :
+    inner class ItemChatSendVH(private val binding: ItemChatSendBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Chat) {
-            val pictureAdapter =
-                PhotoDisplayAdapter(item.photoList ?: listOf())
-            binding.tvDate.apply {
-                visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
-            }
-            binding.recycler.apply {
-                adapter = pictureAdapter
-
-                if (item.photoList!!.size > 2) {
-                    layoutManager = GridLayoutManager(context, 3)
-                    val divider = GridItemSpacingDecoration(convertDpToPixel(context, 4), 3)
-                    binding.recycler.addItemDecoration(divider)
-                } else {
-                    layoutManager = GridLayoutManager(context, 2)
-                    val divider = GridItemSpacingDecoration(convertDpToPixel(context, 4), 2)
-                    binding.recycler.addItemDecoration(divider)
-                }
-
-            }
-            pictureAdapter.notifyDataSetChanged()
+        fun bind(item: ChatModel) {
+            binding.tvItemSendMess.text = item.text
+//            binding.tvItemSendMess.setOnClickListener {
+//                text = convertToMinuteSecond(getTimeCurrent())
+//                visibility = View.VISIBLE
+//            }
         }
     }
 
-    class ItemChatMultiPhotoReceiveVH(private val binding: ItemMultiphotoReceiveBinding) :
+
+    inner class ItemChatOnePhotoReceiveVH(private val binding: ItemPhotoReceiveBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(item: Chat) {
-            val pictureAdapter =
-                PhotoDisplayAdapter(item.photoList ?: listOf())
+        fun bind(item: ChatModel) {
+            Glide.with(binding.ivAvatar)
+                .load(receiver?.profilePicture)
+                .circleCrop()
+                .placeholder(R.drawable.ic_avatar_default)
+                .error(R.drawable.ic_avatar_default)
+                .into(binding.ivAvatar)
             binding.tvDate.apply {
+                text = convertToMinuteSecond(getTimeCurrent())
                 visibility = View.VISIBLE
-                text = convertToMinuteSecond(item.date)
             }
-            binding.recycler.apply {
-                adapter = pictureAdapter
+            Glide.with(binding.ivItemOnepicture)
+                .load(item.photo)
+//                .override(
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
+//                )
+                .into(binding.ivItemOnepicture)
 
-                if (item.photoList!!.size > 2) {
-                    layoutManager = GridLayoutManager(context, 3)
-                    val divider = GridItemSpacingDecoration(convertDpToPixel(context, 4), 3)
-                    binding.recycler.addItemDecoration(divider)
-                } else {
-                    layoutManager = GridLayoutManager(context, 2)
-                    val divider = GridItemSpacingDecoration(convertDpToPixel(context, 4), 2)
-                    binding.recycler.addItemDecoration(divider)
-                }
-
-            }
-            pictureAdapter.notifyDataSetChanged()
         }
     }
 
-    class ExampleListDiffUtil : DiffUtil.ItemCallback<Chat>() {
-        override fun areContentsTheSame(oldItem: Chat, newItem: Chat) =
+    inner class ItemChatOneEmojiReceiveVH(private val binding: ItemPhotoReceiveBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: ChatModel) {
+            Glide.with(binding.ivAvatar)
+                .load(receiver?.profilePicture)
+                .circleCrop()
+                .placeholder(R.drawable.ic_avatar_default)
+                .error(R.drawable.ic_avatar_default)
+                .into(binding.ivAvatar)
+            binding.tvDate.apply {
+                text = convertToMinuteSecond(getTimeCurrent())
+                visibility = View.VISIBLE
+            }
+            Glide.with(binding.ivItemOnepicture)
+                .load(item.emoji?.let { getEmoji(it.toInt()) })
+//                .override(
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
+//                )
+                .into(binding.ivItemOnepicture)
+
+        }
+    }
+
+    inner class ItemChatOneEmojiSendVH(private val binding: ItemPhotoSendBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: ChatModel) {
+            Glide.with(binding.ivItemOnepicture)
+                .load(item.emoji?.let { getEmoji(it.toInt()) })
+//                .override(
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
+//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
+//                )
+                .into(binding.ivItemOnepicture)
+        }
+    }
+    class ExampleListDiffUtil : DiffUtil.ItemCallback<ChatModel>() {
+        override fun areContentsTheSame(oldItem: ChatModel, newItem: ChatModel) =
             oldItem == newItem
 
-        override fun areItemsTheSame(oldItem: Chat, newItem: Chat) =
+        override fun areItemsTheSame(oldItem: ChatModel, newItem: ChatModel) =
             oldItem.id == newItem.id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
-            ChatAction2.DATE.original -> {
-                val binding =
-                    ItemChatDateBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                return ItemChatDateVH(binding)
-            }
-
-            ChatAction2.RECEIVE.original -> {
+            RECEIVE_TEXT -> {
                 val binding =
                     ItemChatReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -194,7 +168,7 @@ class ChatAdapter2(
                 return ItemChatReceiveVH(binding)
             }
 
-            ChatAction2.SEND.original -> {
+            SEND_TEXT -> {
                 val binding =
                     ItemChatSendBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -204,7 +178,7 @@ class ChatAdapter2(
                 return ItemChatSendVH(binding)
             }
 
-            ChatAction2.RECEIVE_PHOTO.original -> {
+            RECEIVE_PHOTOS -> {
                 val binding =
                     ItemPhotoReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -214,7 +188,27 @@ class ChatAdapter2(
                 return ItemChatOnePhotoReceiveVH(binding)
             }
 
-            ChatAction2.SEND_PHOTO.original -> {
+            SEND_EMOJI -> {
+                val binding =
+                    ItemPhotoSendBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                return ItemChatOneEmojiSendVH(binding)
+            }
+
+            RECEIVE_EMOJI -> {
+                val binding =
+                    ItemPhotoReceiveBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                return ItemChatOneEmojiReceiveVH(binding)
+            }
+
+            else -> {
                 val binding =
                     ItemPhotoSendBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -223,88 +217,61 @@ class ChatAdapter2(
                     )
                 return ItemChatOnePhotoSendVH(binding)
             }
-
-            ChatAction2.RECEIVE_MULTIPHOTO.original -> {
-                val binding =
-                    ItemMultiphotoReceiveBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                return ItemChatMultiPhotoReceiveVH(binding)
-            }
-
-            else -> {
-                val binding =
-                    ItemMultiphotoSendBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
-                    )
-                return ItemChatMultiPhotoSendVH(binding)
-            }
         }
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val chat = getItem(position)
         when (holder.itemViewType) {
-            ChatAction2.DATE.original -> {
-                val mHolder = holder as ItemChatDateVH
-                mHolder.bind(chat)
-            }
-
-            ChatAction2.RECEIVE.original -> {
+            RECEIVE_TEXT -> {
                 val mHolder = holder as ItemChatReceiveVH
                 mHolder.bind(chat)
             }
 
-            ChatAction2.SEND.original -> {
+            SEND_TEXT -> {
                 val mHolder = holder as ItemChatSendVH
                 mHolder.bind(chat)
             }
 
-            ChatAction2.RECEIVE_PHOTO.original -> {
+            RECEIVE_PHOTOS -> {
                 val mHolder = holder as ItemChatOnePhotoReceiveVH
                 mHolder.bind(chat)
             }
 
-            ChatAction2.SEND_PHOTO.original -> {
+            SEND_PHOTOS -> {
                 val mHolder = holder as ItemChatOnePhotoSendVH
                 mHolder.bind(chat)
             }
-
-            ChatAction2.SEND_MULTIPHOTO.original -> {
-                val mHolder = holder as ItemChatMultiPhotoSendVH
+            RECEIVE_EMOJI->{
+                val mHolder = holder as ItemChatOneEmojiReceiveVH
                 mHolder.bind(chat)
             }
-
-            ChatAction2.RECEIVE_MULTIPHOTO.original -> {
-                val mHolder = holder as ItemChatMultiPhotoReceiveVH
+            SEND_EMOJI->{
+                val mHolder = holder as ItemChatOneEmojiSendVH
                 mHolder.bind(chat)
             }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
-//        if (getItem(position).date.contains(",")) {
-//            return ChatAction2.DATE.original
-//        }
-        if (getItem(position).isSendText == NO_SEND_TEXT) {
-            return ChatAction2.RECEIVE.original
+        val chat = getItem(position)
+        return if (chat.idSender == idSender) {
+            when (chat.type) {
+                MessageType.PHOTO -> return SEND_PHOTOS
+
+                MessageType.TEXT -> return SEND_TEXT
+
+                else -> return SEND_EMOJI
+
+            }
+        } else {
+            when (chat.type) {
+                MessageType.TEXT -> return RECEIVE_TEXT
+
+                MessageType.PHOTO -> return RECEIVE_PHOTOS
+
+                else -> return RECEIVE_EMOJI
+            }
         }
-        if (getItem(position).isSendText == SEND_TEXT) {
-            return ChatAction2.SEND.original
-        }
-        if (getItem(position).isSendPhoto == NO_SEND_PHOTOS) {
-            return ChatAction2.RECEIVE_PHOTO.original
-        }
-        if (getItem(position).isSendPhoto == SEND_PHOTOS) {
-            return ChatAction2.SEND_PHOTO.original
-        }
-        if (getItem(position).isSendMultiPhoto == SEND_MULTIPHOTOS) {
-            return ChatAction2.SEND_MULTIPHOTO.original
-        }
-        return ChatAction2.RECEIVE_MULTIPHOTO.original
     }
 }
