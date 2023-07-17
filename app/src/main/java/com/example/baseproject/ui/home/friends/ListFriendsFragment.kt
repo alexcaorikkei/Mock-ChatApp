@@ -57,17 +57,17 @@ class ListFriendsFragment(private var states: List<FriendState>) :
         viewModel.searchResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
-                    binding.includeProgress.visibility = View.VISIBLE
+                    binding.swipeRefreshLayout.isRefreshing = true
                     binding.emptyResult.visibility = View.INVISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
                 is Response.Failure -> {
-                    binding.includeProgress.visibility = View.INVISIBLE
+                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.emptyResult.visibility = View.VISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
                 is Response.Success -> {
-                    binding.includeProgress.visibility = View.INVISIBLE
+                    binding.swipeRefreshLayout.isRefreshing = false
                     if (response.data.isEmpty()) {
                         binding.emptyResult.visibility = View.VISIBLE
                         binding.rvFriends.visibility = View.INVISIBLE
@@ -106,6 +106,13 @@ class ListFriendsFragment(private var states: List<FriendState>) :
                     binding.progressCircular.visibility = View.INVISIBLE
                 }
             }
+        }
+    }
+
+    override fun setOnClick() {
+        super.setOnClick()
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.searchAllUserWithCurrentAccount("")
         }
     }
 

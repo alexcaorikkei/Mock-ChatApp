@@ -17,8 +17,38 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
     private val viewModel: MessagesViewModel by viewModels()
     override fun getVM() = viewModel
 
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+    }
+
     override fun bindingStateView() {
         super.bindingStateView()
+        binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvMessages.adapter = MessageAdapter(listOf())
+        viewModel.searchResponse.observe(viewLifecycleOwner) { listMessages ->
+            when(listMessages) {
+                is Response.Failure -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+                is Response.Loading -> {
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
+                is Response.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                    binding.rvMessages.adapter = MessageAdapter(listMessages.data)
+                }
+            }
+        }
+    }
+
+    override fun setOnClick() {
+        super.setOnClick()
+        binding.tvTitle.setOnClickListener {
+            appNavigation.openHomeToChatScreen()
+        }
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.searchMessages("")
+        }
 
         binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMessages.adapter = MessageAdapter(listOf(

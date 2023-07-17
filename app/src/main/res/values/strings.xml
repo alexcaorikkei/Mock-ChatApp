@@ -23,7 +23,7 @@
     <string name="add_friend">Add friend</string>
     <string name="all">All</string>
     <string name="request">Request</string>
-    <string name="email_demo">alexcao194@gmail.com\n</string>
+    <string name="email_demo">alexcao194@gmail.com</string>
     <string name="languages">Languages</string>
     <string name="logout">Logout</string>
     <string name="version_demo">1.0.0</string>
@@ -45,7 +45,6 @@
     <string name="ok">OK</string>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
-    <string name="enter_message">Enter message...</string>
     <string name="a">A</string>
     <string name="friend_request">Friend Request</string>
     <string name="friend_added">Friend Added</string>
@@ -53,6 +52,18 @@
     <string name="friend_request_sent">Friend request was sent</string>
     <string name="friend_request_accepted">Friend request was accepted</string>
     <string name="friend_request_canceled">Friend request was canceled</string>
+    <string name="dd_mm_yyyy">dd/mm/yyyy</string>
+    <string name="phone_number_is_empty">Phone number is empty</string>
+    <string name="enter_message">Enter message…</string>
     <string name="password_is_incorrect">Password is incorrect</string>
     <string name="email_is_not_registered">Email is not registered</string>
+    <string name="take_a_photo">Take a photo</string>
+    <string name="choose_from_gallery">Choose from gallery</string>
+    <string name="english">English</string>
+    <string name="vietnamese">Vietnamese</string>
+    <string name="change_language_toast">Please restart app to apply change language</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="sent_a_photo">sent a photo</string>
+    <string name="sent_a_emoji">sent a emoji</string>
+    <string name="you">You</string>
 </resources>
