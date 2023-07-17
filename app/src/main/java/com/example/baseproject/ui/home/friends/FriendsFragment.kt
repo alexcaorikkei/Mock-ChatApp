@@ -34,7 +34,7 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 else -> getString(R.string.request)
             }
         }.attach()
-        viewModel.searchAllUserWithCurrentAccount("")
+        viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
     }
 
     override fun setOnClick() {

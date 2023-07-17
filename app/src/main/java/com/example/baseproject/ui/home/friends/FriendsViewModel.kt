@@ -18,10 +18,12 @@ class FriendsViewModel @Inject constructor(
     val savedStateHandle : SavedStateHandle,
     private val friendRepository: FriendRepository
 ) : BaseViewModel() {
+    var currentQuery = ""
     private val _searchResponse = MutableLiveData<Response<List<FriendModel>>>()
     val searchResponse: LiveData<Response<List<FriendModel>>> = _searchResponse
 
     fun searchAllUserWithCurrentAccount(query: String) {
+        currentQuery = query
         viewModelScope.launch {
             _searchResponse.value = Response.Loading
             _searchResponse.value = friendRepository.searchAllUserWithCurrentAccount(query)

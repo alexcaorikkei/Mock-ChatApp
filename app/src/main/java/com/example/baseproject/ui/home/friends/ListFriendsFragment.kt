@@ -48,7 +48,7 @@ class ListFriendsFragment(private var states: List<FriendState>) :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.searchAllUserWithCurrentAccount("")
+        viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
     }
 
     override fun bindingStateView() {
@@ -76,8 +76,6 @@ class ListFriendsFragment(private var states: List<FriendState>) :
                         val listFriends = response.data.filter { friendModel ->
                             friendModel.state in states
                         }.toMutableList()
-                        Timber.d("listFriends: ${states.toString()}")
-                        Timber.d("listFriends: ${listFriends.toString()}")
                         listFriendItemModel = when (states.size) {
                             2 -> getFromListFriendModelSortBy(
                                 SortType.SORT_BY_STATE,
@@ -112,7 +110,7 @@ class ListFriendsFragment(private var states: List<FriendState>) :
     override fun setOnClick() {
         super.setOnClick()
         binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.searchAllUserWithCurrentAccount("")
+            viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
         }
     }
 

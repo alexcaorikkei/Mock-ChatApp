@@ -90,7 +90,7 @@ class FriendRepositoryImpl : FriendRepository {
     private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
         friends.children.forEach { friend ->
-            if(friend.child("display_name").toString().contains(query)) {
+            if(friend.child("display_name").value.toString().contains(query)) {
                 listFriends.add(
                     FriendModel(
                         friend.key.toString(),
