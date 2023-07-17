@@ -2,7 +2,7 @@ package com.example.baseproject.ui.home.messages.model
 
 import com.example.baseproject.domain.model.MessageType
 
-data class MessageModel(
+data class RoomModel(
     val id: String = "",
     val name: String = "",
     val profilePicture: String = "",
@@ -10,4 +10,5 @@ data class MessageModel(
     val lastMessage: String = "",
     val time: String = "",
     val isSeen: Boolean = false,
+    val isSent: Boolean = false
 )

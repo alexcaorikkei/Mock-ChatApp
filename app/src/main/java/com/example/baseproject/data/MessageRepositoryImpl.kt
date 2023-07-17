@@ -1,12 +1,13 @@
 package com.example.baseproject.data
 
 import androidx.lifecycle.MutableLiveData
+import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.MessageRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
-import com.example.baseproject.ui.home.messages.model.MessageModel
+import com.example.baseproject.ui.home.messages.model.RoomModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -17,16 +18,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import java.text.DateFormat
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 
+private const val MILISECONDS_IN_A_DAY = 86400000
 
 class MessageRepositoryImpl : MessageRepository {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    override fun getMessages(): MutableLiveData<Response<List<MessageModel>>> {
-        val roomResponse = MutableLiveData<Response<List<MessageModel>>>()
+    override fun getMessages(): MutableLiveData<Response<List<RoomModel>>> {
+        val roomResponse = MutableLiveData<Response<List<RoomModel>>>()
         roomResponse.postValue(Response.Loading)
         val roomReference = database.reference.child("room")
         val roomListener = object: ValueEventListener {
@@ -65,7 +69,7 @@ class MessageRepositoryImpl : MessageRepository {
             ChatModel(
                 lastMessage.key.toString(),
                 lastMessage.key.toString().replace(auth.uid!!, ""),
-                getDate(lastMessage.child("date").value.toString()),
+                getDate(lastMessage.child("date").value.toString().toLong()),
                 type,
                 lastMessage.child(type.reference).value.toString(),
             )
@@ -74,21 +78,28 @@ class MessageRepositoryImpl : MessageRepository {
         }
     }
 
-    private fun getDate(date: String): String {
-        val formatFull = SimpleDateFormat("EE, dd-MM-yyyy:HH:mm")
-        val formatDay = SimpleDateFormat("dd-MM-yyyy")
-        val formatHour = SimpleDateFormat("HH:mm")
-        val messageDate = formatFull.parse(date)
-        val currentDate = Date()
-        return if(formatDay.format(messageDate!!) == formatDay.format(currentDate)) {
-            formatHour.format(messageDate)
+    private fun getDate(date: Long): String {
+        val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+        val hourFormat: DateFormat = SimpleDateFormat("HH:mm")
+        val today = Calendar.getInstance()
+        today.set(
+            today.get(Calendar.YEAR),
+            today.get(Calendar.MONTH),
+            today.get(Calendar.DAY_OF_MONTH),
+            0, 0, 0)
+        val messageDate = Date(date)
+        return if(dateFormat.format(today.time) == dateFormat.format(messageDate)) {
+            hourFormat.format(messageDate)
+        } else if(today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
+            R.string.yesterday.toString()
         } else {
-            formatDay.format(messageDate)
+            dateFormat.format(messageDate)
         }
+
     }
 
-    private suspend fun getListRoom(snapshot: DataSnapshot): List<MessageModel>{
-        val listRoom = mutableListOf<MessageModel>()
+    private suspend fun getListRoom(snapshot: DataSnapshot): List<RoomModel>{
+        val listRoom = mutableListOf<RoomModel>()
         for (room in snapshot.children) {
             val id = room.key.toString()
             if(id.contains(auth.uid!!)) {
@@ -96,14 +107,15 @@ class MessageRepositoryImpl : MessageRepository {
                 val friendProfile = getFriendProfile(friendId)
                 val lastMessage = getLastMessage(room.key.toString())
                 listRoom.add(
-                    MessageModel(
+                    RoomModel(
                         room.child("id").value.toString(),
                         friendProfile.displayName,
                         friendProfile.profilePicture,
                         lastMessage.type,
                         lastMessage.text!!,
                         lastMessage.date,
-                        false
+                        false,
+                        lastMessage.idSender == auth.uid!!
                     )
                 )
             }

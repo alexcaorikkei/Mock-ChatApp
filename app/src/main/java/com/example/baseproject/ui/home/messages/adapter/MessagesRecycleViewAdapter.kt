@@ -6,14 +6,16 @@ import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemMessageBinding
-import com.example.baseproject.ui.home.messages.model.MessageModel
+import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.ui.home.messages.model.RoomModel
 
 class MessageHolder(var binding: ItemMessageBinding): RecyclerView.ViewHolder(binding.root) {
 
 }
 
-class MessageAdapter(private val listMessages: List<MessageModel>): RecyclerView.Adapter<MessageHolder>() {
+class MessageAdapter(private val listMessages: List<RoomModel>): RecyclerView.Adapter<MessageHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
         return MessageHolder(
             ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -32,8 +34,36 @@ class MessageAdapter(private val listMessages: List<MessageModel>): RecyclerView
                     .onLoadStarted(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
             }
             tvName.text = messageData.name
-            tvMessage.text = messageData.lastMessage
-            tvTime.text = messageData.time
+            tvMessage.text = when(messageData.lastMessageType) {
+                MessageType.TEXT -> {
+                    if(messageData.isSent) {
+                        "${tvMessage.context.getString(R.string.you)}: ${messageData.lastMessage}"
+                    } else {
+                        messageData.lastMessage
+                    }
+                }
+                MessageType.NONE -> TODO()
+                MessageType.PHOTO -> {
+                    if(messageData.isSent) {
+                        "${tvMessage.context.getString(R.string.you)} ${tvMessage.context.getString(R.string.sent_a_photo)}"
+                    } else {
+                        "${messageData.name.split(" ").last()} ${tvMessage.context.getString(R.string.sent_a_photo)}"
+                    }
+                }
+                MessageType.EMOJI -> {
+                    if(messageData.isSent) {
+                        "${tvMessage.context.getString(R.string.you)} ${tvMessage.context.getString(R.string.sent_a_emoji)}"
+                    } else {
+                        "${messageData.name.split(" ").last()} ${tvMessage.context.getString(R.string.sent_a_emoji)}"
+                    }
+                }
+                MessageType.DATE -> TODO()
+            }
+            try {
+                tvTime.text = tvTime.context.getString(messageData.time.toInt())
+            } catch (e: Exception) {
+                tvTime.text = messageData.time
+            }
             if (messageData.isSeen) {
                 tvMessage.setTextColor(tvMessage.context.getColor(com.example.core.R.color.gray))
             } else {

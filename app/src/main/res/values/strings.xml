@@ -62,4 +62,8 @@
     <string name="english">English</string>
     <string name="vietnamese">Vietnamese</string>
     <string name="change_language_toast">Please restart app to apply change language</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="sent_a_photo">sent a photo</string>
+    <string name="sent_a_emoji">sent a emoji</string>
+    <string name="you">You</string>
 </resources>
