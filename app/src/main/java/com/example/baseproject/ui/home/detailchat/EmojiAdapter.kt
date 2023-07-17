@@ -1,15 +1,15 @@
 package com.example.baseproject.ui.home.detailchat
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemPhotoBinding
 
-class PhotoAdapter(private var photoList: List<Photo>) :
-    RecyclerView.Adapter<PhotoAdapter.ChatVH>() {
+class EmojiAdapter(var emojiList: ArrayList<Emoji>) :
+    RecyclerView.Adapter<EmojiAdapter.ChatVH>() {
     var onClickListener: OnPhotoAdapterListener? = null
 
     class ChatVH(
@@ -28,11 +28,13 @@ class PhotoAdapter(private var photoList: List<Photo>) :
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ChatVH, position: Int) {
-        val photo = photoList[position]
-        holder.binding.cbItemClicked.isChecked = photo.isClicked
+        val emoji = emojiList[position]
+        holder.binding.cbItemClicked.isChecked = emoji.isClicked
 
         Glide.with(holder.binding.ivItemPicture)
-            .load(photo.uri)
+            .load(getEmoji(emoji.content))
+            .placeholder(R.drawable.ic_avatar_default)
+            .error(R.drawable.ic_avatar_default)
             .into(holder.binding.ivItemPicture)
 
         holder.binding.cbItemClicked.setOnClickListener {
@@ -41,10 +43,6 @@ class PhotoAdapter(private var photoList: List<Photo>) :
     }
 
     override fun getItemCount(): Int {
-        return photoList.size
+        return emojiList.size
     }
-}
-
-interface OnPhotoAdapterListener {
-    fun pickPhoto(position: Int)
 }

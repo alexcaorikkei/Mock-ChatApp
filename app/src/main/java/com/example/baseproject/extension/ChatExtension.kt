@@ -2,20 +2,33 @@ package com.example.baseproject.extension
 
 import android.app.Activity
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.baseproject.R
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+object OwnerMessage {
+    const val MY_MESSAGE = 1
+    const val YOUR_MESSAGE = 2
+}
 
 const val RECEIVE_TEXT = 0
 const val SEND_TEXT = 1
+
 const val RECEIVE_PHOTOS = 2
 const val SEND_PHOTOS = 3
-const val ID_RECEIVE_N = "FScnOo6CljVmxumUJK8hUmlrgrI3"
-//OVC9HAzZmFPmHrfYi7IZNExg8Us2
+
+const val RECEIVE_EMOJI = 4
+const val SEND_EMOJI = 5
+
+const val ID_RECEIVE_N = "OVC9HAzZmFPmHrfYi7IZNExg8Us2"//son
+const val KEY_ID_RECEIVER = "KEY_ID_RECEIVER"
+//FScnOo6CljVmxumUJK8hUmlrgrI3
 
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
@@ -23,37 +36,9 @@ fun Fragment.hideKeyboard() {
 
 private fun Context.hideKeyboard(view: View) {
     val inputMethodManager = getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    inputMethodManager.hideSoftInputFromWindow(view.windowToken,
+        0)
 }
-
-var emojiList: List<String> = listOf(
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_00.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_01.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_02.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_03.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_04.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_05.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_06.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_08.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_11.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_14.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_18.png",
-    "https://fcbk.su/_data/stickers/usagyuuun_and_nekogyuuun/usagyuuun_and_nekogyuuun_21.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_01.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_02.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_11.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_12.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_13.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_17.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_18.png",
-    "https://fcbk.su/_data/stickers/ultra_usagyuuun/ultra_usagyuuun_21.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_13.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_14.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_16.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_19.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_20.png",
-    "https://fcbk.su/_data/stickers/sugar_cubs_in_love/sugar_cubs_in_love_21.png",
-)
 
 fun View.gone() {
     this.visibility = View.GONE

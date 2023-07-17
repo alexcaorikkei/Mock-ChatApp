@@ -36,27 +36,20 @@
             android:paddingHorizontal="14dp"
             android:paddingVertical="14dp"
             android:src="@drawable/ic_back"
-            app:layout_constraintBottom_toBottomOf="@id/cvAvatar"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatarReceiver"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/cvAvatar" />
+            app:layout_constraintTop_toTopOf="@id/ivAvatarReceiver" />
 
-        <androidx.cardview.widget.CardView
-            android:id="@+id/cvAvatar"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivAvatarReceiver"
             android:layout_width="42dp"
             android:layout_height="42dp"
             android:layout_marginStart="12dp"
             android:layout_marginBottom="6dp"
-            app:cardCornerRadius="50dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_avatar_default"
             app:layout_constraintBottom_toBottomOf="@id/tvInfor"
-            app:layout_constraintStart_toEndOf="@id/ivBack">
-
-            <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivAvatarReceiver"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:src="@drawable/ic_avatar_unknown" />
-        </androidx.cardview.widget.CardView>
+            app:layout_constraintStart_toEndOf="@id/ivBack" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvNameReceiver"
@@ -64,14 +57,14 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="13dp"
             android:lineHeight="21dp"
-            android:text="Dr.Thân Mạnh Hùng"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@id/cvAvatar"
+            app:layout_constraintBottom_toBottomOf="@id/ivAvatarReceiver"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/cvAvatar"
-            app:layout_constraintTop_toTopOf="@id/cvAvatar" />
+            app:layout_constraintStart_toEndOf="@id/ivAvatarReceiver"
+            app:layout_constraintTop_toTopOf="@id/ivAvatarReceiver"
+            tools:text="Dr.Thân Mạnh Hùng" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/clChatSend"

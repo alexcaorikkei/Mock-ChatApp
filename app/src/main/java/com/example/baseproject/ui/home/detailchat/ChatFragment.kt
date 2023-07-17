@@ -3,7 +3,6 @@ package com.example.baseproject.ui.home.detailchat
 import android.Manifest
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
-import android.app.Activity
 import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
@@ -14,11 +13,11 @@ import android.util.DisplayMetrics
 import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.GridLayoutManager
+import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentDetailChatBinding
 import com.example.baseproject.domain.model.Response
@@ -27,7 +26,6 @@ import com.example.baseproject.navigation.AppNavigation
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.utils.toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.database.FirebaseDatabase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -43,20 +41,23 @@ class ChatFragment :
     private lateinit var bottomSheetEmojiBehavior: BottomSheetBehavior<View>
 
     private lateinit var photoAdapter: PhotoAdapter
-    private lateinit var emojiAdapter: PhotoAdapter
+    private lateinit var emojiAdapter: EmojiAdapter
     private lateinit var chatAdapter: ChatAdapter2
 
     private var photoListClicked = ArrayList<Photo>()
-    private var emojiListClicked = ArrayList<Photo>()
+    private var emojiListClicked = ArrayList<Emoji>()
 
     private var isOpenGallery = true
     private var isOpenEmoji = true
+
+    private var uidReceiver = ""
 
     @SuppressLint("NotifyDataSetChanged")
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
 
-        setUpViewReceiver()
+        uidReceiver = arguments?.getString(KEY_ID_RECEIVER).toString()
+
         setEdittextUsableWhenFullScreen()
         setRecyclerViewChat()
         listenEdittextChat()
@@ -108,7 +109,7 @@ class ChatFragment :
             ivSendChat.setOnClickListener {
                 viewModel.sendMessage(
                     getTextSend(),
-                    ID_RECEIVE_N
+                    uidReceiver
                 )
             }
         }
@@ -116,12 +117,28 @@ class ChatFragment :
 
     override fun bindingStateView() {
         super.bindingStateView()
-        viewModel.getListMessage()
-        viewModel.uid.observe(viewLifecycleOwner) {
-            chatAdapter.setUid(it)
-        }
         viewModel.apply {
-            sendChatResponse.observe(viewLifecycleOwner) { response ->
+
+            getReceiver(uidReceiver)
+
+            receiver.observe(viewLifecycleOwner) {
+                chatAdapter.setReceiver(it)
+                binding.tvNameReceiver.text = it.displayName
+                Glide.with(binding.ivAvatarReceiver)
+                    .load(it.profilePicture)
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_avatar_default)
+                    .error(R.drawable.ic_avatar_default)
+                    .into(binding.ivAvatarReceiver)
+            }
+
+            getListMessage(uidReceiver)
+
+            uid.observe(viewLifecycleOwner) {
+                chatAdapter.setIdSender(it)
+            }
+
+            sendMessageResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {
                     }
@@ -130,43 +147,53 @@ class ChatFragment :
                     }
 
                     is Response.Failure -> {
-                        response.e.toString().toast(requireContext())
+                        "Error Message: ${response.e}".toast(requireContext())
                     }
                 }
             }
-        }
+            sendEmojiResponse.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                    }
 
-        viewModel.messageListLiveData.observe(viewLifecycleOwner) {
-            chatAdapter.submitList(it.toMutableList())
-            binding.rvChat.smoothScrollToPosition(it.size)
+                    is Response.Success -> {
+                    }
+
+                    is Response.Failure -> {
+                        "Error Emoji: ${response.e}".toast(requireContext())
+                    }
+                }
+            }
+            sendPhotoResponse.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {
+                    }
+
+                    is Response.Success -> {
+                    }
+
+                    is Response.Failure -> {
+                        "Error Photo: ${response.e}".toast(requireContext())
+                    }
+                }
+            }
+
+            messageListLiveData.observe(viewLifecycleOwner) {
+                chatAdapter.submitList(it.toMutableList())
+                binding.rvChat.smoothScrollToPosition(it.size)
+            }
         }
     }
 
     private fun getListPhotoClicked() {
-        val myChat = viewModel.uid.value?.let {
-            Chat(
-                FirebaseDatabase.getInstance().reference.push().key.toString(),
-                it,
-                getTimeCurrent(),
-                photoListClicked[0].uri.toString(),
-            )
-        }
-        viewModel.sendPhoto(myChat!!, ID_RECEIVE_N)
+        viewModel.sendPhoto(photoListClicked[0].uri, uidReceiver)
         binding.ivSendChat.gone()
         binding.ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
         isOpenGallery = !isOpenGallery
     }
 
     private fun getListEmojiClicked() {
-        val myChat = viewModel.uid.value?.let {
-            Chat(
-                FirebaseDatabase.getInstance().reference.push().key.toString(),
-                it,
-                getTimeCurrent(),
-                emojiListClicked[0].uri.toString(),
-            )
-        }
-        viewModel.sendPhoto(myChat!!, ID_RECEIVE_N)
+        viewModel.sendEmoji(emojiListClicked[0].content.toString(), uidReceiver)
         binding.ivSendChat.gone()
         binding.ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
         isOpenEmoji = !isOpenEmoji
@@ -207,15 +234,12 @@ class ChatFragment :
 
             val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
             rvEmojiList.addItemDecoration(divider)
+            val emojiObjectList = ArrayList<Emoji>()
 
-            val emojiStringList = ArrayList<String>()
-            emojiStringList.addAll(emojiList)
-
-            val emojiObjectList = ArrayList<Photo>()
-            emojiStringList.forEach {
-                emojiObjectList.add(Photo(it.toUri(), false))
+            for (i in 1..10) {
+                emojiObjectList.add(Emoji(i, false))
             }
-            emojiAdapter = PhotoAdapter(requireActivity(), emojiObjectList)
+            emojiAdapter = EmojiAdapter(emojiObjectList)
             rvEmojiList.adapter = emojiAdapter
             emojiAdapter.notifyDataSetChanged()
 
@@ -238,7 +262,8 @@ class ChatFragment :
                     } else {
                         ivSendEmoji.gone()
                         ivSendChat.gone()
-                    }                }
+                    }
+                }
             }
         }
     }
@@ -256,6 +281,7 @@ class ChatFragment :
     }
 
     private fun openGallery() {
+        checkPermission()
         bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetGalleryBehavior.isHideable = false
         binding.apply {
@@ -264,7 +290,6 @@ class ChatFragment :
             edtChat.isEnabled = false
         }
         isOpenGallery = !isOpenGallery
-        checkPermission()
     }
 
     private fun checkPermission() {
@@ -273,7 +298,7 @@ class ChatFragment :
             } != PackageManager.PERMISSION_GRANTED
         ) {
             ActivityCompat.requestPermissions(
-                (context as Activity?)!!,
+                requireActivity(),
                 arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
                 123
             )
@@ -295,9 +320,9 @@ class ChatFragment :
             val gallery = getAllImagesFromDevice(requireContext())
             val photoList = ArrayList<Photo>()
             for (photo in gallery) {
-                photoList.add(Photo(photo, false))
+                photoList.add(Photo(photo.toString(), false))
             }
-            photoAdapter = PhotoAdapter(requireActivity(), photoList)
+            photoAdapter = PhotoAdapter(photoList)
             rvGallery.adapter = photoAdapter
             photoAdapter.notifyDataSetChanged()
 
@@ -350,18 +375,10 @@ class ChatFragment :
         return imageUris
     }
 
-    private fun getTextSend(): Chat {
+    private fun getTextSend(): String {
         val textSendUser = binding.edtChat.text?.trim().toString()
         binding.edtChat.text?.clear()
-        val myChat = viewModel.uid.value?.let {
-            Chat(
-                FirebaseDatabase.getInstance().reference.push().key.toString(),
-                it,
-                getTimeCurrent(),
-                textSendUser
-            )
-        }
-        return myChat!!
+        return textSendUser
     }
 
     private fun setUpBottomSheetGalleryAndEmoji() {
@@ -408,12 +425,5 @@ class ChatFragment :
             chatAdapter = ChatAdapter2()
             adapter = chatAdapter
         }
-    }
-
-    private fun setUpViewReceiver() {
-//        binding.tvNameReceiver.text =
-//        Glide.with(binding.ivAvatarReceiver)
-//            .load(item)
-//            .into(binding.ivAvatarReceiver)
     }
 }

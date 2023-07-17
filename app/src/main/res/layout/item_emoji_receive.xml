@@ -8,6 +8,13 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="5dp">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline_item_onepicture"
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.3" />
+
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/ivAvatar"
             android:layout_width="50dp"
@@ -17,24 +24,19 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/tvItemchatMess"
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/ivItemOnepicture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:background="@drawable/bg_tv_receive"
-            android:backgroundTint="@color/color_line_divide"
-            android:lineHeight="19dp"
-            android:padding="15dp"
-            android:textColor="@color/black"
-            android:textFontWeight="500"
-            android:textSize="16sp"
+            android:adjustViewBounds="true"
+            android:maxHeight="300dp"
+            android:src="@drawable/ic_avatar_unknown"
             app:layout_constrainedWidth="true"
             app:layout_constraintEnd_toEndOf="@id/guideline_item_onepicture"
             app:layout_constraintHorizontal_bias="0"
             app:layout_constraintStart_toEndOf="@id/ivAvatar"
-            app:layout_constraintTop_toTopOf="@id/ivAvatar"
-            tools:text="Hellossssssssssssssssssssssssssssssssssssssssssssssssssssss" />
+            app:layout_constraintTop_toTopOf="@id/ivAvatar" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tvDate"
@@ -45,16 +47,9 @@
             android:textFontWeight="400"
             android:textSize="12sp"
             android:visibility="gone"
-            app:layout_constraintStart_toStartOf="@id/tvItemchatMess"
-            app:layout_constraintTop_toBottomOf="@id/tvItemchatMess"
+            app:layout_constraintStart_toStartOf="@id/ivItemOnepicture"
+            app:layout_constraintTop_toBottomOf="@id/ivItemOnepicture"
             tools:text="12:10" />
-
-        <androidx.constraintlayout.widget.Guideline
-            android:id="@+id/guideline_item_onepicture"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.7" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
