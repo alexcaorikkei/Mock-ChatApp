@@ -45,6 +45,10 @@ class RoomAdapter(
                     .load(listRoom[position].profilePicture.toUri())
                     .into(ivAvatar)
                     .onLoadStarted(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
+            } else {
+                Glide.with(ivAvatar.context)
+                    .load(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
+                    .into(ivAvatar)
             }
             tvName.text = roomData.name
             tvMessage.text = when(roomData.lastMessageType) {

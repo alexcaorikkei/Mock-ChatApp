@@ -8,6 +8,7 @@ import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.extension.toViWithoutAccent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.values
 import kotlinx.coroutines.tasks.await
 
 class FriendRepositoryImpl : FriendRepository {
@@ -88,6 +89,11 @@ class FriendRepositoryImpl : FriendRepository {
         }
         return true
     }
+
+    private suspend fun getProfilePicture(id: String): String {
+        return database.reference.child("users").child(id).child("profile").child("profile_picture").get().await().value.toString()
+    }
+
     private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
         friends.children.forEach { friend ->
@@ -96,7 +102,7 @@ class FriendRepositoryImpl : FriendRepository {
                     FriendModel(
                         friend.key.toString(),
                         friend.child("display_name").value.toString(),
-                        friend.child("profile_picture").value.toString(),
+                        getProfilePicture(friend.key.toString()),
                         state,
                     )
                 )

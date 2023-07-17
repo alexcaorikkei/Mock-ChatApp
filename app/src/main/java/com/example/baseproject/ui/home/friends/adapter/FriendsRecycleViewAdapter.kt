@@ -2,11 +2,15 @@ package com.example.baseproject.ui.home.friends.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.baseproject.databinding.ItemFriendBinding
 import com.example.baseproject.databinding.ItemFriendHeaderBinding
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
+import com.example.core.R
 
 interface OnItemClickListener {
     fun onItemClicked(position: Int, view: ItemFriendBinding)
@@ -75,6 +79,21 @@ class FriendsRecycleViewAdapter(
                 val friendData = listViewFriends[position].friendModel
                 holder.binding.apply {
                     tvName.text = friendData!!.displayName
+                    if(listViewFriends[position].friendModel!!.profilePicture.isNotEmpty()) {
+                        Glide.with(ivAvatar.context)
+                            .load(listViewFriends[position].friendModel!!.profilePicture.toUri())
+                            .into(ivAvatar)
+                            .onLoadStarted(
+                                AppCompatResources.getDrawable(
+                                    ivAvatar.context,
+                                    R.drawable.ic_avatar_default
+                                )
+                            )
+                    } else {
+                        Glide.with(ivAvatar.context)
+                            .load(R.drawable.ic_avatar_default)
+                            .into(ivAvatar)
+                    }
                     when (friendData.state) {
                         FriendState.FRIEND -> {
                             btnCancel.visibility = ViewGroup.INVISIBLE
