@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.baseproject.databinding.ItemFriendBinding
 import com.example.baseproject.databinding.ItemFriendHeaderBinding
-import com.example.baseproject.ui.home.friends.model.FriendState
+import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
 
 interface OnItemClickListener {

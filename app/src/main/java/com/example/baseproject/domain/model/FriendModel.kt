@@ -1,4 +1,4 @@
-package com.example.baseproject.ui.home.friends.model
+package com.example.baseproject.domain.model
 
 enum class FriendState {
     FRIEND,

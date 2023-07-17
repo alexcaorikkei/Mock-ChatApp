@@ -3,7 +3,7 @@ package com.example.baseproject.ui.home.friends.adapter
 import androidx.fragment.app.Fragment
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.baseproject.ui.home.friends.ListFriendsFragment
-import com.example.baseproject.ui.home.friends.model.FriendState
+import com.example.baseproject.domain.model.FriendState
 
 class FriendsNavigationAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     override fun getItemCount(): Int {

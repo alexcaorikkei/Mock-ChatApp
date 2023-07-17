@@ -1,10 +1,9 @@
 package com.example.baseproject.data
 
 import android.net.Uri
-import androidx.core.net.toUri
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.ProfileRepository
-import com.example.baseproject.ui.home.profile.model.UserModel
+import com.example.baseproject.domain.model.UserModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage

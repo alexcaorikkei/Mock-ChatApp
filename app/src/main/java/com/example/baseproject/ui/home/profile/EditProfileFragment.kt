@@ -1,16 +1,10 @@
 package com.example.baseproject.ui.home.profile
 
 
-import android.app.DatePickerDialog
-import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.view.View
-import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.net.toUri
-import androidx.databinding.adapters.DatePickerBindingAdapter
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentEditProfileBinding
@@ -18,12 +12,9 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.transformIntoDatePicker
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
-import com.example.baseproject.ui.home.profile.model.UserModel
+import com.example.baseproject.domain.model.UserModel
 import com.example.core.base.fragment.BaseFragment
 import dagger.hilt.android.AndroidEntryPoint
-import timber.log.Timber
-import java.io.File
-import java.util.Timer
 import javax.inject.Inject
 
 @AndroidEntryPoint

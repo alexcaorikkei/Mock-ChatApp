@@ -63,4 +63,8 @@
     <string name="english">Tiếng Anh</string>
     <string name="vietnamese">Tiếng Việt</string>
     <string name="change_language_toast">Vui lòng khởi động lại để hoàn tất thay đổi</string>
+    <string name="yesterday">Hôm qua</string>
+    <string name="sent_a_photo">đã gửi một ảnh</string>
+    <string name="sent_a_emoji">đã gửi một emoji</string>
+    <string name="you">Bạn</string>
 </resources>
