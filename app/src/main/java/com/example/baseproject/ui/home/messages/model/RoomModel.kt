@@ -4,6 +4,7 @@ import com.example.baseproject.domain.model.MessageType
 
 data class RoomModel(
     val id: String = "",
+    val friendId: String = "",
     val name: String = "",
     val profilePicture: String = "",
     val lastMessageType: MessageType = MessageType.TEXT,

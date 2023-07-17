@@ -109,6 +109,7 @@ class MessageRepositoryImpl : MessageRepository {
                 listRoom.add(
                     RoomModel(
                         room.child("id").value.toString(),
+                        friendId,
                         friendProfile.displayName,
                         friendProfile.profilePicture,
                         lastMessage.type,

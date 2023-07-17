@@ -11,14 +11,27 @@ import com.example.baseproject.databinding.ItemMessageBinding
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.ui.home.messages.model.RoomModel
 
-class MessageHolder(var binding: ItemMessageBinding): RecyclerView.ViewHolder(binding.root) {
-
+interface OnMessageClickListener {
+    fun onMessageClicked(position: Int, view: ItemMessageBinding)
 }
 
-class MessageAdapter(private val listMessages: List<RoomModel>): RecyclerView.Adapter<MessageHolder>() {
+class MessageHolder(var binding: ItemMessageBinding, val onMessageClickListener: OnMessageClickListener): RecyclerView.ViewHolder(binding.root) {
+    init {
+        binding.apply {
+            root.setOnClickListener {
+                onMessageClickListener.onMessageClicked(adapterPosition, binding)
+            }
+        }
+    }
+}
+
+class MessageAdapter(
+    private val listMessages: List<RoomModel>,
+    private val onMessageClickListener: OnMessageClickListener): RecyclerView.Adapter<MessageHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder {
         return MessageHolder(
-            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+            ItemMessageBinding.inflate(LayoutInflater.from(parent.context), parent, false),
+            onMessageClickListener
         )
     }
 
