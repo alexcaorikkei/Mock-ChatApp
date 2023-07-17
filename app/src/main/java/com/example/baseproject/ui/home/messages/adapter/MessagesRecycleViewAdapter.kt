@@ -42,7 +42,7 @@ class MessageAdapter(private val listMessages: List<RoomModel>): RecyclerView.Ad
                         messageData.lastMessage
                     }
                 }
-                MessageType.NONE -> TODO()
+                MessageType.NONE -> {""}
                 MessageType.PHOTO -> {
                     if(messageData.isSent) {
                         "${tvMessage.context.getString(R.string.you)} ${tvMessage.context.getString(R.string.sent_a_photo)}"
@@ -57,7 +57,7 @@ class MessageAdapter(private val listMessages: List<RoomModel>): RecyclerView.Ad
                         "${messageData.name.split(" ").last()} ${tvMessage.context.getString(R.string.sent_a_emoji)}"
                     }
                 }
-                MessageType.DATE -> TODO()
+                MessageType.DATE -> {""}
             }
             try {
                 tvTime.text = tvTime.context.getString(messageData.time.toInt())

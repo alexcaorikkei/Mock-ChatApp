@@ -20,6 +20,7 @@ import com.google.firebase.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.Calendar
 import javax.inject.Inject
 
 
@@ -129,7 +130,7 @@ class ChatViewModel @Inject constructor(
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
-                getTimeCurrent(),
+                Calendar.getInstance().time.time.toString(),
                 MessageType.EMOJI,
                 null, null,
                 linkEmoji
@@ -153,7 +154,7 @@ class ChatViewModel @Inject constructor(
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
-                getTimeCurrent(),
+                Calendar.getInstance().time.time.toString(),
                 MessageType.PHOTO, null,
                 uri,
                 null
@@ -177,7 +178,7 @@ class ChatViewModel @Inject constructor(
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
-                getTimeCurrent(),
+                Calendar.getInstance().time.time.toString(),
                 MessageType.TEXT,
                 text
             )
