@@ -14,6 +14,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 
 class DetailMessageRepositoryImpl : DetailMessageRepository {
@@ -49,7 +50,7 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                             ChatModel(
                                 database.reference.push().key.toString(),
                                 it1,
-                                getTimeCurrent(),
+                                Calendar.getInstance().time.time.toString(),
                                 MessageType.PHOTO, null,
                                 uri.toString()
                             )
