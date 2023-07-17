@@ -21,9 +21,6 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        if(savedInstanceState == null) {
-            viewModel.searchMessages("")
-        }
     }
 
     override fun bindingStateView() {
@@ -42,7 +39,6 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
                     binding.swipeRefreshLayout.isRefreshing = false
                     binding.rvMessages.adapter = MessageAdapter(listMessages.data)
                 }
-
             }
         }
     }

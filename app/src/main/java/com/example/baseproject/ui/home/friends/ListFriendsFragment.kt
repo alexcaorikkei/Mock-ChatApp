@@ -12,8 +12,7 @@ import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.friends.adapter.FriendsRecycleViewAdapter
 import com.example.baseproject.ui.home.friends.adapter.OnItemClickListener
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
-import com.example.baseproject.ui.home.friends.model.FriendModel
-import com.example.baseproject.ui.home.friends.model.FriendState
+import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.ui.home.friends.model.SortType
 import com.example.baseproject.ui.home.friends.model.getFromListFriendModelSortBy
 import com.example.core.base.fragment.BaseFragment

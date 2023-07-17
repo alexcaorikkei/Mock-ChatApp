@@ -1,7 +1,8 @@
 package com.example.baseproject.ui.home.friends.model
 
-import android.content.res.Resources
 import com.example.baseproject.R
+import com.example.baseproject.domain.model.FriendModel
+import com.example.baseproject.domain.model.FriendState
 
 enum class SortType {
     SORT_BY_NAME,

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.AuthRepository
 import com.example.baseproject.domain.repository.ProfileRepository
-import com.example.baseproject.ui.home.profile.model.UserModel
+import com.example.baseproject.domain.model.UserModel
 import com.example.core.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch

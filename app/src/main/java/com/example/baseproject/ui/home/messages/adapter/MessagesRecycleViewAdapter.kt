@@ -2,10 +2,12 @@ package com.example.baseproject.ui.home.messages.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
-import com.example.baseproject.R
+import com.bumptech.glide.Glide
 import com.example.baseproject.databinding.ItemMessageBinding
-import com.example.baseproject.ui.home.messages.MessageModel
+import com.example.baseproject.ui.home.messages.model.MessageModel
 
 class MessageHolder(var binding: ItemMessageBinding): RecyclerView.ViewHolder(binding.root) {
 
@@ -23,9 +25,14 @@ class MessageAdapter(private val listMessages: List<MessageModel>): RecyclerView
     override fun onBindViewHolder(holder: MessageHolder, position: Int) {
         val messageData = listMessages[position]
         with(holder.binding) {
-//            ivAvatar.setImageResource(messageData.image)
+            if(listMessages[position].profilePicture.isNotEmpty()) {
+                Glide.with(ivAvatar.context)
+                    .load(listMessages[position].profilePicture.toUri())
+                    .into(ivAvatar)
+                    .onLoadStarted(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
+            }
             tvName.text = messageData.name
-            tvMessage.text = messageData.message
+            tvMessage.text = messageData.lastMessage
             tvTime.text = messageData.time
             if (messageData.isSeen) {
                 tvMessage.setTextColor(tvMessage.context.getColor(com.example.core.R.color.gray))

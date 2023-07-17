@@ -1,6 +1,7 @@
 package com.example.baseproject.ui.home.profile
 
 import android.os.Bundle
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
@@ -54,7 +55,13 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                     if(response.data.profilePicture.isNotEmpty()) {
                         Glide.with(requireContext())
                             .load(response.data.profilePicture.toUri())
-                            .into(binding.ivProfile);
+                            .into(binding.ivProfile)
+                            .onLoadStarted(
+                                AppCompatResources.getDrawable(
+                                    binding.ivProfile.context,
+                                    com.example.core.R.drawable.ic_avatar_default
+                                )
+                            )
                     }
                 }
             }

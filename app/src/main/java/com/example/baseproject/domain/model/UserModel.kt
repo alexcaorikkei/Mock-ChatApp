@@ -1,4 +1,4 @@
-package com.example.baseproject.ui.home.profile.model
+package com.example.baseproject.domain.model
 
 data class UserModel(
     val id: String = "",

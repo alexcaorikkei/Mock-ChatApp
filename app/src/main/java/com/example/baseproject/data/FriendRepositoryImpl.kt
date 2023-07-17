@@ -3,8 +3,8 @@ package com.example.baseproject.data
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
-import com.example.baseproject.ui.home.friends.model.FriendModel
-import com.example.baseproject.ui.home.friends.model.FriendState
+import com.example.baseproject.domain.model.FriendModel
+import com.example.baseproject.domain.model.FriendState
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
