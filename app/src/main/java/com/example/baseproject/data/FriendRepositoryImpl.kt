@@ -5,6 +5,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.toViWithoutAccent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.tasks.await
@@ -90,7 +91,7 @@ class FriendRepositoryImpl : FriendRepository {
     private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
         friends.children.forEach { friend ->
-            if(friend.child("display_name").value.toString().contains(query)) {
+            if(friend.child("display_name").value.toString().toViWithoutAccent().contains(query)) {
                 listFriends.add(
                     FriendModel(
                         friend.key.toString(),
@@ -106,7 +107,7 @@ class FriendRepositoryImpl : FriendRepository {
         val friends = database.reference.child("users").get().await()
         friends.children.forEach { userSnapshot ->
             if(userSnapshot.key.toString().notIn(listFriends)
-                && userSnapshot.child("profile").child("display_name").value.toString().contains(query)
+                && userSnapshot.child("profile").child("display_name").value.toString().toViWithoutAccent().contains(query)
                 && userSnapshot.key.toString() != auth.uid!!) {
                 listFriends.add(
                     FriendModel(

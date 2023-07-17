@@ -8,6 +8,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.toViWithoutAccent
 import com.example.core.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -26,7 +27,7 @@ class FriendsViewModel @Inject constructor(
         currentQuery = query
         viewModelScope.launch {
             _searchResponse.value = Response.Loading
-            _searchResponse.value = friendRepository.searchAllUserWithCurrentAccount(query)
+            _searchResponse.value = friendRepository.searchAllUserWithCurrentAccount(query.toViWithoutAccent())
         }
     }
 
