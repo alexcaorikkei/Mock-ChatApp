@@ -17,7 +17,7 @@ class MessagesViewModel @Inject constructor(
     private val _searchResponse = messageRepository.getMessages()
     val searchResponse: LiveData<Response<List<RoomModel>>> = _searchResponse
 
-    fun searchMessages(query: String) {
+    fun searchRoom(query: String) {
         _searchResponse.value = Response.Success(
             (_searchResponse.value as Response.Success<List<RoomModel>>).data.filter { room ->
                 room.name.contains(query, true)
