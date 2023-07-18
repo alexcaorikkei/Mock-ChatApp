@@ -122,7 +122,6 @@ class ChatFragment :
             getReceiver(uidReceiver)
 
             receiver.observe(viewLifecycleOwner) {
-                chatAdapter.setReceiver(it)
                 binding.tvNameReceiver.text = it.displayName
                 Glide.with(binding.ivAvatarReceiver)
                     .load(it.profilePicture)

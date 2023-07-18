@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemChatReceiveBinding
 import com.example.baseproject.databinding.ItemChatSendBinding
 import com.example.baseproject.databinding.ItemEmojiReceiveBinding
@@ -16,18 +15,13 @@ import com.example.baseproject.databinding.ItemPhotoReceiveBinding
 import com.example.baseproject.databinding.ItemPhotoSendBinding
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.MessageType
-import com.example.baseproject.domain.model.UserModel
 import com.example.baseproject.extension.*
 import com.google.firebase.auth.FirebaseAuth
 
 class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
     ExampleListDiffUtil()
 ) {
-    private var receiver: UserModel? = null
     private val user = FirebaseAuth.getInstance().currentUser
-    fun setReceiver(receiver: UserModel?) {
-        this.receiver = receiver
-    }
 
     override fun submitList(list: MutableList<ChatModel>?) {
         val result = arrayListOf<ChatModel>()
@@ -41,18 +35,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            binding.tvDate.apply {
-                text = convertToMinuteSecond(getTimeCurrent())
-                visibility = View.VISIBLE
-            }
             binding.tvItemchatMess.text = item.text
-
-            Glide.with(binding.ivAvatar)
-                .load(receiver?.profilePicture)
-                .circleCrop()
-                .placeholder(R.drawable.ic_avatar_default)
-                .error(R.drawable.ic_avatar_default)
-                .into(binding.ivAvatar)
         }
     }
 
@@ -62,10 +45,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         fun bind(item: ChatModel) {
             Glide.with(binding.ivItemOnepicture)
                 .load(item.photo)
-//                .override(
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
-//                )
+                .override(
+                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt(),
+                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt()
+                )
                 .into(binding.ivItemOnepicture)
         }
     }
@@ -87,22 +70,12 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivAvatar)
-                .load(receiver?.profilePicture)
-                .circleCrop()
-                .placeholder(R.drawable.ic_avatar_default)
-                .error(R.drawable.ic_avatar_default)
-                .into(binding.ivAvatar)
-            binding.tvDate.apply {
-                text = convertToMinuteSecond(getTimeCurrent())
-                visibility = View.VISIBLE
-            }
             Glide.with(binding.ivItemOnepicture)
                 .load(item.photo)
-//                .override(
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
-//                )
+                .override(
+                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt(),
+                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt()
+                )
                 .into(binding.ivItemOnepicture)
 
         }
@@ -112,22 +85,8 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivAvatar)
-                .load(receiver?.profilePicture)
-                .circleCrop()
-                .placeholder(R.drawable.ic_avatar_default)
-                .error(R.drawable.ic_avatar_default)
-                .into(binding.ivAvatar)
-            binding.tvDate.apply {
-                text = convertToMinuteSecond(getTimeCurrent())
-                visibility = View.VISIBLE
-            }
             Glide.with(binding.ivItemOnepicture)
                 .load(item.emoji?.let { getEmoji(it.toInt()) })
-//                .override(
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
-//                )
                 .into(binding.ivItemOnepicture)
 
         }
@@ -139,10 +98,6 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         fun bind(item: ChatModel) {
             Glide.with(binding.ivItemOnepicture)
                 .load(item.emoji?.let { getEmoji(it.toInt()) })
-//                .override(
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt(),
-//                    (300 * holder.itemView.context.resources.displayMetrics.density).toInt()
-//                )
                 .into(binding.ivItemOnepicture)
         }
     }
