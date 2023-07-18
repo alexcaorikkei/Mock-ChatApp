@@ -22,27 +22,27 @@ interface OnItemClickListener {
 
 class FriendsRecycleViewHolder(
     var binding: ItemFriendBinding,
-//    onItemClickListener: OnItemClickListener
+    onItemClickListener: OnItemClickListener
 ) : RecyclerView.ViewHolder(binding.root) {
-//    init {
-//        binding.apply {
-//            root.setOnClickListener {
-//                onItemClickListener.onItemClicked(adapterPosition, binding)
-//            }
-//
-//            btnAccept.setOnClickListener {
-//                onItemClickListener.onAcceptClicked(adapterPosition, binding)
-//            }
-//
-//            btnCancel.setOnClickListener {
-//                onItemClickListener.onCancelClicked(adapterPosition, binding)
-//            }
-//
-//            btnAddNewFriend.setOnClickListener {
-//                onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
-//            }
-//        }
-//    }
+    init {
+        binding.apply {
+            root.setOnClickListener {
+                onItemClickListener.onItemClicked(adapterPosition, binding)
+            }
+
+            btnAccept.setOnClickListener {
+                onItemClickListener.onAcceptClicked(adapterPosition, binding)
+            }
+
+            btnCancel.setOnClickListener {
+                onItemClickListener.onCancelClicked(adapterPosition, binding)
+            }
+
+            btnAddNewFriend.setOnClickListener {
+                onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
+            }
+        }
+    }
 }
 
 class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
@@ -51,7 +51,7 @@ class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
 
 class FriendsRecycleViewAdapter(
     private val listViewFriends: List<FriendItemModel>,
-//    private val onItemClickListener: OnItemClickListener
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount() = listViewFriends.size
@@ -62,9 +62,11 @@ class FriendsRecycleViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             0 -> {
-                val binding = ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-//                FriendsRecycleViewHolder(binding, onItemClickListener)
-                FriendsRecycleViewHolder(binding)
+                val binding = ItemFriendBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false)
+                FriendsRecycleViewHolder(binding, onItemClickListener)
             }
 
             else -> {

@@ -9,6 +9,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentFriendsBinding
+import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.friends.adapter.FriendsNavigationAdapter
 import com.example.core.base.fragment.BaseFragment
@@ -35,7 +36,23 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
             }
         }.attach()
         viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
+
+        viewModel.searchResponse.observe(viewLifecycleOwner) {response ->
+            when(response) {
+                is Response.Failure -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+                is Response.Loading -> {
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
+                is Response.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
     }
+
+
 
     override fun setOnClick() {
         var timer = Timer()
@@ -49,6 +66,10 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                     }
                 }, 500)
             }
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
         }
     }
 }

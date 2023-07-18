@@ -57,38 +57,36 @@ class ListFriendsFragment(private var states: List<FriendState>) :
         viewModel.searchResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
-                    binding.swipeRefreshLayout.isRefreshing = true
                     binding.emptyResult.visibility = View.INVISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
                 is Response.Failure -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
                     binding.emptyResult.visibility = View.VISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
                 is Response.Success -> {
-                    binding.swipeRefreshLayout.isRefreshing = false
-                    if (response.data.isEmpty()) {
+                    val listFriends = response.data.filter { friendModel ->
+                        friendModel.state in states
+                    }.toMutableList()
+                    listFriendItemModel = when (states.size) {
+                        2 -> getFromListFriendModelSortBy(
+                            SortType.SORT_BY_STATE,
+                            listFriends
+                        )
+                        else -> getFromListFriendModelSortBy(
+                            SortType.SORT_BY_NAME,
+                            listFriends
+                        )
+                    }
+                    if(listFriendItemModel.isEmpty()) {
                         binding.emptyResult.visibility = View.VISIBLE
                         binding.rvFriends.visibility = View.INVISIBLE
                     } else {
+                        binding.emptyResult.visibility = View.INVISIBLE
                         binding.rvFriends.visibility = View.VISIBLE
-                        val listFriends = response.data.filter { friendModel ->
-                            friendModel.state in states
-                        }.toMutableList()
-                        listFriendItemModel = when (states.size) {
-                            2 -> getFromListFriendModelSortBy(
-                                SortType.SORT_BY_STATE,
-                                listFriends
-                            )
-                            else -> getFromListFriendModelSortBy(
-                                SortType.SORT_BY_NAME,
-                                listFriends
-                            )
-                        }
                         binding.rvFriends.adapter = FriendsRecycleViewAdapter(
                             listFriendItemModel,
-//                            this
+                            this
                         )
                     }
                 }
@@ -101,19 +99,11 @@ class ListFriendsFragment(private var states: List<FriendState>) :
                 }
                 is Response.Failure -> {
                     binding.progressCircular.visibility = View.INVISIBLE
-                    "Error: ${it.e}".toast(requireContext())
                 }
                 is Response.Success -> {
                     binding.progressCircular.visibility = View.INVISIBLE
                 }
             }
-        }
-    }
-
-    override fun setOnClick() {
-        super.setOnClick()
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
         }
     }
 
