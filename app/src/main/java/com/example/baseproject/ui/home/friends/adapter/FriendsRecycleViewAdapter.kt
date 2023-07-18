@@ -11,6 +11,7 @@ import com.example.baseproject.databinding.ItemFriendHeaderBinding
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
 import com.example.core.R
+import timber.log.Timber
 
 interface OnItemClickListener {
     fun onItemClicked(position: Int, view: ItemFriendBinding)
@@ -80,6 +81,7 @@ class FriendsRecycleViewAdapter(
                 holder.binding.apply {
                     tvName.text = friendData!!.displayName
                     if(listViewFriends[position].friendModel!!.profilePicture.isNotEmpty()) {
+                        Timber.d("profile picture: ${listViewFriends[position].friendModel!!.profilePicture}")
                         Glide.with(ivAvatar.context)
                             .load(listViewFriends[position].friendModel!!.profilePicture.toUri())
                             .into(ivAvatar)
