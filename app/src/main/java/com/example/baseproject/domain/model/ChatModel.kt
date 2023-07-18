@@ -57,11 +57,11 @@ enum class MessageType {
 data class ChatModel(
     val id: String,
     val idSender: String,
-    val date: String,
-    val type: MessageType,
-    val text: String? = null,
-    val photo: String? = null,
-    val emoji: String? = null
+    var date: String,
+    var type: MessageType,
+    var text: String? = null,
+    var photo: String? = null,
+    var emoji: String? = null
 ) {
     constructor () : this("", "", "", MessageType.NONE, "", "", "")
 }

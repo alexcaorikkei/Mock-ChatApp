@@ -134,10 +134,6 @@ class ChatFragment :
 
             getListMessage(uidReceiver)
 
-            uid.observe(viewLifecycleOwner) {
-                chatAdapter.setIdSender(it)
-            }
-
             sendMessageResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {

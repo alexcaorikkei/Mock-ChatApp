@@ -1,11 +1,5 @@
 package com.example.baseproject.ui.home.detailchat
 
-import android.util.Log
-import com.example.baseproject.databinding.ItemChatReceiveBinding
-import com.example.baseproject.databinding.ItemChatSendBinding
-import com.example.baseproject.databinding.ItemPhotoReceiveBinding
-import com.example.baseproject.databinding.ItemPhotoSendBinding
-import com.example.baseproject.extension.*
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,21 +8,25 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
+import com.example.baseproject.databinding.ItemChatReceiveBinding
+import com.example.baseproject.databinding.ItemChatSendBinding
+import com.example.baseproject.databinding.ItemEmojiReceiveBinding
+import com.example.baseproject.databinding.ItemEmojiSendBinding
+import com.example.baseproject.databinding.ItemPhotoReceiveBinding
+import com.example.baseproject.databinding.ItemPhotoSendBinding
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.domain.model.UserModel
+import com.example.baseproject.extension.*
+import com.google.firebase.auth.FirebaseAuth
 
 class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
     ExampleListDiffUtil()
 ) {
-    private var idSender: String? = null
     private var receiver: UserModel? = null
+    private val user = FirebaseAuth.getInstance().currentUser
     fun setReceiver(receiver: UserModel?) {
         this.receiver = receiver
-    }
-
-    fun setIdSender(idSender: String?) {
-        this.idSender = idSender
     }
 
     override fun submitList(list: MutableList<ChatModel>?) {
@@ -110,7 +108,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         }
     }
 
-    inner class ItemChatOneEmojiReceiveVH(private val binding: ItemPhotoReceiveBinding) :
+    inner class ItemChatOneEmojiReceiveVH(private val binding: ItemEmojiReceiveBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
@@ -135,7 +133,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         }
     }
 
-    inner class ItemChatOneEmojiSendVH(private val binding: ItemPhotoSendBinding) :
+    inner class ItemChatOneEmojiSendVH(private val binding: ItemEmojiSendBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
@@ -190,7 +188,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
             SEND_EMOJI -> {
                 val binding =
-                    ItemPhotoSendBinding.inflate(
+                    ItemEmojiSendBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
@@ -200,7 +198,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
             RECEIVE_EMOJI -> {
                 val binding =
-                    ItemPhotoReceiveBinding.inflate(
+                    ItemEmojiReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
                         false
@@ -255,7 +253,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int {
         val chat = getItem(position)
-        return if (chat.idSender == idSender) {
+        return if (chat.idSender == user?.uid) {
             when (chat.type) {
                 MessageType.PHOTO -> return SEND_PHOTOS
 

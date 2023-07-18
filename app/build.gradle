@@ -93,5 +93,5 @@ dependencies {
     implementation libraries.glide
     kapt libraries.glideCompiler
 
-    debugImplementation libraries.leak
+//    debugImplementation libraries.leak
 }

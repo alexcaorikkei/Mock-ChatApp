@@ -6,7 +6,6 @@ import com.example.baseproject.domain.repository.DetailMessageRepository
 import com.example.baseproject.extension.*
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.FriendModel
-import com.example.baseproject.domain.model.MessageType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -14,7 +13,6 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
-import java.util.Calendar
 
 
 class DetailMessageRepositoryImpl : DetailMessageRepository {
@@ -46,18 +44,10 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                 .putFile(it.toUri())
                 .addOnSuccessListener { task ->
                     task.storage.downloadUrl.addOnSuccessListener { uri ->
-                        val myChatModel = auth.uid?.let { it1 ->
-                            ChatModel(
-                                database.reference.push().key.toString(),
-                                it1,
-                                Calendar.getInstance().time.time.toString(),
-                                MessageType.PHOTO, null,
-                                uri.toString()
-                            )
-                        }
+                        chatModel.photo = uri.toString()
                         database.reference.child("room")
                             .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
-                            .child(chatModel.id).setValue(myChatModel)
+                            .child(chatModel.id).setValue(chatModel)
                     }
                 }
                 .addOnFailureListener { it2 ->
