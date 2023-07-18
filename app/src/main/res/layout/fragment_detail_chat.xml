@@ -60,6 +60,8 @@
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
+            android:maxLines="1"
+            android:ellipsize="end"
             app:layout_constraintBottom_toBottomOf="@id/ivAvatarReceiver"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ivAvatarReceiver"

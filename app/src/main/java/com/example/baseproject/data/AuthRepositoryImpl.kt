@@ -26,7 +26,7 @@ class AuthRepositoryImpl : AuthRepository {
                     child("birthday").setValue("")
                     child("phone_number").setValue("")
                 }
-                createDemoData()
+//                createDemoData()
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)

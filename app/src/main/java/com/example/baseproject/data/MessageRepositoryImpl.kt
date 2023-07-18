@@ -68,7 +68,7 @@ class MessageRepositoryImpl : MessageRepository {
             val type = MessageType.fromString(lastMessage.child("type").value.toString())
             ChatModel(
                 lastMessage.key.toString(),
-                lastMessage.key.toString().replace(auth.uid!!, ""),
+                lastMessage.child("idSender").value.toString(),
                 getDate(lastMessage.child("date").value.toString().toLong()),
                 type,
                 lastMessage.child(type.reference).value.toString(),

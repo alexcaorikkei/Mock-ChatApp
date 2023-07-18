@@ -5,8 +5,10 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.toViWithoutAccent
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ktx.values
 import kotlinx.coroutines.tasks.await
 
 class FriendRepositoryImpl : FriendRepository {
@@ -87,15 +89,26 @@ class FriendRepositoryImpl : FriendRepository {
         }
         return true
     }
+
+    private suspend fun getFriend(id: String) : FriendModel {
+        val friend = database.reference.child("users").child(id).child("profile").get().await()
+        return FriendModel(
+            id,
+            friend.child("display_name").value.toString(),
+            friend.child("profile_picture").value.toString(),
+        )
+    }
+
     private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
         friends.children.forEach { friend ->
-            if(friend.child("display_name").toString().contains(query)) {
+            if(friend.child("display_name").value.toString().toViWithoutAccent().contains(query)) {
+                val friendInfo = getFriend(friend.key.toString())
                 listFriends.add(
                     FriendModel(
                         friend.key.toString(),
-                        friend.child("display_name").value.toString(),
-                        friend.child("profile_picture").value.toString(),
+                        friendInfo.displayName,
+                        friendInfo.profilePicture,
                         state,
                     )
                 )
@@ -106,7 +119,7 @@ class FriendRepositoryImpl : FriendRepository {
         val friends = database.reference.child("users").get().await()
         friends.children.forEach { userSnapshot ->
             if(userSnapshot.key.toString().notIn(listFriends)
-                && userSnapshot.child("profile").child("display_name").value.toString().contains(query)
+                && userSnapshot.child("profile").child("display_name").value.toString().toViWithoutAccent().contains(query)
                 && userSnapshot.key.toString() != auth.uid!!) {
                 listFriends.add(
                     FriendModel(
