@@ -37,7 +37,7 @@ class EmojiAdapter(var emojiList: ArrayList<Emoji>) :
             .error(R.drawable.ic_avatar_default)
             .into(holder.binding.ivItemPicture)
 
-        holder.binding.cbItemClicked.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             onClickListener?.pickPhoto(position)
         }
     }

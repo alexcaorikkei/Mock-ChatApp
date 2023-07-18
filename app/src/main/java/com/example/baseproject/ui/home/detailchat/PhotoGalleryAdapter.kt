@@ -35,7 +35,7 @@ class PhotoAdapter(private var photoList: List<Photo>) :
             .load(photo.uri)
             .into(holder.binding.ivItemPicture)
 
-        holder.binding.cbItemClicked.setOnClickListener {
+        holder.binding.root.setOnClickListener {
             onClickListener?.pickPhoto(position)
         }
     }
