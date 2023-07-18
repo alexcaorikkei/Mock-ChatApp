@@ -1,11 +1,9 @@
 package com.example.baseproject.ui.home.detailchat
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.DetailMessageRepository
@@ -14,7 +12,6 @@ import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.domain.model.UserModel
 import com.example.core.base.BaseViewModel
-import com.example.core.utils.SingleLiveEvent
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -47,38 +44,22 @@ class ChatViewModel @Inject constructor(
     val getListChatResponseModel: LiveData<Response<List<ChatModel>>> get() = _getListChatResponseModel
 
 
-    private var messageList = arrayListOf<ChatModel>()
     private val _messageListLiveData = MutableLiveData<ArrayList<ChatModel>>()
     val messageListLiveData: LiveData<ArrayList<ChatModel>> get() = _messageListLiveData
 
     private var receiveData: UserModel? = null
     private val _receiver = MutableLiveData<UserModel>()
     val receiver: LiveData<UserModel> get() = _receiver
-
-    val uid = SingleLiveEvent<String>()
-
-    init {
-        val user = FirebaseAuth.getInstance().currentUser
-        user?.let {
-            uid.value = it.uid
-        }
-    }
+    private val myUid = FirebaseAuth.getInstance().currentUser?.uid
 
     fun getReceiver(idReceive: String) {
-//        viewModelScope.launch {
-//            _getReceiverResponse.value =
-//                detailMessageRepository.getInformationReceiver(KEY_ID_RECEIVER)
-//            if (_getReceiverResponse.value is Response.Success) {
-//                receiveData = (_getReceiverResponse.value as Response.Success).data
-//            }
-//        }
         FirebaseDatabase.getInstance().reference.child("users")
             .child(idReceive)
             .child("profile")
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     receiveData = UserModel(
-                        "",
+                        idReceive,
                         snapshot.child("display_name").value.toString(),
                         snapshot.child("phone_number").value.toString(),
                         snapshot.child("birthday").value.toString(),
@@ -96,37 +77,43 @@ class ChatViewModel @Inject constructor(
     }
 
     fun getListMessage(idReceive: String) {
-//        viewModelScope.launch {
-//            _getListChatResponse.value = detailMessageRepository.getListMessage(idReceive)
-//            if (_getListChatResponse.value is Response.Success) {
-//                messageList.addAll((_getListChatResponse.value as Response.Success).data)
-//                Log.d("ngocc", "getListMessage: $messageList")
-//            }
-//        }
-
-        val user = FirebaseAuth.getInstance().currentUser
-        val idSender = user?.uid
         FirebaseDatabase.getInstance().reference.child("room")
-            .child(getIdRoom(idSender.toString(), idReceive))
-            .addValueEventListener(object : ValueEventListener {
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    val messageListFirebase = ArrayList<ChatModel>()
-                    for (dataSnapshot in snapshot.children) {
-                        val message = dataSnapshot.getValue(ChatModel::class.java)
-                        if (message != null) {
-                            messageListFirebase.add(message)
-                        }
+            .child(getIdRoom(myUid.toString(), idReceive))
+            .addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val message = snapshot.getValue(ChatModel::class.java) ?: return
+                    val messageList = _messageListLiveData.value ?: arrayListOf()
+
+                    val oldItem = messageList.firstOrNull { it.id == message.id }
+                    if (oldItem != null) {
+                        oldItem.photo = message.photo
+                    } else {
+                        messageList.add(message)
                     }
-                    _messageListLiveData.value = messageListFirebase
+
+                    _messageListLiveData.value = messageList
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    //do nothing
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                    //do nothing
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    //do nothing
                 }
 
                 override fun onCancelled(error: DatabaseError) {
+                    //do nothing
                 }
             })
     }
 
     fun sendEmoji(linkEmoji: String, idReceive: String) {
-        val chatModel = uid.value?.let {
+        val chatModel = myUid?.let {
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
@@ -140,17 +127,13 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendEmojiResponse.value = response
-                if (response is Response.Success) {
-                    messageList.add(chatModel)
-                    _messageListLiveData.postValue(messageList)
-                }
             }
         }
     }
 
 
     fun sendPhoto(uri: String, idReceive: String) {
-        val chatModel = uid.value?.let {
+        val chatModel = myUid?.let {
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
@@ -166,6 +149,7 @@ class ChatViewModel @Inject constructor(
 
                 _sendPhotoResponse.postValue(response)
                 if (response is Response.Success) {
+                    val messageList = _messageListLiveData.value ?: arrayListOf()
                     messageList.add(chatModel)
                     _messageListLiveData.postValue(messageList)
                 }
@@ -174,7 +158,7 @@ class ChatViewModel @Inject constructor(
     }
 
     fun sendMessage(text: String, idReceive: String) {
-        val chatModel = uid.value?.let {
+        val chatModel = myUid?.let {
             ChatModel(
                 FirebaseDatabase.getInstance().reference.push().key.toString(),
                 it,
@@ -188,10 +172,6 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendMessageResponse.value = response
-                if (response is Response.Success) {
-                    messageList.add(chatModel)
-                    _messageListLiveData.postValue(messageList)
-                }
             }
         }
     }
