@@ -2,11 +2,16 @@ package com.example.baseproject.ui.home.friends.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.baseproject.databinding.ItemFriendBinding
 import com.example.baseproject.databinding.ItemFriendHeaderBinding
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
+import com.example.core.R
+import timber.log.Timber
 
 interface OnItemClickListener {
     fun onItemClicked(position: Int, view: ItemFriendBinding)
@@ -15,7 +20,10 @@ interface OnItemClickListener {
     fun onAddNewFriendClicked(position: Int, view: ItemFriendBinding)
 }
 
-class FriendsRecycleViewHolder(var binding: ItemFriendBinding, onItemClickListener: OnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
+class FriendsRecycleViewHolder(
+    var binding: ItemFriendBinding,
+    onItemClickListener: OnItemClickListener
+) : RecyclerView.ViewHolder(binding.root) {
     init {
         binding.apply {
             root.setOnClickListener {
@@ -54,7 +62,10 @@ class FriendsRecycleViewAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             0 -> {
-                val binding = ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+                val binding = ItemFriendBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false)
                 FriendsRecycleViewHolder(binding, onItemClickListener)
             }
 
@@ -73,8 +84,25 @@ class FriendsRecycleViewAdapter(
         when (holder) {
             is FriendsRecycleViewHolder -> {
                 val friendData = listViewFriends[position].friendModel
+                Timber.d("onBindViewHolder: $position")
+                Timber.d("onBindViewHolder: $friendData")
                 holder.binding.apply {
                     tvName.text = friendData!!.displayName
+                    if(friendData.profilePicture.isNotEmpty()) {
+                        Glide.with(ivAvatar.context)
+                            .load(friendData.profilePicture.toUri())
+                            .into(ivAvatar)
+                            .onLoadStarted(
+                                AppCompatResources.getDrawable(
+                                    ivAvatar.context,
+                                    R.drawable.ic_avatar_default
+                                )
+                            )
+                    } else {
+                        Glide.with(ivAvatar.context)
+                            .load(R.drawable.ic_avatar_default)
+                            .into(ivAvatar)
+                    }
                     when (friendData.state) {
                         FriendState.FRIEND -> {
                             btnCancel.visibility = ViewGroup.INVISIBLE

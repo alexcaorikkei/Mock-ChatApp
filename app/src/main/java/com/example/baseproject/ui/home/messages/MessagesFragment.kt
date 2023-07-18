@@ -26,6 +26,7 @@ class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel
 
     override fun bindingStateView() {
         super.bindingStateView()
+        binding.swipeRefreshLayout.isEnabled = false
         binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
         binding.rvMessages.adapter = RoomAdapter(listOf(), this)
         viewModel.searchResponse.observe(viewLifecycleOwner) { listRoom ->
