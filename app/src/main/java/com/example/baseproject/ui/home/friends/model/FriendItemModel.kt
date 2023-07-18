@@ -14,14 +14,14 @@ fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendMod
     return when(sortType) {
         SortType.SORT_BY_NAME -> {
             val result = mutableListOf<FriendItemModel>()
-            val sortedList = listFriend.sortedBy { it.displayName.split(" ").last() }
+            val sortedList = listFriend.sortedBy { it.displayName.split(" ").last().lowercase() }
             var currentHeader = 'A'
-            if(sortedList.first().displayName.split(" ").last().first() == currentHeader) {
+            if(sortedList.first().displayName.split(" ").last().lowercase().first() == currentHeader) {
                 result.add(FriendItemModel(1, header = currentHeader.toString()))
             }
             sortedList.forEach() {friend ->
-            if (friend.displayName.split(" ").last().first() != currentHeader) {
-                    currentHeader = friend.displayName.split(" ").last().first()
+            if (friend.displayName.split(" ").last().lowercase().first() != currentHeader) {
+                    currentHeader = friend.displayName.split(" ").last().lowercase().first()
                     result.add(FriendItemModel(1, header = currentHeader.toString()))
                 }
                 result.add(FriendItemModel(0, friendModel = friend))
@@ -40,9 +40,15 @@ fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendMod
             listFriendRequest.forEach { friend ->
                 result.add(FriendItemModel(0, friendModel = friend))
             }
+            if(result.last().viewType == 1) {
+                result.removeLast()
+            }
             result.add(FriendItemModel(1, header = R.string.friend_added.toString()))
             listFriendAdded.forEach { friend ->
                 result.add(FriendItemModel(0, friendModel = friend))
+            }
+            if(result.last().viewType == 1) {
+                result.removeLast()
             }
             result
         }

@@ -90,19 +90,25 @@ class FriendRepositoryImpl : FriendRepository {
         return true
     }
 
-    private suspend fun getProfilePicture(id: String): String {
-        return database.reference.child("users").child(id).child("profile").child("profile_picture").get().await().value.toString()
+    private suspend fun getFriend(id: String) : FriendModel {
+        val friend = database.reference.child("users").child(id).child("profile").get().await()
+        return FriendModel(
+            id,
+            friend.child("display_name").value.toString(),
+            friend.child("profile_picture").value.toString(),
+        )
     }
 
     private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
         val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
         friends.children.forEach { friend ->
             if(friend.child("display_name").value.toString().toViWithoutAccent().contains(query)) {
+                val friendInfo = getFriend(friend.key.toString())
                 listFriends.add(
                     FriendModel(
                         friend.key.toString(),
-                        friend.child("display_name").value.toString(),
-                        getProfilePicture(friend.key.toString()),
+                        friendInfo.displayName,
+                        friendInfo.profilePicture,
                         state,
                     )
                 )

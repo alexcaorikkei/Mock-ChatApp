@@ -86,7 +86,10 @@ class ListFriendsFragment(private var states: List<FriendState>) :
                                 listFriends
                             )
                         }
-                        binding.rvFriends.adapter = FriendsRecycleViewAdapter(listFriendItemModel, this)
+                        binding.rvFriends.adapter = FriendsRecycleViewAdapter(
+                            listFriendItemModel,
+//                            this
+                        )
                     }
                 }
             }

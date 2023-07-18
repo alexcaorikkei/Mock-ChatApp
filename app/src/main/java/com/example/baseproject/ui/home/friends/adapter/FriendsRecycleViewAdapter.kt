@@ -20,26 +20,29 @@ interface OnItemClickListener {
     fun onAddNewFriendClicked(position: Int, view: ItemFriendBinding)
 }
 
-class FriendsRecycleViewHolder(var binding: ItemFriendBinding, onItemClickListener: OnItemClickListener) : RecyclerView.ViewHolder(binding.root) {
-    init {
-        binding.apply {
-            root.setOnClickListener {
-                onItemClickListener.onItemClicked(adapterPosition, binding)
-            }
-
-            btnAccept.setOnClickListener {
-                onItemClickListener.onAcceptClicked(adapterPosition, binding)
-            }
-
-            btnCancel.setOnClickListener {
-                onItemClickListener.onCancelClicked(adapterPosition, binding)
-            }
-
-            btnAddNewFriend.setOnClickListener {
-                onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
-            }
-        }
-    }
+class FriendsRecycleViewHolder(
+    var binding: ItemFriendBinding,
+//    onItemClickListener: OnItemClickListener
+) : RecyclerView.ViewHolder(binding.root) {
+//    init {
+//        binding.apply {
+//            root.setOnClickListener {
+//                onItemClickListener.onItemClicked(adapterPosition, binding)
+//            }
+//
+//            btnAccept.setOnClickListener {
+//                onItemClickListener.onAcceptClicked(adapterPosition, binding)
+//            }
+//
+//            btnCancel.setOnClickListener {
+//                onItemClickListener.onCancelClicked(adapterPosition, binding)
+//            }
+//
+//            btnAddNewFriend.setOnClickListener {
+//                onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
+//            }
+//        }
+//    }
 }
 
 class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
@@ -48,7 +51,7 @@ class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
 
 class FriendsRecycleViewAdapter(
     private val listViewFriends: List<FriendItemModel>,
-    private val onItemClickListener: OnItemClickListener
+//    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun getItemCount() = listViewFriends.size
@@ -60,7 +63,8 @@ class FriendsRecycleViewAdapter(
         return when (viewType) {
             0 -> {
                 val binding = ItemFriendBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-                FriendsRecycleViewHolder(binding, onItemClickListener)
+//                FriendsRecycleViewHolder(binding, onItemClickListener)
+                FriendsRecycleViewHolder(binding)
             }
 
             else -> {
@@ -78,12 +82,13 @@ class FriendsRecycleViewAdapter(
         when (holder) {
             is FriendsRecycleViewHolder -> {
                 val friendData = listViewFriends[position].friendModel
+                Timber.d("onBindViewHolder: $position")
+                Timber.d("onBindViewHolder: $friendData")
                 holder.binding.apply {
                     tvName.text = friendData!!.displayName
-                    if(listViewFriends[position].friendModel!!.profilePicture.isNotEmpty()) {
-                        Timber.d("profile picture: ${listViewFriends[position].friendModel!!.profilePicture}")
+                    if(friendData.profilePicture.isNotEmpty()) {
                         Glide.with(ivAvatar.context)
-                            .load(listViewFriends[position].friendModel!!.profilePicture.toUri())
+                            .load(friendData.profilePicture.toUri())
                             .into(ivAvatar)
                             .onLoadStarted(
                                 AppCompatResources.getDrawable(
