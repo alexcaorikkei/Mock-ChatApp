@@ -78,7 +78,7 @@ class ChatFragment :
                 ivGallery.setImageResource(R.drawable.ic_gallery_clicked)
 
                 if (!isOpenEmoji) closeEmoji()
-                if (isOpenGallery) openGallery() else closeGallery()
+                if (isOpenGallery) checkPermission() else closeGallery()
             }
 
             ivSendGallery.setOnClickListener {
@@ -276,7 +276,6 @@ class ChatFragment :
     }
 
     private fun openGallery() {
-        checkPermission()
         bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetGalleryBehavior.isHideable = false
         binding.apply {
@@ -285,6 +284,7 @@ class ChatFragment :
             edtChat.isEnabled = false
         }
         isOpenGallery = !isOpenGallery
+        loadGallery()
     }
 
     private fun checkPermission() {
@@ -298,7 +298,7 @@ class ChatFragment :
                 123
             )
         } else {
-            loadGallery()
+            openGallery()
         }
     }
 
