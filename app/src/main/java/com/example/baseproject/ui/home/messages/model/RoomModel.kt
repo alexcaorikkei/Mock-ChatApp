@@ -1,5 +1,4 @@
 package com.example.baseproject.ui.home.messages.model
-
 import com.example.baseproject.domain.model.MessageType
 
 data class RoomModel(

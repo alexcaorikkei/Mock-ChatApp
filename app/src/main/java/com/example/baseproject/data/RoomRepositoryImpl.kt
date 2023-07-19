@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
-import com.example.baseproject.domain.repository.MessageRepository
+import com.example.baseproject.domain.repository.RoomRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.ui.home.messages.model.RoomModel
@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,7 +26,7 @@ import java.util.Date
 
 private const val MILISECONDS_IN_A_DAY = 86400000
 
-class MessageRepositoryImpl : MessageRepository {
+class RoomRepositoryImpl : RoomRepository {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -69,7 +70,7 @@ class MessageRepositoryImpl : MessageRepository {
             ChatModel(
                 lastMessage.key.toString(),
                 lastMessage.child("idSender").value.toString(),
-                getDate(lastMessage.child("date").value.toString().toLong()),
+                lastMessage.child("date").value.toString(),
                 type,
                 lastMessage.child(type.reference).value.toString(),
             )
@@ -121,6 +122,10 @@ class MessageRepositoryImpl : MessageRepository {
                 )
             }
         }
-        return listRoom.toList()
+        return listRoom.sortedBy {
+            -it.time.toLong()
+        }.map{
+            it.copy(time = getDate(it.time.toLong()))
+        }.toList()
     }
 }

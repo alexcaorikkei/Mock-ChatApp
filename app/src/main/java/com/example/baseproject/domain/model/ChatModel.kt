@@ -61,7 +61,7 @@ data class ChatModel(
     var type: MessageType,
     var text: String? = null,
     var photo: String? = null,
-    var emoji: String? = null
+    var emoji: String? = null,
 ) {
     constructor () : this("", "", "", MessageType.NONE, "", "", "")
 }
