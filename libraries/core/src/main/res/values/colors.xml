@@ -15,7 +15,7 @@
     <color name="background_color_white">@color/white</color>
     <color name="background_color_gray">#EFEFF4</color>
     <color name="start_color_btn_common">#087EFF</color>
-    <color name="end_color_btn_common">#05E8BA</color>
+    <color name="end_color_btn_common">#FFFFFF</color>
 
     <color name="color_hint_edit_text">#333333</color>
 
