@@ -46,4 +46,16 @@ class ProfileViewModel @Inject constructor(
             _profileResponse.value = profileRepository.getProfile()
         }
     }
+
+    private var _validator: MutableLiveData<Boolean> = MutableLiveData()
+    val validator: LiveData<Boolean> get() = _validator
+    private var _isValidPhone = false
+    private var _isValidName = false
+    fun setValidState(
+        isValidPhone: Boolean? = _isValidPhone,
+        isValidName: Boolean? = _isValidName) {
+        _isValidPhone = isValidPhone!!
+        _isValidName = isValidName!!
+        _validator.value = _isValidPhone && _isValidName
+    }
 }

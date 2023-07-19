@@ -22,11 +22,14 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
     @Inject
     lateinit var appNavigaiton: AppNavigation
     private val viewModel: ProfileViewModel by activityViewModels()
-    var imageProfileUri : Uri? = null
+    private var imageProfileUri : Uri? = null
     override fun getVM() = viewModel
 
     override fun bindingStateView() {
         super.bindingStateView()
+        viewModel.validator.observe(viewLifecycleOwner) { isValid ->
+            binding.tvSave.isEnabled = isValid
+        }
         viewModel.profileResponse.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Failure -> {
@@ -57,15 +60,19 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
             etName.validate { name ->
                 if(name.isEmpty()) {
                     etName.error = getString(R.string.name_is_empty)
+                    viewModel.setValidState(isValidName = false)
                 } else {
                     etName.error = null
+                    viewModel.setValidState(isValidName = true)
                 }
             }
             etPhoneNumber.validate { phoneNumber ->
-                if(phoneNumber.isEmpty()) {
-                    etPhoneNumber.error = getString(R.string.phone_number_is_empty)
-                } else {
+                if(phoneNumber.startsWith("0") && phoneNumber.length == 10 || phoneNumber.isEmpty()) {
                     etPhoneNumber.error = null
+                    viewModel.setValidState(isValidPhone = true)
+                } else {
+                    etPhoneNumber.error = getString(R.string.phone_number_is_invalid)
+                    viewModel.setValidState(isValidPhone = false)
                 }
             }
         }
