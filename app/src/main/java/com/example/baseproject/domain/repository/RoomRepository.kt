@@ -6,4 +6,5 @@ import com.example.baseproject.ui.home.messages.model.RoomModel
 
 interface RoomRepository {
     fun getMessages(): MutableLiveData<Response<List<RoomModel>>>
+    suspend fun searchMessages(query: String): Response<List<RoomModel>>
 }

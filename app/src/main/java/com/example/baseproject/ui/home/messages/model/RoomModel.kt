@@ -6,9 +6,10 @@ data class RoomModel(
     val friendId: String = "",
     val name: String = "",
     val profilePicture: String = "",
-    val lastMessageType: MessageType = MessageType.TEXT,
-    val lastMessage: String = "",
+    val messageType: MessageType = MessageType.TEXT,
+    val message: String = "",
     val time: String = "",
     val isSeen: Boolean = false,
-    val isSent: Boolean = false
+    val isSent: Boolean = false,
+    val messagesMatched: Int = 0
 )
