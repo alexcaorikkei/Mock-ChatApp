@@ -66,4 +66,5 @@
     <string name="sent_a_photo">sent a photo</string>
     <string name="sent_a_emoji">sent a emoji</string>
     <string name="you">You</string>
+    <string name="phone_number_is_invalid">Phone number is invalid</string>
 </resources>
