@@ -34,7 +34,11 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            binding.tvItemchatMess.text = item.text
+            binding.apply {
+                tvItemchatMess.text = item.text
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
 
@@ -42,13 +46,18 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivItemOnepicture)
-                .load(item.photo)
-                .override(
-                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt(),
-                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt()
-                )
-                .into(binding.ivItemOnepicture)
+            binding.apply {
+                Glide.with(ivItemOnepicture)
+                    .load(item.photo)
+                    .override(
+                        (300 * ivItemOnepicture.resources.displayMetrics.density).toInt(),
+                        (300 * ivItemOnepicture.resources.displayMetrics.density).toInt()
+                    )
+                    .into(ivItemOnepicture)
+
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
 
@@ -56,11 +65,11 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            binding.tvItemSendMess.text = item.text
-//            binding.tvItemSendMess.setOnClickListener {
-//                text = convertToMinuteSecond(getTimeCurrent())
-//                visibility = View.VISIBLE
-//            }
+            binding.apply {
+                tvItemSendMess.text = item.text
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
 
@@ -69,14 +78,17 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivItemOnepicture)
-                .load(item.photo)
-                .override(
-                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt(),
-                    (300 * binding.ivItemOnepicture.resources.displayMetrics.density).toInt()
-                )
-                .into(binding.ivItemOnepicture)
+            binding.apply {
+                Glide.with(ivItemOnepicture)
+                    .load(item.photo)
+                    .override(
+                        (300 * ivItemOnepicture.resources.displayMetrics.density).toInt(),
+                        (300 * ivItemOnepicture.resources.displayMetrics.density).toInt()
+                    ).into(ivItemOnepicture)
 
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
 
@@ -84,10 +96,14 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivItemOnepicture)
-                .load(item.emoji?.let { getEmoji(it.toInt()) })
-                .into(binding.ivItemOnepicture)
+            binding.apply {
+                Glide.with(ivItemOnepicture)
+                    .load(item.emoji?.let { getEmoji(it.toInt()) })
+                    .into(ivItemOnepicture)
 
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
 
@@ -95,11 +111,17 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         RecyclerView.ViewHolder(binding.root) {
 
         fun bind(item: ChatModel) {
-            Glide.with(binding.ivItemOnepicture)
-                .load(item.emoji?.let { getEmoji(it.toInt()) })
-                .into(binding.ivItemOnepicture)
+            binding.apply {
+                Glide.with(ivItemOnepicture)
+                    .load(item.emoji?.let { getEmoji(it.toInt()) })
+                    .into(ivItemOnepicture)
+
+                tvDate.text = getMinuteSecond(item.date.toLong())
+                tvDate.visible()
+            }
         }
     }
+
     class ExampleListDiffUtil : DiffUtil.ItemCallback<ChatModel>() {
         override fun areContentsTheSame(oldItem: ChatModel, newItem: ChatModel) =
             oldItem == newItem
@@ -194,11 +216,13 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 val mHolder = holder as ItemChatOnePhotoSendVH
                 mHolder.bind(chat)
             }
-            RECEIVE_EMOJI->{
+
+            RECEIVE_EMOJI -> {
                 val mHolder = holder as ItemChatOneEmojiReceiveVH
                 mHolder.bind(chat)
             }
-            SEND_EMOJI->{
+
+            SEND_EMOJI -> {
                 val mHolder = holder as ItemChatOneEmojiSendVH
                 mHolder.bind(chat)
             }

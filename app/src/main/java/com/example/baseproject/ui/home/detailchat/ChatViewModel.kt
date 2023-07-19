@@ -39,11 +39,6 @@ class ChatViewModel @Inject constructor(
     private var _getReceiverResponse: MutableLiveData<Response<FriendModel>> = MutableLiveData()
     val getReceiverResponse: LiveData<Response<FriendModel>> get() = _getReceiverResponse
 
-    private var _getListChatResponseModel: MutableLiveData<Response<List<ChatModel>>> =
-        MutableLiveData()
-    val getListChatResponseModel: LiveData<Response<List<ChatModel>>> get() = _getListChatResponseModel
-
-
     private val _messageListLiveData = MutableLiveData<ArrayList<ChatModel>>()
     val messageListLiveData: LiveData<ArrayList<ChatModel>> get() = _messageListLiveData
 
@@ -91,6 +86,9 @@ class ChatViewModel @Inject constructor(
                         messageList.add(message)
                     }
 
+                    messageList.forEach { itemChat ->
+                        itemChat.date = getDate(itemChat.date.toLong())
+                    }
                     _messageListLiveData.value = messageList
                 }
 
@@ -130,7 +128,6 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
-
 
     fun sendPhoto(uri: String, idReceive: String) {
         val chatModel = myUid?.let {

@@ -7,6 +7,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.MessageRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.extension.MILISECONDS_IN_A_DAY
 import com.example.baseproject.ui.home.messages.model.RoomModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -22,8 +23,6 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
-
-private const val MILISECONDS_IN_A_DAY = 86400000
 
 class MessageRepositoryImpl : MessageRepository {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
