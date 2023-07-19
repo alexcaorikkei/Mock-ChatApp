@@ -56,12 +56,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="13dp"
+            android:ellipsize="end"
             android:lineHeight="21dp"
+            android:maxLines="1"
             android:textColor="@color/black"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:maxLines="1"
-            android:ellipsize="end"
             app:layout_constraintBottom_toBottomOf="@id/ivAvatarReceiver"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ivAvatarReceiver"
@@ -129,18 +129,6 @@
                 app:layout_constraintTop_toTopOf="@id/edtChat" />
 
             <androidx.appcompat.widget.AppCompatImageView
-                android:id="@+id/ivSendEmoji"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp"
-                android:layout_marginEnd="10dp"
-                android:paddingHorizontal="5dp"
-                android:src="@drawable/ic_send"
-                android:visibility="gone"
-                app:layout_constraintBottom_toBottomOf="@id/edtChat"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/edtChat" />
-
-            <androidx.appcompat.widget.AppCompatImageView
                 android:id="@+id/ivSendChat"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp"
@@ -164,7 +152,7 @@
                 android:id="@+id/clBottomSheetGallery"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:behavior_hideable="true"
+                app:behavior_hideable="false"
                 app:layout_behavior="@string/bottom_sheet_behavior">
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -189,7 +177,7 @@
                 android:id="@+id/clBottomSheetEmoji"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:behavior_hideable="true"
+                app:behavior_hideable="false"
                 app:layout_behavior="@string/bottom_sheet_behavior">
 
                 <androidx.recyclerview.widget.RecyclerView
