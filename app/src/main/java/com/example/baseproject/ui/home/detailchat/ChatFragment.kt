@@ -45,7 +45,6 @@ class ChatFragment :
     private lateinit var chatAdapter: ChatAdapter2
 
     private var photoListClicked = ArrayList<Photo>()
-    private var emojiListClicked = ArrayList<Emoji>()
 
     private var isOpenGallery = true
     private var isOpenEmoji = true
@@ -78,7 +77,7 @@ class ChatFragment :
                 ivGallery.setImageResource(R.drawable.ic_gallery_clicked)
 
                 if (!isOpenEmoji) closeEmoji()
-                if (isOpenGallery) openGallery() else closeGallery()
+                if (isOpenGallery) checkPermission() else closeGallery()
             }
 
             ivSendGallery.setOnClickListener {
@@ -86,24 +85,14 @@ class ChatFragment :
                 coordinatorLayoutGallery.gone()
                 ivSendGallery.gone()
                 edtChat.isEnabled = true
-                getListPhotoClicked()
+                sendPhotoClicked()
             }
 
             ivEmoji.setOnClickListener {
                 hideKeyboard()
                 ivEmoji.setImageResource(R.drawable.ic_smile_clicked)
-
                 if (!isOpenGallery) closeGallery()
                 if (isOpenEmoji) openEmoji() else closeEmoji()
-            }
-
-            ivSendEmoji.setOnClickListener {
-                bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
-                coordinatorLayoutEmoji.gone()
-                coordinatorLayoutGallery.gone()
-                ivSendEmoji.gone()
-                edtChat.isEnabled = true
-                getListEmojiClicked()
             }
 
             ivSendChat.setOnClickListener {
@@ -180,18 +169,11 @@ class ChatFragment :
         }
     }
 
-    private fun getListPhotoClicked() {
+    private fun sendPhotoClicked() {
         viewModel.sendPhoto(photoListClicked[0].uri, uidReceiver)
         binding.ivSendChat.gone()
         binding.ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
         isOpenGallery = !isOpenGallery
-    }
-
-    private fun getListEmojiClicked() {
-        viewModel.sendEmoji(emojiListClicked[0].content.toString(), uidReceiver)
-        binding.ivSendChat.gone()
-        binding.ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
-        isOpenEmoji = !isOpenEmoji
     }
 
     private fun closeEmoji() {
@@ -199,7 +181,6 @@ class ChatFragment :
         binding.apply {
             coordinatorLayoutEmoji.gone()
             coordinatorLayoutGallery.gone()
-            ivSendEmoji.gone()
             ivSendChat.gone()
             edtChat.isEnabled = true
             ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
@@ -221,43 +202,33 @@ class ChatFragment :
     }
 
     private fun loadEmoji() {
-        emojiListClicked.clear()
-
         binding.apply {
-            val layoutManager = GridLayoutManager(requireActivity(), 3)
+            val layoutManager = GridLayoutManager(requireActivity(), 7)
             rvEmojiList.layoutManager = layoutManager
 
-            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
+            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 3), 7)
             rvEmojiList.addItemDecoration(divider)
             val emojiObjectList = ArrayList<Emoji>()
 
-            for (i in 1..10) {
-                emojiObjectList.add(Emoji(i, false))
+            for (i in 1..32) {
+                emojiObjectList.add(Emoji(content = i))
             }
             emojiAdapter = EmojiAdapter(emojiObjectList)
             rvEmojiList.adapter = emojiAdapter
             emojiAdapter.notifyDataSetChanged()
 
-            emojiAdapter.onClickListener = object : OnPhotoAdapterListener {
-                override fun pickPhoto(position: Int) {
-                    val emoji = emojiObjectList[position]
-                    val isClicked = emoji.isClicked
-                    if (isClicked) {
-                        emoji.isClicked = false
-                        emojiListClicked.remove(emoji)
-                    }
-                    if (!isClicked) {
-                        emoji.isClicked = true
-                        emojiListClicked.add(emoji)
-                    }
-                    emojiAdapter.notifyItemChanged(position)
-                    if (emojiListClicked.size > 0) {
-                        ivSendEmoji.visible()
-                        ivSendChat.invisible()
-                    } else {
-                        ivSendEmoji.gone()
-                        ivSendChat.gone()
-                    }
+            emojiAdapter.onClickListener = object : OnEmojiAdapterListener {
+                override fun pickEmoji(position: Int) {
+                    isOpenEmoji = !isOpenEmoji
+
+                    bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                    coordinatorLayoutEmoji.gone()
+                    coordinatorLayoutGallery.gone()
+                    ivSendChat.gone()
+                    ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
+                    edtChat.isEnabled = true
+
+                    viewModel.sendEmoji(emojiObjectList[position].content.toString(), uidReceiver)
                 }
             }
         }
@@ -276,7 +247,6 @@ class ChatFragment :
     }
 
     private fun openGallery() {
-        checkPermission()
         bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
         bottomSheetGalleryBehavior.isHideable = false
         binding.apply {
@@ -285,6 +255,7 @@ class ChatFragment :
             edtChat.isEnabled = false
         }
         isOpenGallery = !isOpenGallery
+        loadGallery()
     }
 
     private fun checkPermission() {
@@ -298,7 +269,7 @@ class ChatFragment :
                 123
             )
         } else {
-            loadGallery()
+            openGallery()
         }
     }
 
@@ -309,7 +280,7 @@ class ChatFragment :
             val layoutManager = GridLayoutManager(requireActivity(), 3)
             rvGallery.layoutManager = layoutManager
 
-            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 1), 3)
+            val divider = GridItemSpacingDecoration(convertDpToPixel(requireActivity(), 2), 3)
             rvGallery.addItemDecoration(divider)
 
             val gallery = getAllImagesFromDevice(requireContext())
