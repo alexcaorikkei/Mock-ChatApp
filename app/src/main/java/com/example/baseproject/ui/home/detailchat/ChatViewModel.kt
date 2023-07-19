@@ -86,9 +86,9 @@ class ChatViewModel @Inject constructor(
                         messageList.add(message)
                     }
 
-                    messageList.forEach { itemChat ->
-                        itemChat.date = getDate(itemChat.date.toLong())
-                    }
+//                    messageList.forEach { itemChat ->
+//                        itemChat.date = getDate(itemChat.date.toLong())
+//                    }
                     _messageListLiveData.value = messageList
                 }
 
