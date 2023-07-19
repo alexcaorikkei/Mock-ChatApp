@@ -4,9 +4,10 @@ import androidx.lifecycle.MutableLiveData
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
-import com.example.baseproject.domain.repository.MessageRepository
+import com.example.baseproject.domain.repository.RoomRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.extension.toViWithoutAccent
 import com.example.baseproject.ui.home.messages.model.RoomModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
@@ -18,6 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
+import java.sql.Time
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,7 +28,7 @@ import java.util.Date
 
 private const val MILISECONDS_IN_A_DAY = 86400000
 
-class MessageRepositoryImpl : MessageRepository {
+class RoomRepositoryImpl : RoomRepository {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -39,14 +42,62 @@ class MessageRepositoryImpl : MessageRepository {
                     roomResponse.postValue(Response.Success(getListRoom(snapshot)))
                 }
             }
-
             override fun onCancelled(error: DatabaseError) {
                 roomResponse.postValue(Response.Failure(error.toException()))
             }
-
         }
         roomReference.addValueEventListener(roomListener)
         return roomResponse
+    }
+
+    override suspend fun searchMessages(query: String): Response<List<RoomModel>> {
+        if(query.isEmpty()) return Response.Success(listOf())
+        return try {
+            val roomReference = database.reference.child("room")
+            val roomSnapshot = roomReference.get().await()
+            val listRoom = getListRoomQuery(roomSnapshot, query.toViWithoutAccent())
+            Response.Success(listRoom)
+        } catch (e: Exception) {
+            Response.Failure(e)
+        }
+    }
+
+    private suspend fun getListRoomQuery(roomSnapshot: DataSnapshot?, query: String): List<RoomModel> {
+        val listRoom = mutableListOf<RoomModel>()
+        roomSnapshot?.children?.filter { it.key.toString().contains(auth.uid!!) }?.forEach { room ->
+            var messagesMatched = 0
+            var textMatched = ""
+            var sender = ""
+            var time = ""
+            room.children.forEach { message ->
+                val text = message.child("text").value.toString()
+                if (text != "null" && text.toViWithoutAccent().contains(query)) {
+                    messagesMatched += 1
+                    textMatched = text
+                    sender = message.child("idSender").value.toString()
+                    time = message.child("date").value.toString()
+                }
+            }
+            if(messagesMatched > 0) {
+                val id = room.key.toString()
+                val friendId = id.replace(auth.uid!!, "")
+                val friendProfile = getFriendProfile(friendId)
+                listRoom.add(
+                    RoomModel(
+                        id,
+                        friendId,
+                        friendProfile.displayName,
+                        friendProfile.profilePicture,
+                        MessageType.TEXT,
+                        textMatched,
+                        time,
+                        isSent = sender == auth.uid!!,
+                        messagesMatched = messagesMatched,
+                    )
+                )
+            }
+        }
+        return listRoom.sortedBy { -it.time.toLong() }.toList()
     }
 
     private suspend fun getFriendProfile(friendId: String): FriendModel {
@@ -69,7 +120,7 @@ class MessageRepositoryImpl : MessageRepository {
             ChatModel(
                 lastMessage.key.toString(),
                 lastMessage.child("idSender").value.toString(),
-                getDate(lastMessage.child("date").value.toString().toLong()),
+                lastMessage.child("date").value.toString(),
                 type,
                 lastMessage.child(type.reference).value.toString(),
             )
@@ -121,6 +172,10 @@ class MessageRepositoryImpl : MessageRepository {
                 )
             }
         }
-        return listRoom.toList()
+        return listRoom.sortedBy {
+            -it.time.toLong()
+        }.map{
+            it.copy(time = getDate(it.time.toLong()))
+        }.toList()
     }
 }

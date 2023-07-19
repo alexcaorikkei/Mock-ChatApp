@@ -51,12 +51,16 @@ class RoomAdapter(
                     .into(ivAvatar)
             }
             tvName.text = roomData.name
-            tvMessage.text = when(roomData.lastMessageType) {
+            tvMessage.text = when(roomData.messageType) {
                 MessageType.TEXT -> {
-                    if(roomData.isSent) {
-                        "${tvMessage.context.getString(R.string.you)}: ${roomData.lastMessage}"
+                    if(roomData.messagesMatched <= 1) {
+                        if(roomData.isSent) {
+                            "${tvMessage.context.getString(R.string.you)}: ${roomData.message}"
+                        } else {
+                            roomData.message
+                        }
                     } else {
-                        roomData.lastMessage
+                        "${roomData.messagesMatched} ${tvMessage.context.getString(R.string.messages_matched)}"
                     }
                 }
                 MessageType.NONE -> {""}
@@ -76,10 +80,14 @@ class RoomAdapter(
                 }
                 MessageType.DATE -> {""}
             }
-            try {
-                tvTime.text = tvTime.context.getString(roomData.time.toInt())
-            } catch (e: Exception) {
-                tvTime.text = roomData.time
+            if(roomData.messagesMatched == 0) {
+                try {
+                    tvTime.text = tvTime.context.getString(roomData.time.toInt())
+                } catch (e: Exception) {
+                    tvTime.text = roomData.time
+                }
+            } else {
+                tvTime.text = ""
             }
             if (roomData.isSeen) {
                 tvMessage.setTextColor(tvMessage.context.getColor(com.example.core.R.color.gray))
