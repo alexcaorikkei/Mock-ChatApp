@@ -32,12 +32,4 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(R.layout.f
         navController = (childFragmentManager.findFragmentById(R.id.nav_host_container) as NavHostFragment).navController
         binding.bottomNav.setupWithNavController(navController)
     }
-
-    override fun bindingStateView() {
-        super.bindingStateView()
-    }
-
-    override fun bindingAction() {
-        super.bindingAction()
-    }
 }
