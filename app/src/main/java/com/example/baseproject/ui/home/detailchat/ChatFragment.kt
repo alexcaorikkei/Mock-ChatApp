@@ -106,8 +106,8 @@ class ChatFragment :
 
     override fun bindingStateView() {
         super.bindingStateView()
-        viewModel.apply {
 
+        viewModel.apply {
             getReceiver(uidReceiver)
 
             receiver.observe(viewLifecycleOwner) {
@@ -122,49 +122,49 @@ class ChatFragment :
 
             getListMessage(uidReceiver)
 
+            messageListLiveData.observe(viewLifecycleOwner) {
+                chatAdapter.submitList(it.toMutableList())
+                binding.rvChat.smoothScrollToPosition(it.size)
+            }
+
             sendMessageResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
-                    is Response.Loading -> {
-                    }
-
-                    is Response.Success -> {
-                    }
-
+                    is Response.Loading -> {}
+                    is Response.Success -> {}
                     is Response.Failure -> {
                         "Error Message: ${response.e}".toast(requireContext())
                     }
                 }
             }
+
             sendEmojiResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
-                    is Response.Loading -> {
-                    }
-
-                    is Response.Success -> {
-                    }
-
+                    is Response.Loading -> {}
+                    is Response.Success -> {}
                     is Response.Failure -> {
                         "Error Emoji: ${response.e}".toast(requireContext())
                     }
                 }
             }
-            sendPhotoResponse.observe(viewLifecycleOwner) { response ->
+
+            getReceiverResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
-                    is Response.Loading -> {
-                    }
-
-                    is Response.Success -> {
-                    }
-
+                    is Response.Loading -> {}
+                    is Response.Success -> {}
                     is Response.Failure -> {
-                        "Error Photo: ${response.e}".toast(requireContext())
+                        "Error Receiver: ${response.e}".toast(requireContext())
                     }
                 }
             }
 
-            messageListLiveData.observe(viewLifecycleOwner) {
-                chatAdapter.submitList(it.toMutableList())
-                binding.rvChat.smoothScrollToPosition(it.size)
+            sendPhotoResponse.observe(viewLifecycleOwner) { response ->
+                when (response) {
+                    is Response.Loading -> {}
+                    is Response.Success -> {}
+                    is Response.Failure -> {
+                        "Error Photo: ${response.e}".toast(requireContext())
+                    }
+                }
             }
         }
     }

@@ -84,7 +84,7 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
 
             auth.uid?.let {
                 database.reference.child("room")
-                    .child(getIdRoom(it, ID_RECEIVE_N))
+                    .child(getIdRoom(it, idReceive))
                     .addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
                             for (dataSnapshot in snapshot.children) {
