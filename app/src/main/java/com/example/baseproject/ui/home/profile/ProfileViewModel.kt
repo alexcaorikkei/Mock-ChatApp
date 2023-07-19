@@ -10,6 +10,7 @@ import com.example.baseproject.domain.repository.AuthRepository
 import com.example.baseproject.domain.repository.ProfileRepository
 import com.example.baseproject.domain.model.UserModel
 import com.example.core.base.BaseViewModel
+import com.example.core.utils.SingleLiveEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -20,7 +21,7 @@ class ProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
     private val profileRepository: ProfileRepository
 ) : BaseViewModel() {
-    private var _logOutResponse = MutableLiveData<Response<Boolean>>()
+    private var _logOutResponse = SingleLiveEvent<Response<Boolean>>()
     val logOutResponse: MutableLiveData<Response<Boolean>> = _logOutResponse
     fun logOut() {
         viewModelScope.launch {
@@ -44,5 +45,17 @@ class ProfileViewModel @Inject constructor(
             profileRepository.updateProfile(user, profilePictureUri)
             _profileResponse.value = profileRepository.getProfile()
         }
+    }
+
+    private var _validator: MutableLiveData<Boolean> = MutableLiveData()
+    val validator: LiveData<Boolean> get() = _validator
+    private var _isValidPhone = false
+    private var _isValidName = false
+    fun setValidState(
+        isValidPhone: Boolean? = _isValidPhone,
+        isValidName: Boolean? = _isValidName) {
+        _isValidPhone = isValidPhone!!
+        _isValidName = isValidName!!
+        _validator.value = _isValidPhone && _isValidName
     }
 }

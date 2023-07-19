@@ -59,7 +59,7 @@ class RegisterFragment() :
     override fun bindingAction() {
         super.bindingAction()
         viewModel.apply {
-            signUpResponse.observe(this@RegisterFragment) { response ->
+            signUpResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
                     is Response.Loading -> {}
                     is Response.Success -> {
