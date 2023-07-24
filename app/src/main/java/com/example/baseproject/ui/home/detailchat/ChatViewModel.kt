@@ -123,8 +123,8 @@ class ChatViewModel @Inject constructor(
             })
         }
 
-        if (messageList.size - 1 > 0) {
-            if (messageList[positionBefore].type != MessageType.DATE) {
+        if (messageList.size - 1 > 0 && messageList[positionBefore].type != MessageType.DATE) {//tinh ca DATE
+            if (messageList[positionBefore].idSender == message.idSender) {
                 val compareTwoTime = context.getMinuteSecond(
                     message.date.toLong(),
                     messageList[positionBefore].date.toLong()
