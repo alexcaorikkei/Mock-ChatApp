@@ -62,6 +62,18 @@ data class ChatModel(
     var text: String? = null,
     var photo: String? = null,
     var emoji: String? = null,
+    var currentDate: String? = "",
+    var formatDate: String? = ""
 ) {
-    constructor () : this("", "", "", MessageType.NONE, "", "", "")
+    constructor () : this(
+        "",
+        "",
+        "",
+        type = MessageType.NONE,
+        text = "",
+        photo = "",
+        emoji = "",
+        currentDate = "",
+        formatDate = ""
+    )
 }

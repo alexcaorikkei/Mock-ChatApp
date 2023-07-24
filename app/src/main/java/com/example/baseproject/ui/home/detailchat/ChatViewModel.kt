@@ -1,9 +1,12 @@
 package com.example.baseproject.ui.home.detailchat
 
+import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.DetailMessageRepository
@@ -15,7 +18,7 @@ import com.example.core.base.BaseViewModel
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import java.util.Calendar
 import javax.inject.Inject
@@ -23,6 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
     val savedStateHandle: SavedStateHandle,
     private var detailMessageRepository: DetailMessageRepository
 ) : BaseViewModel() {
@@ -82,14 +86,10 @@ class ChatViewModel @Inject constructor(
                     val oldItem = messageList.firstOrNull { it.id == message.id }
                     if (oldItem != null) {
                         oldItem.photo = message.photo
-                    } else {
-                        messageList.add(message)
-                    }
+                        _messageListLiveData.value = messageList
+                    } else handleAddMessage(message)
 
-//                    messageList.forEach { itemChat ->
-//                        itemChat.date = getDate(itemChat.date.toLong())
-//                    }
-                    _messageListLiveData.value = messageList
+//                    if (oldItem == null) handleAddMessage(message)
                 }
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -110,6 +110,40 @@ class ChatViewModel @Inject constructor(
             })
     }
 
+    private fun handleAddMessage(message: ChatModel) {
+        val messageList = _messageListLiveData.value ?: arrayListOf()
+
+        val mDate = context.getDate(message.date.toLong())
+        val positionBefore = messageList.size - 1
+
+        if (messageList.isEmpty() || messageList.find { it.currentDate == mDate } == null) {
+            messageList.add(ChatModel().apply {
+                type = MessageType.DATE
+                currentDate = mDate
+            })
+        }
+
+        if (messageList.size - 1 > 0 && messageList[positionBefore].type != MessageType.DATE) {//tinh ca DATE
+            if (messageList[positionBefore].idSender == message.idSender) {
+                val compareTwoTime = context.getMinuteSecond(
+                    message.date.toLong(),
+                    messageList[positionBefore].date.toLong()
+                )
+                if (compareTwoTime == context.getString(R.string.same_minute))
+                    messageList[positionBefore].formatDate = context.getString(
+                        R.string.same_minute
+                    )
+            }
+        }
+        message.formatDate = context.getMinuteSecond(
+            message.date.toLong(),
+            0
+        )
+        messageList.add(message)
+        _messageListLiveData.value = messageList
+    }
+
+
     fun sendEmoji(linkEmoji: String, idReceive: String) {
         val chatModel = myUid?.let {
             ChatModel(
@@ -122,9 +156,10 @@ class ChatViewModel @Inject constructor(
             )
         }
         if (chatModel != null) {
+//            handleAddMessage(chatModel)
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
-                _sendEmojiResponse.value = response
+                _sendEmojiResponse.postValue(response)
             }
         }
     }
@@ -141,15 +176,10 @@ class ChatViewModel @Inject constructor(
             )
         }
         if (chatModel != null) {
-            viewModelScope.launch(Dispatchers.IO) {
+            handleAddMessage(chatModel)
+            viewModelScope.launch {
                 val response = detailMessageRepository.sendPhoto(chatModel, idReceive)
-
-                _sendPhotoResponse.postValue(response)
-                if (response is Response.Success) {
-                    val messageList = _messageListLiveData.value ?: arrayListOf()
-                    messageList.add(chatModel)
-                    _messageListLiveData.postValue(messageList)
-                }
+                _sendPhotoResponse.value = response
             }
         }
     }
@@ -165,7 +195,7 @@ class ChatViewModel @Inject constructor(
             )
         }
         if (chatModel != null) {
-
+//            handleAddMessage(chatModel)
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendMessageResponse.value = response

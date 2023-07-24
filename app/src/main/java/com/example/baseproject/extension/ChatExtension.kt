@@ -20,9 +20,10 @@ const val SEND_PHOTOS = 3
 const val RECEIVE_EMOJI = 4
 const val SEND_EMOJI = 5
 
-const val KEY_ID_RECEIVER = "KEY_ID_RECEIVER"
+const val DATE = 6
 
-const val MILISECONDS_IN_A_DAY = 86400000
+const val KEY_ID_RECEIVER = "KEY_ID_RECEIVER"
+private const val MILISECONDS_IN_A_MINUTE = 60000
 
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
@@ -60,7 +61,7 @@ fun convertDpToPixel(context: Context, dp: Int): Int {
 }
 
 fun Context.getDate(date: Long): String {
-    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/YYYY")
     val today = Calendar.getInstance()
     today.set(
         today.get(Calendar.YEAR),
@@ -71,26 +72,22 @@ fun Context.getDate(date: Long): String {
     val messageDate = Date(date)
     return if (dateFormat.format(today.time) == dateFormat.format(messageDate)) {
         resources.getString(R.string.today)
-    } else if (today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
-        resources.getString(R.string.yesterday)
     } else {
         dateFormat.format(messageDate)
     }
 }
 
-fun getDate(date: Long): String {
-    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
-    val today = Calendar.getInstance()
-    today.set(
-        today.get(Calendar.YEAR),
-        today.get(Calendar.MONTH),
-        today.get(Calendar.DAY_OF_MONTH),
-        0, 0, 0
-    )
+fun Context.getMinuteSecond(date: Long, dateBefore: Long): String {
+    val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
     val messageDate = Date(date)
-    return dateFormat.format(messageDate)
+    return if (isMinute(date,dateBefore)) {
+        resources.getString(R.string.same_minute)
+    } else {
+        dateFormat.format(messageDate)
+    }
 }
 
-fun getMinuteSecond(date: Long): String {
-    return SimpleDateFormat("hh:mm").format(Date(date))
+fun isMinute(date: Long, dateBefore: Long): Boolean {
+    if (date - dateBefore < 60000) return true
+    return false
 }

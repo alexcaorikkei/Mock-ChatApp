@@ -3,14 +3,18 @@ package com.example.baseproject.ui.home.detailchat
 import android.Manifest
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.DisplayMetrics
 import android.view.View
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
@@ -23,6 +27,8 @@ import com.example.baseproject.databinding.FragmentDetailChatBinding
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.*
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.ui.home.detailchat.notification.Notification
+import com.example.baseproject.ui.home.detailchat.notification.channelID
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.utils.toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -51,10 +57,12 @@ class ChatFragment :
 
     private var uidReceiver = ""
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("NotifyDataSetChanged")
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
 
+        createNotificationChannel()
         uidReceiver = arguments?.getString(KEY_ID_RECEIVER).toString()
 
         setEdittextUsableWhenFullScreen()
@@ -100,8 +108,28 @@ class ChatFragment :
                     getTextSend(),
                     uidReceiver
                 )
+//                sendNotification()
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)//từ ver 8.0
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                channelID,
+                "Notify Channel",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            val notificationManager =
+                context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.createNotificationChannel(channel)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendNotification() {
+        context?.let { Notification.createNotification(1, it, "title", "message") }
     }
 
     override fun bindingStateView() {
@@ -171,8 +199,12 @@ class ChatFragment :
 
     private fun sendPhotoClicked() {
         viewModel.sendPhoto(photoListClicked[0].uri, uidReceiver)
-        binding.ivSendChat.gone()
-        binding.ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
+        binding.apply {
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
+            ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
+        }
         isOpenGallery = !isOpenGallery
     }
 
@@ -181,8 +213,10 @@ class ChatFragment :
         binding.apply {
             coordinatorLayoutEmoji.gone()
             coordinatorLayoutGallery.gone()
-            ivSendChat.gone()
             edtChat.isEnabled = true
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
             ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
         }
         isOpenEmoji = !isOpenEmoji
@@ -224,10 +258,11 @@ class ChatFragment :
                     bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                     coordinatorLayoutEmoji.gone()
                     coordinatorLayoutGallery.gone()
-                    ivSendChat.gone()
                     ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
                     edtChat.isEnabled = true
-
+                    edtChat.text?.let {
+                        if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+                    }
                     viewModel.sendEmoji(emojiObjectList[position].content.toString(), uidReceiver)
                 }
             }
@@ -239,8 +274,10 @@ class ChatFragment :
         binding.apply {
             coordinatorLayoutGallery.gone()
             ivSendGallery.gone()
-            ivSendChat.gone()
             edtChat.isEnabled = true
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
             ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
         }
         isOpenGallery = !isOpenGallery
@@ -364,11 +401,7 @@ class ChatFragment :
     private fun listenEdittextChat() {
         binding.apply {
             edtChat.validate { textInputUser ->
-                if (textInputUser.isNullOrBlank()) {
-                    ivSendChat.gone()
-                } else {
-                    ivSendChat.visible()
-                }
+                if (textInputUser.isBlank()) ivSendChat.gone() else ivSendChat.visible()
             }
         }
     }
