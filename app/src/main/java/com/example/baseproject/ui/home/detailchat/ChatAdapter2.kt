@@ -40,7 +40,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }
@@ -61,7 +61,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }
@@ -75,7 +75,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }
@@ -96,7 +96,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }
@@ -113,7 +113,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }
@@ -130,7 +130,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 if (item.formatDate != "empty") {
                     tvDate.text = item.formatDate
                     tvDate.visible()
-                }
+                } else tvDate.gone()
             }
         }
     }

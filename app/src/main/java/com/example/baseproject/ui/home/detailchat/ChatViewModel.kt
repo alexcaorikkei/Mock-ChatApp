@@ -1,10 +1,12 @@
 package com.example.baseproject.ui.home.detailchat
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.DetailMessageRepository
@@ -84,7 +86,6 @@ class ChatViewModel @Inject constructor(
                     val oldItem = messageList.firstOrNull { it.id == message.id }
                     if (oldItem != null) {
                         oldItem.photo = message.photo
-                        messageList.add(oldItem)
                         _messageListLiveData.value = messageList
                     } else handleAddMessage(message)
 
@@ -110,35 +111,34 @@ class ChatViewModel @Inject constructor(
     }
 
     private fun handleAddMessage(message: ChatModel) {
-//        messageList.add(message)
         val messageList = _messageListLiveData.value ?: arrayListOf()
-        val mDate = context.getDate(message.date.toLong())
-//        val index = messageList.indexOfFirst { it.date == message.date }
 
+        val mDate = context.getDate(message.date.toLong())
+        val positionBefore = messageList.size - 1
 
         if (messageList.isEmpty() || messageList.find { it.currentDate == mDate } == null) {
-//            if (index > 0) {
-//                val mTime = context.getMinuteSecond(
-//                    message.date.toLong(),
-//                    messageList[index - 1].date.toLong()
-//                )
-//
-//                if (messageList.find { it.formatDate == mTime } == null) {
-//                    messageList.add(ChatModel().apply {
-//                        type = MessageType.DATE
-//                        currentDate = mDate
-//                        formatDate = mTime
-//                    })
-//                } else {
-                    messageList.add(ChatModel().apply {
-                        type = MessageType.DATE
-                        currentDate = mDate
-
-                    })
-//                }
-//            }
+            messageList.add(ChatModel().apply {
+                type = MessageType.DATE
+                currentDate = mDate
+            })
         }
 
+        if (messageList.size - 1 > 0) {
+            if (messageList[positionBefore].type != MessageType.DATE) {
+                val compareTwoTime = context.getMinuteSecond(
+                    message.date.toLong(),
+                    messageList[positionBefore].date.toLong()
+                )
+                if (compareTwoTime == context.getString(R.string.same_minute))
+                    messageList[positionBefore].formatDate = context.getString(
+                        R.string.same_minute
+                    )
+            }
+        }
+        message.formatDate = context.getMinuteSecond(
+            message.date.toLong(),
+            0
+        )
         messageList.add(message)
         _messageListLiveData.value = messageList
     }

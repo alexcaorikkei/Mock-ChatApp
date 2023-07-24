@@ -77,18 +77,17 @@ fun Context.getDate(date: Long): String {
     }
 }
 
-//fun getMinuteSecond(date: Long): String {
-//    return SimpleDateFormat("hh:mm").format(Date(date))
-//}
 fun Context.getMinuteSecond(date: Long, dateBefore: Long): String {
-    val hourFormat: DateFormat = SimpleDateFormat("hh:mm")
+    val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
     val messageDate = Date(date)
-    val messageDateBefore = Date(dateBefore)
-
-    return if (messageDate.time - messageDateBefore.time < MILISECONDS_IN_A_MINUTE) {
-        resources.getString(R.string.empty)
+    return if (isMinute(date,dateBefore)) {
+        resources.getString(R.string.same_minute)
     } else {
-        hourFormat.format(messageDate)
+        dateFormat.format(messageDate)
     }
+}
 
+fun isMinute(date: Long, dateBefore: Long): Boolean {
+    if (date - dateBefore < 60000) return true
+    return false
 }

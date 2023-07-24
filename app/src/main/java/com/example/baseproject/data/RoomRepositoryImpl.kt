@@ -164,7 +164,7 @@ class RoomRepositoryImpl : RoomRepository {
                         friendProfile.displayName,
                         friendProfile.profilePicture,
                         lastMessage.type,
-                        lastMessage.text!!,
+                        lastMessage.text?:"",
                         lastMessage.date,
                         false,
                         lastMessage.idSender == auth.uid!!

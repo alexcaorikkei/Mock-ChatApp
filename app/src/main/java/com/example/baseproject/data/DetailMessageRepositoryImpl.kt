@@ -12,7 +12,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.storage.FirebaseStorage
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import kotlin.coroutines.resumeWithException
 
 
 class DetailMessageRepositoryImpl : DetailMessageRepository {
@@ -35,32 +38,38 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override suspend fun sendPhoto(
         chatModel: ChatModel,
         idReceive: String
-    ): Response<Boolean> {
-        chatModel.photo?.let {
-            storage.reference.child("images/" + it.toUri().lastPathSegment)
-                .putFile(it.toUri())
-                .addOnSuccessListener { task ->
-                    task.storage.downloadUrl.addOnSuccessListener { uri ->
-                        chatModel.photo = uri.toString()
-                        database.reference.child("room")
-                            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
-                            .child(chatModel.id).setValue(chatModel)
+    ): Response<Boolean> =
+        suspendCancellableCoroutine { emit ->
+            chatModel.photo?.let {
+                storage.reference
+                    .child("images/" + it.toUri().lastPathSegment)
+                    .putFile(it.toUri())
+                    .addOnSuccessListener { task ->
+                        task.storage
+                            .downloadUrl
+                            .addOnSuccessListener { uri ->
+                                chatModel.photo = uri.toString()
+                                database.reference
+                                    .child("room")
+                                    .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+                                    .child(chatModel.id).setValue(chatModel)
+                                    .addOnSuccessListener {
+                                        emit.resume(Response.Success(true), null)
+                                    }.addOnFailureListener { e ->
+                                        emit.resumeWithException(e)
+                                    }
+                            }.addOnFailureListener { e ->
+                                emit.resumeWithException(e)
+                            }
+                    }.addOnFailureListener { it2 ->
+                        emit.resumeWithException(it2)
                     }
-                }
-                .addOnFailureListener { it2 ->
-                    print(it2.message)
-                }
+            }
         }
-
-        return try {
-            Response.Success(true)
-        } catch (e: Exception) {
-            Response.Failure(e)
-        }
-    }
 
     override suspend fun getInformationReceiver(idReceive: String): Response<FriendModel> {
         return try {
