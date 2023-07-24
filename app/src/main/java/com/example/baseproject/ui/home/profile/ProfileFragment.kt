@@ -31,9 +31,6 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        if(viewModel.profileResponse.value == null) {
-            viewModel.getProfile()
-        }
         lifecycleScope.launch {
             binding.tvLanguage.text = getString(
                 Language
