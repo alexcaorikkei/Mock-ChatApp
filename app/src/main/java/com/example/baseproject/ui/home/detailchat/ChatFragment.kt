@@ -32,7 +32,6 @@ import com.example.baseproject.ui.home.detailchat.notification.channelID
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.utils.toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -109,7 +108,7 @@ class ChatFragment :
                     getTextSend(),
                     uidReceiver
                 )
-                sendNotification()
+//                sendNotification()
             }
         }
     }
@@ -200,8 +199,12 @@ class ChatFragment :
 
     private fun sendPhotoClicked() {
         viewModel.sendPhoto(photoListClicked[0].uri, uidReceiver)
-        binding.ivSendChat.gone()
-        binding.ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
+        binding.apply {
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
+            ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
+        }
         isOpenGallery = !isOpenGallery
     }
 
@@ -210,8 +213,10 @@ class ChatFragment :
         binding.apply {
             coordinatorLayoutEmoji.gone()
             coordinatorLayoutGallery.gone()
-            ivSendChat.gone()
             edtChat.isEnabled = true
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
             ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
         }
         isOpenEmoji = !isOpenEmoji
@@ -253,10 +258,11 @@ class ChatFragment :
                     bottomSheetGalleryBehavior.state = BottomSheetBehavior.STATE_HIDDEN
                     coordinatorLayoutEmoji.gone()
                     coordinatorLayoutGallery.gone()
-                    ivSendChat.gone()
                     ivEmoji.setImageResource(R.drawable.ic_smile_no_click)
                     edtChat.isEnabled = true
-
+                    edtChat.text?.let {
+                        if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+                    }
                     viewModel.sendEmoji(emojiObjectList[position].content.toString(), uidReceiver)
                 }
             }
@@ -268,8 +274,10 @@ class ChatFragment :
         binding.apply {
             coordinatorLayoutGallery.gone()
             ivSendGallery.gone()
-            ivSendChat.gone()
             edtChat.isEnabled = true
+            edtChat.text?.let {
+                if (it.isNotBlank()) ivSendChat.visible() else ivSendChat.gone()
+            }
             ivGallery.setImageResource(R.drawable.ic_gallery_no_click)
         }
         isOpenGallery = !isOpenGallery
@@ -393,11 +401,7 @@ class ChatFragment :
     private fun listenEdittextChat() {
         binding.apply {
             edtChat.validate { textInputUser ->
-                if (textInputUser.isNullOrBlank()) {
-                    ivSendChat.gone()
-                } else {
-                    ivSendChat.visible()
-                }
+                if (textInputUser.isBlank()) ivSendChat.gone() else ivSendChat.visible()
             }
         }
     }
