@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.baseproject.databinding.ItemChatDateBinding
 import com.example.baseproject.databinding.ItemChatReceiveBinding
 import com.example.baseproject.databinding.ItemChatSendBinding
 import com.example.baseproject.databinding.ItemEmojiReceiveBinding
@@ -36,8 +37,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         fun bind(item: ChatModel) {
             binding.apply {
                 tvItemchatMess.text = item.text
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
         }
     }
@@ -55,8 +58,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     )
                     .into(ivItemOnepicture)
 
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
         }
     }
@@ -67,8 +72,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         fun bind(item: ChatModel) {
             binding.apply {
                 tvItemSendMess.text = item.text
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
         }
     }
@@ -86,8 +93,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                         (300 * ivItemOnepicture.resources.displayMetrics.density).toInt()
                     ).into(ivItemOnepicture)
 
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
         }
     }
@@ -101,8 +110,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     .load(item.emoji?.let { getEmoji(it.toInt()) })
                     .into(ivItemOnepicture)
 
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
         }
     }
@@ -116,9 +127,19 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     .load(item.emoji?.let { getEmoji(it.toInt()) })
                     .into(ivItemOnepicture)
 
-                tvDate.text = getMinuteSecond(item.date.toLong())
-                tvDate.visible()
+                if (item.formatDate != "empty") {
+                    tvDate.text = item.formatDate
+                    tvDate.visible()
+                }
             }
+        }
+    }
+
+    inner class ItemChatDateVH(private val binding: ItemChatDateBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+
+        fun bind(item: ChatModel) {
+            binding.tvDate.text = item.currentDate
         }
     }
 
@@ -182,6 +203,16 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatOneEmojiReceiveVH(binding)
             }
 
+            DATE -> {
+                val binding =
+                    ItemChatDateBinding.inflate(
+                        LayoutInflater.from(parent.context),
+                        parent,
+                        false
+                    )
+                return ItemChatDateVH(binding)
+            }
+
             else -> {
                 val binding =
                     ItemPhotoSendBinding.inflate(
@@ -226,27 +257,33 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 val mHolder = holder as ItemChatOneEmojiSendVH
                 mHolder.bind(chat)
             }
+
+            DATE -> {
+                val mHolder = holder as ItemChatDateVH
+                mHolder.bind(chat)
+            }
         }
     }
 
     override fun getItemViewType(position: Int): Int {
         val chat = getItem(position)
-        return if (chat.idSender == user?.uid) {
-            when (chat.type) {
-                MessageType.PHOTO -> return SEND_PHOTOS
+        if (chat.type == MessageType.DATE) return DATE
+        else if (chat.idSender == user?.uid) {
+            return when (chat.type) {
+                MessageType.PHOTO -> SEND_PHOTOS
 
-                MessageType.TEXT -> return SEND_TEXT
+                MessageType.TEXT -> SEND_TEXT
 
-                else -> return SEND_EMOJI
+                else -> SEND_EMOJI
 
             }
         } else {
-            when (chat.type) {
-                MessageType.TEXT -> return RECEIVE_TEXT
+            return when (chat.type) {
+                MessageType.TEXT -> RECEIVE_TEXT
 
-                MessageType.PHOTO -> return RECEIVE_PHOTOS
+                MessageType.PHOTO -> RECEIVE_PHOTOS
 
-                else -> return RECEIVE_EMOJI
+                else -> RECEIVE_EMOJI
             }
         }
     }
