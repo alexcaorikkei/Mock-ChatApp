@@ -1,5 +1,6 @@
 package com.example.baseproject.data
 
+import androidx.lifecycle.MutableLiveData
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
@@ -7,129 +8,118 @@ import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.extension.toViWithoutAccent
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.values
 import kotlinx.coroutines.tasks.await
 
 class FriendRepositoryImpl : FriendRepository {
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    override suspend fun searchAllUserWithCurrentAccount(query: String): Response<List<FriendModel>> {
+    override fun getFriends(): MutableLiveData<Response<List<FriendModel>>> {
+        val friendsResponse = MutableLiveData<Response<List<FriendModel>>>()
+        auth.addAuthStateListener(object : FirebaseAuth.AuthStateListener {
+            override fun onAuthStateChanged(p0: FirebaseAuth) {
+                p0.currentUser?.let {
+                    database.reference.child("users").addValueEventListener(object :
+                        ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val friends = mutableListOf<FriendModel>()
+                            snapshot.children.forEach {user ->
+                                if(user.key.toString() != auth.uid) {
+                                    val friend = FriendModel(
+                                        uid = user.key.toString(),
+                                        displayName = user.child("profile").child("display_name").value.toString(),
+                                        profilePicture = user.child("profile").child("profile_picture").value.toString(),
+                                        state = FriendState.NONE
+                                    )
+                                    friends.add(friend)
+                                }
+                            }
+                            database.reference.child("users").child(auth.uid!!).child("friends").addValueEventListener(object : ValueEventListener {
+                                override fun onDataChange(snapshot: DataSnapshot) {
+                                    snapshot.children.forEach {friend ->
+                                        val friendUid = friend.key.toString()
+                                        val friendState = FriendState.fromString(friend.child("state").value.toString())
+                                        friends.find { it.uid == friendUid }?.state = friendState
+                                    }
+                                    friendsResponse.postValue(Response.Success(friends))
+                                }
+                                override fun onCancelled(error: DatabaseError) {
+                                    friendsResponse.postValue(Response.Failure(error.toException()))
+                                }
+                            })
+                        }
+                        override fun onCancelled(error: DatabaseError) {
+                            friendsResponse.postValue(Response.Failure(error.toException()))
+                        }
+                    })
+                } ?: run {
+                    friendsResponse.postValue(Response.Loading)
+                }
+            }
+        })
+        return friendsResponse
+    }
+
+    override suspend fun addFriend(friendUid: String): Response<Boolean> {
         return try {
-            val listFriends = mutableListOf<FriendModel>()
-            searchByState(FriendState.ADDED, query, listFriends)
-            searchByState(FriendState.REQUEST, query, listFriends)
-            searchByState(FriendState.FRIEND, query, listFriends)
-            searchAll(query, listFriends)
-            Response.Success(listFriends)
+            val userFriendReference = database.reference.child("users").child(auth.uid!!).child("friends")
+            if(userFriendReference.child(friendUid).child("state").get().await().value == null) {
+                userFriendReference.child(friendUid).child("state")
+                    .setValue(FriendState.ADDED.toString()).await()
+            }
+
+            val friendFriendReference = database.reference.child("users").child(friendUid).child("friends")
+            if(friendFriendReference.child(auth.uid!!).child("state").get().await().value == null) {
+                friendFriendReference.child(auth.uid!!).child("state")
+                    .setValue(FriendState.REQUEST.toString()).await()
+            }
+            Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun sendFriendRequest(friendId: String): Response<String> {
+    override suspend fun acceptFriend(friendUid: String): Response<Boolean> {
         return try {
-            database.reference.child("users").apply {
-                val userProfile = child(auth.uid!!).child("profile").get().await()
-                val friendProfile = child(friendId).child("profile").get().await()
-                child(auth.uid!!).child("added").child(friendId).apply {
-                    child("display_name").setValue(friendProfile.child("display_name").value)
-                    child("profile_picture").setValue(friendProfile.child("profile_picture").value)
-                }
-                child(friendId).child("request").child(auth.uid!!).apply {
-                    child("display_name").setValue(userProfile.child("display_name").value)
-                    child("profile_picture").setValue(userProfile.child("profile_picture").value)
-                }
+            val userFriendReference = database.reference.child("users").child(auth.uid!!).child("friends")
+            val friendFriendReference = database.reference.child("users").child(friendUid).child("friends")
+            if(userFriendReference.child(friendUid).child("state").get().await().value.toString() == FriendState.REQUEST.toString()) {
+                userFriendReference.child(friendUid).child("state")
+                    .setValue(FriendState.FRIEND.toString()).await()
+                friendFriendReference.child(auth.uid!!).child("state")
+                    .setValue(FriendState.FRIEND.toString()).await()
             }
-            Response.Success(R.string.friend_request_sent.toString())
+            Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun acceptFriendRequest(friendId: String): Response<String> {
+    override suspend fun removeFriend(friendUid: String): Response<Boolean> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun cancelFriend(friendUid: String): Response<Boolean> {
         return try {
-            database.reference.child("users").apply {
-                val userProfile = child(friendId).child("added").child(auth.uid!!).get().await()
-                val friendProfile = child(auth.uid!!).child("request").child(friendId).get().await()
-                child(auth.uid!!).child("request").child(friendId).setValue(null)
-                child(auth.uid!!).child("friends").child(friendId).apply {
-                    child("display_name").setValue(friendProfile.child("display_name").value)
-                    child("profile_picture").setValue(friendProfile.child("profile_picture").value)
-                }
-                child(friendId).child("added").child(auth.uid!!).setValue(null)
-                child(friendId).child("friends").child(auth.uid!!).apply {
-                    child("display_name").setValue(userProfile.child("display_name").value)
-                    child("profile_picture").setValue(userProfile.child("profile_picture").value)
-                }
+            val userFriendReference = database.reference.child("users").child(auth.uid!!).child("friends")
+            if(userFriendReference.child(friendUid).child("state").get().await().value.toString() == FriendState.ADDED.toString()) {
+                userFriendReference.child(friendUid)
+                    .removeValue().await()
             }
-            Response.Success(R.string.friend_request_accepted.toString())
+
+            val friendFriendReference = database.reference.child("users").child(friendUid).child("friends")
+            if(friendFriendReference.child(auth.uid!!).child("state").get().await().value.toString() == FriendState.REQUEST.toString()) {
+                friendFriendReference.child(auth.uid!!)
+                    .removeValue().await()
+            }
+            Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
         }
     }
 
-    override suspend fun cancelFriendRequest(friendId: String): Response<String> {
-        return try {
-            database.reference.child("users").apply {
-                child(auth.uid!!).child("added").child(friendId).setValue(null)
-                child(friendId).child("request").child(auth.uid!!).setValue(null)
-            }
-            Response.Success(R.string.friend_request_canceled.toString())
-        } catch (e: Exception) {
-            Response.Failure(e)
-        }
-    }
-
-    private fun String.notIn(listFriends: List<FriendModel>): Boolean {
-        listFriends.forEach {
-            if (it.uid == this) {
-                return false
-            }
-        }
-        return true
-    }
-
-    private suspend fun getFriend(id: String) : FriendModel {
-        val friend = database.reference.child("users").child(id).child("profile").get().await()
-        return FriendModel(
-            id,
-            friend.child("display_name").value.toString(),
-            friend.child("profile_picture").value.toString(),
-        )
-    }
-
-    private suspend fun searchByState(state: FriendState, query: String, listFriends: MutableList<FriendModel>) {
-        val friends = database.reference.child("users").child(auth.uid!!).child(state.toString()).get().await()
-        friends.children.forEach { friend ->
-            if(friend.child("display_name").value.toString().toViWithoutAccent().contains(query)) {
-                val friendInfo = getFriend(friend.key.toString())
-                listFriends.add(
-                    FriendModel(
-                        friend.key.toString(),
-                        friendInfo.displayName,
-                        friendInfo.profilePicture,
-                        state,
-                    )
-                )
-            }
-        }
-    }
-    private suspend fun searchAll(query: String, listFriends: MutableList<FriendModel>) {
-        val friends = database.reference.child("users").get().await()
-        friends.children.forEach { userSnapshot ->
-            if(userSnapshot.key.toString().notIn(listFriends)
-                && userSnapshot.child("profile").child("display_name").value.toString().toViWithoutAccent().contains(query)
-                && userSnapshot.key.toString() != auth.uid!!) {
-                listFriends.add(
-                    FriendModel(
-                        userSnapshot.key.toString(),
-                        userSnapshot.child("profile").child("display_name").value.toString(),
-                        userSnapshot.child("profile").child("profile_picture").value.toString(),
-                        FriendState.NONE
-                    )
-                )
-            }
-        }
-    }
 }

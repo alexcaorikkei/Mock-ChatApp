@@ -14,6 +14,7 @@ import com.example.baseproject.ui.home.friends.adapter.FriendsRecycleViewAdapter
 import com.example.baseproject.ui.home.friends.adapter.OnItemClickListener
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.toViWithoutAccent
 import com.example.baseproject.ui.home.friends.model.SortType
 import com.example.baseproject.ui.home.friends.model.getFromListFriendModelSortBy
 import com.example.core.base.fragment.BaseFragment
@@ -33,6 +34,8 @@ class ListFriendsFragment(private var states: List<FriendState>) :
     private val viewModel: FriendsViewModel by activityViewModels()
     private var listFriendItemModel = listOf<FriendItemModel>()
     override fun getVM() = viewModel
+    private var enabledButton = true
+    private val friendsAdapter = FriendsRecycleViewAdapter(this)
 
     override fun onSaveInstanceState(outState: Bundle) {
         outState.putStringArrayList("states", ArrayList(states.map { it.name }))
@@ -46,82 +49,86 @@ class ListFriendsFragment(private var states: List<FriendState>) :
         }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        binding.rvFriends.layoutManager = LinearLayoutManager(requireContext())
+        binding.rvFriends.adapter = friendsAdapter
     }
 
     override fun bindingStateView() {
         super.bindingStateView()
-        binding.rvFriends.layoutManager = LinearLayoutManager(requireContext())
-        viewModel.searchResponse.observe(viewLifecycleOwner) { response ->
+        viewModel.listFriend.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Response.Loading -> {
                     binding.emptyResult.visibility = View.INVISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
+
                 is Response.Failure -> {
                     binding.emptyResult.visibility = View.VISIBLE
                     binding.rvFriends.visibility = View.INVISIBLE
                 }
+
                 is Response.Success -> {
-                    val listFriends = response.data.filter { friendModel ->
-                        friendModel.state in states
-                    }.toMutableList()
-                    listFriendItemModel = when (states.size) {
-                        2 -> getFromListFriendModelSortBy(
-                            SortType.SORT_BY_STATE,
-                            listFriends
-                        )
-                        else -> getFromListFriendModelSortBy(
-                            SortType.SORT_BY_NAME,
-                            listFriends
-                        )
-                    }
-                    if(listFriendItemModel.isEmpty()) {
-                        binding.emptyResult.visibility = View.VISIBLE
-                        binding.rvFriends.visibility = View.INVISIBLE
-                    } else {
-                        binding.emptyResult.visibility = View.INVISIBLE
-                        binding.rvFriends.visibility = View.VISIBLE
-                        binding.rvFriends.adapter = FriendsRecycleViewAdapter(
-                            listFriendItemModel,
-                            this
-                        )
+                    viewModel.queryData.observe(viewLifecycleOwner) { query ->
+                        val listFriends = response.data.filter { friendModel ->
+                            (friendModel.state in states
+                                    && friendModel.displayName.toViWithoutAccent()
+                                .contains(query.toViWithoutAccent()))
+                        }.toMutableList()
+                         listFriendItemModel = when (states.size) {
+                            2 -> getFromListFriendModelSortBy(
+                                SortType.SORT_BY_STATE,
+                                listFriends
+                            )
+
+                            else -> getFromListFriendModelSortBy(
+                                SortType.SORT_BY_NAME,
+                                listFriends
+                            )
+                        }
+                        if(listFriendItemModel.isEmpty()) {
+                            binding.emptyResult.visibility = View.VISIBLE
+                            binding.rvFriends.visibility = View.INVISIBLE
+                        } else {
+                            binding.emptyResult.visibility = View.INVISIBLE
+                            binding.rvFriends.visibility = View.VISIBLE
+                            friendsAdapter.submitList(listFriendItemModel)
+                        }
                     }
                 }
             }
-        }
-        viewModel.friendChangeStateResponse.observe(viewLifecycleOwner) {
-            when (it) {
-                is Response.Loading -> {
-                    binding.progressCircular.visibility = View.VISIBLE
-                }
-                is Response.Failure -> {
-                    binding.progressCircular.visibility = View.INVISIBLE
-                }
-                is Response.Success -> {
-                    binding.progressCircular.visibility = View.INVISIBLE
+            viewModel.friendStateResponse.observe(viewLifecycleOwner) {
+                enabledButton = when (it) {
+                    is Response.Loading -> false
+                    is Response.Failure -> true
+                    is Response.Success -> true
                 }
             }
         }
     }
 
     override fun onItemClicked(position: Int, view: ItemFriendBinding) {
-        val bundle = Bundle()
-        bundle.putString(KEY_ID_RECEIVER, listFriendItemModel[position].friendModel!!.uid)
-        appNavigation.openHomeToChatScreen(bundle)
+        if(listFriendItemModel[position].friendModel != null) {
+            if(listFriendItemModel[position].friendModel!!.state == FriendState.FRIEND) {
+                val bundle = Bundle()
+                bundle.putString(KEY_ID_RECEIVER, listFriendItemModel[position].friendModel!!.uid)
+                appNavigation.openHomeToChatScreen(bundle)
+            } else {
+                getString(R.string.not_friend).toast(requireContext())
+            }
+        }
     }
 
     override fun onAcceptClicked(position: Int, view: ItemFriendBinding) {
-        viewModel.acceptFriend(listFriendItemModel[position].friendModel!!.uid)
+        if(enabledButton) viewModel.acceptFriend(listFriendItemModel[position].friendModel!!.uid)
     }
 
     override fun onCancelClicked(position: Int, view: ItemFriendBinding) {
-        viewModel.cancelFriend(listFriendItemModel[position].friendModel!!.uid)
+        if(enabledButton) viewModel.cancelFriend(listFriendItemModel[position].friendModel!!.uid)
     }
 
     override fun onAddNewFriendClicked(position: Int, view: ItemFriendBinding) {
-        viewModel.addFriend(listFriendItemModel[position].friendModel!!.uid)
+        if(enabledButton) viewModel.addFriend(listFriendItemModel[position].friendModel!!.uid)
     }
 }

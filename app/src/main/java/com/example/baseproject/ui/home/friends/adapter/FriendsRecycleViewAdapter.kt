@@ -4,11 +4,17 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.baseproject.databinding.ItemFriendBinding
 import com.example.baseproject.databinding.ItemFriendHeaderBinding
+import com.example.baseproject.domain.model.ChatModel
+import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.gone
+import com.example.baseproject.extension.visible
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
 import com.example.core.R
 import timber.log.Timber
@@ -22,9 +28,9 @@ interface OnItemClickListener {
 
 class FriendsRecycleViewHolder(
     var binding: ItemFriendBinding,
-    onItemClickListener: OnItemClickListener
+    private val onItemClickListener: OnItemClickListener
 ) : RecyclerView.ViewHolder(binding.root) {
-    init {
+     fun bind(friendData: FriendModel) {
         binding.apply {
             root.setOnClickListener {
                 onItemClickListener.onItemClicked(adapterPosition, binding)
@@ -41,24 +47,95 @@ class FriendsRecycleViewHolder(
             btnAddNewFriend.setOnClickListener {
                 onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
             }
+
+            if(friendData.displayName.isNotEmpty()) {
+                Glide.with(ivAvatar)
+                    .load(friendData.profilePicture.toUri())
+                    .into(ivAvatar)
+                    .onLoadStarted(
+                        AppCompatResources.getDrawable(
+                            ivAvatar.context,
+                            R.drawable.ic_avatar_default
+                        )
+                    )
+            } else {
+                Glide.with(ivAvatar)
+                    .load(
+                        AppCompatResources.getDrawable(
+                            ivAvatar.context,
+                            R.drawable.ic_avatar_default
+                        )
+                    )
+                    .into(ivAvatar)
+            }
+
+            tvName.text = friendData.displayName
+            when(friendData.state) {
+                FriendState.FRIEND -> {
+                    btnAddNewFriend.gone()
+                    btnAccept.gone()
+                    btnCancel.gone()
+                }
+                FriendState.ADDED -> {
+                    btnAddNewFriend.gone()
+                    btnAccept.gone()
+                    btnCancel.visible()
+                }
+                FriendState.REQUEST -> {
+                    btnAddNewFriend.gone()
+                    btnAccept.visible()
+                    btnCancel.gone()
+                }
+                FriendState.NONE -> {
+                    btnAddNewFriend.visible()
+                    btnAccept.gone()
+                    btnCancel.gone()
+                }
+            }
         }
+
+
     }
+
 }
 
 class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
     RecyclerView.ViewHolder(binding.root) {
+    fun bind(header: String) {
+        binding.apply {
+            tvHeader.text = header
+        }
+    }
+}
+
+object FriendItemDiffUtil : DiffUtil.ItemCallback<FriendItemModel>() {
+    override fun areContentsTheSame(oldItem: FriendItemModel, newItem: FriendItemModel) =
+        oldItem == newItem
+
+
+    override fun areItemsTheSame(oldItem: FriendItemModel, newItem: FriendItemModel) =
+        if(oldItem.viewType == 0 && newItem.viewType == 0) {
+            oldItem.friendModel!!.uid == newItem.friendModel!!.uid
+        } else {
+            oldItem.header == newItem.header
+        }
 }
 
 class FriendsRecycleViewAdapter(
-    private val listViewFriends: List<FriendItemModel>,
     private val onItemClickListener: OnItemClickListener
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : ListAdapter<FriendItemModel, RecyclerView.ViewHolder>(FriendItemDiffUtil) {
 
-    override fun getItemCount() = listViewFriends.size
-    override fun getItemViewType(position: Int): Int {
-        return listViewFriends[position].viewType
+    override fun submitList(list: List<FriendItemModel>?) {
+        val result = arrayListOf<FriendItemModel>()
+        list?.forEach {
+            result.add(it.copy())
+        }
+        super.submitList(result)
     }
 
+    override fun getItemViewType(position: Int): Int {
+        return getItem(position).viewType
+    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             0 -> {
@@ -81,64 +158,9 @@ class FriendsRecycleViewAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (holder) {
-            is FriendsRecycleViewHolder -> {
-                val friendData = listViewFriends[position].friendModel
-                Timber.d("onBindViewHolder: $position")
-                Timber.d("onBindViewHolder: $friendData")
-                holder.binding.apply {
-                    tvName.text = friendData!!.displayName
-                    if(friendData.profilePicture.isNotEmpty()) {
-                        Glide.with(ivAvatar.context)
-                            .load(friendData.profilePicture.toUri())
-                            .into(ivAvatar)
-                            .onLoadStarted(
-                                AppCompatResources.getDrawable(
-                                    ivAvatar.context,
-                                    R.drawable.ic_avatar_default
-                                )
-                            )
-                    } else {
-                        Glide.with(ivAvatar.context)
-                            .load(R.drawable.ic_avatar_default)
-                            .into(ivAvatar)
-                    }
-                    when (friendData.state) {
-                        FriendState.FRIEND -> {
-                            btnCancel.visibility = ViewGroup.INVISIBLE
-                            btnAccept.visibility = ViewGroup.INVISIBLE
-                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
-                        }
-
-                        FriendState.ADDED -> {
-                            btnCancel.visibility = ViewGroup.VISIBLE
-                            btnAccept.visibility = ViewGroup.INVISIBLE
-                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
-                        }
-
-                        FriendState.REQUEST -> {
-                            btnCancel.visibility = ViewGroup.INVISIBLE
-                            btnAccept.visibility = ViewGroup.VISIBLE
-                            btnAddNewFriend.visibility = ViewGroup.INVISIBLE
-                        }
-
-                        FriendState.NONE -> {
-                            btnCancel.visibility = ViewGroup.INVISIBLE
-                            btnAccept.visibility = ViewGroup.INVISIBLE
-                            btnAddNewFriend.visibility = ViewGroup.VISIBLE
-                        }
-                    }
-                }
-            }
-
-            is FriendHeaderViewHolder -> {
-                if (listViewFriends[position].header!!.length == 1) {
-                    holder.binding.tvHeader.text = listViewFriends[position].header
-                } else {
-                    holder.binding.tvHeader.text =
-                        holder.binding.tvHeader.context.getString(listViewFriends[position].header!!.toInt())
-                }
-            }
+        when(holder) {
+            is FriendsRecycleViewHolder -> holder.bind(getItem(position).friendModel!!)
+            is FriendHeaderViewHolder -> holder.bind(getItem(position).header!!)
         }
     }
 }
