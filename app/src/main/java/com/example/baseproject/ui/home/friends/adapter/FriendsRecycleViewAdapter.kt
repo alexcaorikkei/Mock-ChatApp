@@ -14,6 +14,7 @@ import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.extension.gone
+import com.example.baseproject.extension.invisible
 import com.example.baseproject.extension.visible
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
 import com.example.core.R
@@ -72,24 +73,24 @@ class FriendsRecycleViewHolder(
             tvName.text = friendData.displayName
             when(friendData.state) {
                 FriendState.FRIEND -> {
-                    btnAddNewFriend.gone()
-                    btnAccept.gone()
-                    btnCancel.gone()
+                    btnAddNewFriend.invisible()
+                    btnAccept.invisible()
+                    btnCancel.invisible()
                 }
                 FriendState.ADDED -> {
-                    btnAddNewFriend.gone()
-                    btnAccept.gone()
+                    btnAddNewFriend.invisible()
+                    btnAccept.invisible()
                     btnCancel.visible()
                 }
                 FriendState.REQUEST -> {
-                    btnAddNewFriend.gone()
+                    btnAddNewFriend.invisible()
                     btnAccept.visible()
-                    btnCancel.gone()
+                    btnCancel.invisible()
                 }
                 FriendState.NONE -> {
                     btnAddNewFriend.visible()
-                    btnAccept.gone()
-                    btnCancel.gone()
+                    btnAccept.invisible()
+                    btnCancel.invisible()
                 }
             }
         }
@@ -103,7 +104,11 @@ class FriendHeaderViewHolder(var binding: ItemFriendHeaderBinding) :
     RecyclerView.ViewHolder(binding.root) {
     fun bind(header: String) {
         binding.apply {
-            tvHeader.text = header
+            tvHeader.text = if(header.length == 1) {
+                 header
+            } else {
+                tvHeader.context.getString(header.toInt())
+            }
         }
     }
 }
