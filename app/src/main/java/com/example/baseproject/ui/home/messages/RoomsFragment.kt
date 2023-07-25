@@ -32,11 +32,18 @@ class RoomsFragment(private val position: Int) : BaseFragment<FragmentRoomsBindi
 
     private var listRoomChat = listOf<RoomModel>()
 
-    override fun bindingStateView() {
-        super.bindingStateView()
+    private val roomAdapter = RoomAdapter(this)
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
         binding.swipeRefreshLayout.isEnabled = false
         binding.rvMessages.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvMessages.adapter = RoomAdapter(listRoomChat, this)
+        binding.rvMessages.adapter = roomAdapter
+        roomAdapter.submitList(listRoomChat)
+    }
+
+    override fun bindingStateView() {
+        super.bindingStateView()
         val responseLiveData = when(position) {
             0 -> viewModel.roomResponse
             else -> viewModel.searchResponse
@@ -52,7 +59,7 @@ class RoomsFragment(private val position: Int) : BaseFragment<FragmentRoomsBindi
                 is Response.Success -> {
                     binding.swipeRefreshLayout.isRefreshing = false
                     listRoomChat = listRoom.data
-                    binding.rvMessages.adapter = RoomAdapter(listRoomChat, this)
+                    roomAdapter.submitList(listRoomChat)
                 }
             }
         }

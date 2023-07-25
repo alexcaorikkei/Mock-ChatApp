@@ -7,10 +7,21 @@ enum class FriendState {
     NONE;
     override fun toString(): String {
         return when(this) {
-            FRIEND -> "friends"
+            FRIEND -> "friend"
             ADDED -> "added"
             REQUEST -> "request"
             NONE -> "none"
+        }
+    }
+
+    companion object {
+        fun fromString(string: String): FriendState {
+            return when(string) {
+                "friend" -> FRIEND
+                "added" -> ADDED
+                "request" -> REQUEST
+                else -> NONE
+            }
         }
     }
 }
@@ -19,5 +30,5 @@ data class FriendModel(
     val uid: String = "",
     val displayName: String = "",
     val profilePicture: String = "",
-    val state: FriendState = FriendState.NONE
+    var state: FriendState = FriendState.NONE
 )

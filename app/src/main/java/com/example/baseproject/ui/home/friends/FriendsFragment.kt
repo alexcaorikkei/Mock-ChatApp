@@ -25,6 +25,13 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
     lateinit var appNavigation: AppNavigation
     private val viewModel: FriendsViewModel by activityViewModels()
     override fun getVM() = viewModel
+
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        binding.swipeRefreshLayout.isEnabled = false
+    }
+
     override fun bindingStateView() {
         super.bindingStateView()
         binding.friendsViewPager.adapter = FriendsNavigationAdapter(this)
@@ -35,9 +42,22 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 else -> getString(R.string.request)
             }
         }.attach()
-        viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
 
-        viewModel.searchResponse.observe(viewLifecycleOwner) {response ->
+        viewModel.listFriend.observe(viewLifecycleOwner) {response ->
+            when(response) {
+                is Response.Failure -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+                is Response.Loading -> {
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
+                is Response.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
+
+        viewModel.friendStateResponse.observe(viewLifecycleOwner) { response ->
             when(response) {
                 is Response.Failure -> {
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -62,14 +82,10 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 timer = Timer()
                 timer.schedule(object : TimerTask() {
                     override fun run() {
-                        viewModel.searchAllUserWithCurrentAccount(it.toString())
+                        viewModel.searchFriend(it.toString())
                     }
                 }, 500)
             }
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
         }
     }
 }
