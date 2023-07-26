@@ -21,9 +21,23 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class ListFriendsFragment(private val states: List<FriendState>) :
+class ListFriendsFragment(private var states: List<FriendState>) :
     BaseFragment<FragmentListFriendsBinding, FriendsViewModel>(R.layout.fragment_list_friends),
     OnItemClickListener {
+
+    constructor() : this(listOf())
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putStringArrayList("states", ArrayList(states.map { it.name }))
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onViewStateRestored(savedInstanceState: Bundle?) {
+        super.onViewStateRestored(savedInstanceState)
+        savedInstanceState?.getStringArrayList("states")?.forEach() {
+            states = states + FriendState.valueOf(it)
+        }
+    }
 
     companion object {
         fun newInstance(states: List<FriendState>) = ListFriendsFragment(states)
