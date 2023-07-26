@@ -37,28 +37,20 @@ class ProfileRepositoryImpl : ProfileRepository {
 
     override fun getProfile(): MutableLiveData<Response<UserModel>> {
         val profileResponse = MutableLiveData<Response<UserModel>>()
-        auth.addAuthStateListener(object : FirebaseAuth.AuthStateListener {
-            override fun onAuthStateChanged(p0: FirebaseAuth) {
-                p0.currentUser?.let {
-                    database.reference.child("users").child(auth.uid!!).child("profile").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
-                        override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                            val user = UserModel(
-                                displayName = snapshot.child("display_name").value.toString(),
-                                email = snapshot.child("email").value.toString(),
-                                phoneNumber = snapshot.child("phone_number").value.toString(),
-                                birthday = snapshot.child("birthday").value.toString(),
-                                profilePicture = snapshot.child("profile_picture").value.toString()
-                            )
-                            profileResponse.postValue(Response.Success(user))
-                        }
+        database.reference.child("users").child(auth.uid!!).child("profile").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val user = UserModel(
+                    displayName = snapshot.child("display_name").value.toString(),
+                    email = snapshot.child("email").value.toString(),
+                    phoneNumber = snapshot.child("phone_number").value.toString(),
+                    birthday = snapshot.child("birthday").value.toString(),
+                    profilePicture = snapshot.child("profile_picture").value.toString()
+                )
+                profileResponse.postValue(Response.Success(user))
+            }
 
-                        override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
-                            profileResponse.postValue(Response.Failure(error.toException()))
-                        }
-                    })
-                } ?: run {
-                    profileResponse.postValue(Response.Loading)
-                }
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                profileResponse.postValue(Response.Failure(error.toException()))
             }
         })
         return profileResponse

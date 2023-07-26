@@ -35,26 +35,18 @@ class RoomRepositoryImpl : RoomRepository {
     override fun getMessages(): MutableLiveData<Response<List<RoomModel>>> {
         val roomResponse = MutableLiveData<Response<List<RoomModel>>>()
         roomResponse.postValue(Response.Loading)
-        auth.addAuthStateListener(object : FirebaseAuth.AuthStateListener {
-            override fun onAuthStateChanged(p0: FirebaseAuth) {
-                p0.currentUser?.let {
-                    val roomReference = database.reference.child("room")
-                    val roomListener = object: ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            coroutineScope.launch {
-                                roomResponse.postValue(Response.Success(getListRoom(snapshot)))
-                            }
-                        }
-                        override fun onCancelled(error: DatabaseError) {
-                            roomResponse.postValue(Response.Failure(error.toException()))
-                        }
-                    }
-                    roomReference.addValueEventListener(roomListener)
-                } ?: run {
-                    roomResponse.postValue(Response.Loading)
+        val roomReference = database.reference.child("room")
+        val roomListener = object: ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                coroutineScope.launch {
+                    roomResponse.postValue(Response.Success(getListRoom(snapshot)))
                 }
             }
-        })
+            override fun onCancelled(error: DatabaseError) {
+                roomResponse.postValue(Response.Failure(error.toException()))
+            }
+        }
+        roomReference.addValueEventListener(roomListener)
         return roomResponse
     }
 

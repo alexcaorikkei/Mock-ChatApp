@@ -1,5 +1,6 @@
 package com.example.baseproject.data
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.Response
@@ -18,47 +19,39 @@ import kotlinx.coroutines.tasks.await
 class FriendRepositoryImpl : FriendRepository {
     private val database = FirebaseDatabase.getInstance()
     private val auth = FirebaseAuth.getInstance()
-    override fun getFriends(): MutableLiveData<Response<List<FriendModel>>> {
+    override fun getFriends(): LiveData<Response<List<FriendModel>>> {
         val friendsResponse = MutableLiveData<Response<List<FriendModel>>>()
-        auth.addAuthStateListener(object : FirebaseAuth.AuthStateListener {
-            override fun onAuthStateChanged(p0: FirebaseAuth) {
-                p0.currentUser?.let {
-                    database.reference.child("users").addValueEventListener(object :
-                        ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            val friends = mutableListOf<FriendModel>()
-                            snapshot.children.forEach {user ->
-                                if(user.key.toString() != auth.uid) {
-                                    val friend = FriendModel(
-                                        uid = user.key.toString(),
-                                        displayName = user.child("profile").child("display_name").value.toString(),
-                                        profilePicture = user.child("profile").child("profile_picture").value.toString(),
-                                        state = FriendState.NONE
-                                    )
-                                    friends.add(friend)
-                                }
-                            }
-                            database.reference.child("users").child(auth.uid!!).child("friends").addValueEventListener(object : ValueEventListener {
-                                override fun onDataChange(snapshot: DataSnapshot) {
-                                    snapshot.children.forEach {friend ->
-                                        val friendUid = friend.key.toString()
-                                        val friendState = FriendState.fromString(friend.child("state").value.toString())
-                                        friends.find { it.uid == friendUid }?.state = friendState
-                                    }
-                                    friendsResponse.postValue(Response.Success(friends))
-                                }
-                                override fun onCancelled(error: DatabaseError) {
-                                    friendsResponse.postValue(Response.Failure(error.toException()))
-                                }
-                            })
-                        }
-                        override fun onCancelled(error: DatabaseError) {
-                            friendsResponse.postValue(Response.Failure(error.toException()))
-                        }
-                    })
-                } ?: run {
-                    friendsResponse.postValue(Response.Loading)
+        database.reference.child("users").addValueEventListener(object :
+            ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val friends = mutableListOf<FriendModel>()
+                snapshot.children.forEach {user ->
+                    if(user.key.toString() != auth.uid) {
+                        val friend = FriendModel(
+                            uid = user.key.toString(),
+                            displayName = user.child("profile").child("display_name").value.toString(),
+                            profilePicture = user.child("profile").child("profile_picture").value.toString(),
+                            state = FriendState.NONE
+                        )
+                        friends.add(friend)
+                    }
                 }
+                database.reference.child("users").child(auth.uid!!).child("friends").addValueEventListener(object : ValueEventListener {
+                    override fun onDataChange(snapshot: DataSnapshot) {
+                        snapshot.children.forEach {friend ->
+                            val friendUid = friend.key.toString()
+                            val friendState = FriendState.fromString(friend.child("state").value.toString())
+                            friends.find { it.uid == friendUid }?.state = friendState
+                        }
+                        friendsResponse.postValue(Response.Success(friends))
+                    }
+                    override fun onCancelled(error: DatabaseError) {
+                        friendsResponse.postValue(Response.Failure(error.toException()))
+                    }
+                })
+            }
+            override fun onCancelled(error: DatabaseError) {
+                friendsResponse.postValue(Response.Failure(error.toException()))
             }
         })
         return friendsResponse

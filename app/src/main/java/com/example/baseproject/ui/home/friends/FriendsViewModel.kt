@@ -7,8 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.FriendRepository
 import com.example.baseproject.domain.model.FriendModel
-import com.example.baseproject.domain.model.FriendState
-import com.example.baseproject.extension.toViWithoutAccent
 import com.example.core.base.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,7 +17,14 @@ class FriendsViewModel @Inject constructor(
     val savedStateHandle : SavedStateHandle,
     private val friendRepository: FriendRepository
 ) : BaseViewModel() {
+    private var _listFriendLiveData = friendRepository.getFriends()
+    val listFriendLiveData: LiveData<Response<List<FriendModel>>> = _listFriendLiveData
+
+    private var _queryResponse = MutableLiveData("")
+    val queryResponse: LiveData<String> = _queryResponse
+
     val friendStateResponse = MutableLiveData<Response<Boolean>>()
+
     fun acceptFriend(uid: String) {
         viewModelScope.launch {
             friendStateResponse.postValue(Response.Loading)
@@ -44,12 +49,7 @@ class FriendsViewModel @Inject constructor(
         }
     }
 
-    private val _listFriendLiveData = friendRepository.getFriends()
-    val listFriend: LiveData<Response<List<FriendModel>>> = _listFriendLiveData
-    private val _queryData = MutableLiveData("")
-    val queryData: LiveData<String> = _queryData
-
     fun searchFriend(query: String) {
-        _queryData.postValue(query)
+        _queryResponse.postValue(query)
     }
 }

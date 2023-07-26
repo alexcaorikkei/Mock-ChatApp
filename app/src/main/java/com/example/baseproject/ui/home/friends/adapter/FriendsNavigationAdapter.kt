@@ -16,6 +16,6 @@ class FriendsNavigationAdapter(fragment: Fragment) : FragmentStateAdapter(fragme
             1 -> listOf(FriendState.NONE, FriendState.ADDED, FriendState.REQUEST, FriendState.FRIEND)
             else -> listOf(FriendState.REQUEST, FriendState.ADDED)
         }
-        return ListFriendsFragment(states)
+        return ListFriendsFragment.newInstance(states)
     }
 }

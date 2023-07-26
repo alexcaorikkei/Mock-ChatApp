@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
@@ -26,7 +27,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
     lateinit var appNavigation: AppNavigation
     @Inject
     lateinit var rxPreferences: RxPreferences
-    private val viewModel: ProfileViewModel by activityViewModels()
+    private val viewModel: ProfileViewModel by viewModels()
     override fun getVM() = viewModel
 
     override fun initView(savedInstanceState: Bundle?) {

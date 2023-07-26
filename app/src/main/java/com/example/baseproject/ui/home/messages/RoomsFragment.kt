@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -27,7 +28,7 @@ import javax.inject.Inject
 class RoomsFragment(private val position: Int) : BaseFragment<FragmentRoomsBinding, MessagesViewModel>(R.layout.fragment_rooms), OnRoomClickListener {
     @Inject
     lateinit var appNavigation: AppNavigation
-    private val viewModel: MessagesViewModel by activityViewModels()
+    private val viewModel: MessagesViewModel by viewModels({requireParentFragment()})
     override fun getVM() = viewModel
 
     private var listRoomChat = listOf<RoomModel>()

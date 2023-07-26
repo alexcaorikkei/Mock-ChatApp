@@ -3,6 +3,7 @@ package com.example.baseproject.ui.home.friends.model
 import com.example.baseproject.R
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
+import com.example.baseproject.extension.toViWithoutAccent
 
 enum class SortType {
     SORT_BY_NAME,
@@ -14,14 +15,14 @@ fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendMod
     return when(sortType) {
         SortType.SORT_BY_NAME -> {
             val result = mutableListOf<FriendItemModel>()
-            val sortedList = listFriend.sortedBy { it.displayName.split(" ").last().lowercase() }
+            val sortedList = listFriend.sortedBy { it.displayName.split(" ").last().toViWithoutAccent() }
             var currentHeader = 'A'
-            if(sortedList.first().displayName.split(" ").last().lowercase().first() == currentHeader) {
+            if(sortedList.first().displayName.split(" ").last().toViWithoutAccent().first() == currentHeader) {
                 result.add(FriendItemModel(1, header = currentHeader.toString()))
             }
             sortedList.forEach() {friend ->
-            if (friend.displayName.split(" ").last().lowercase().first() != currentHeader) {
-                    currentHeader = friend.displayName.split(" ").last().lowercase().first()
+            if (friend.displayName.split(" ").last().toViWithoutAccent().first() != currentHeader) {
+                    currentHeader = friend.displayName.split(" ").last().toViWithoutAccent().first()
                     result.add(FriendItemModel(1, header = currentHeader.toString()))
                 }
                 result.add(FriendItemModel(0, friendModel = friend))
@@ -57,6 +58,16 @@ fun getFromListFriendModelSortBy(sortType: SortType, listFriend : List<FriendMod
 
 data class FriendItemModel(
     val viewType: Int,
-    val friendModel: FriendModel? = null,
+    var friendModel: FriendModel? = null,
     val header: String? = null
-)
+){
+    fun clone() : FriendItemModel{
+        val result = copy().apply {
+            friendModel?.let {
+                friendModel =  friendModel!!.copy()
+            }
+        }
+
+        return result
+    }
+}

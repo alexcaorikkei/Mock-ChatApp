@@ -5,6 +5,7 @@ import android.view.View
 import android.view.View.OnTouchListener
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentMessagesBinding
 import com.example.baseproject.navigation.AppNavigation
@@ -20,7 +21,7 @@ import javax.inject.Inject
 class MessagesFragment : BaseFragment<FragmentMessagesBinding, MessagesViewModel>(R.layout.fragment_messages) {
     @Inject
     lateinit var appNavigation: AppNavigation
-    private val viewModel: MessagesViewModel by activityViewModels()
+    private val viewModel: MessagesViewModel by viewModels()
     override fun getVM() = viewModel
 
     override fun initView(savedInstanceState: Bundle?) {
