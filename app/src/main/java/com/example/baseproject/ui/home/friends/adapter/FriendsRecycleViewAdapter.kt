@@ -3,6 +3,7 @@ package com.example.baseproject.ui.home.friends.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -50,24 +51,18 @@ class FriendsRecycleViewHolder(
             }
 
             if(friendData.displayName.isNotEmpty()) {
-                Glide.with(ivAvatar)
+                Glide.with(root.context)
                     .load(friendData.profilePicture.toUri())
+                    .placeholder(R.drawable.ic_avatar_default)
+                    .error(R.drawable.ic_avatar_default)
                     .into(ivAvatar)
-                    .onLoadStarted(
-                        AppCompatResources.getDrawable(
-                            ivAvatar.context,
-                            R.drawable.ic_avatar_default
-                        )
-                    )
             } else {
-                Glide.with(ivAvatar)
-                    .load(
-                        AppCompatResources.getDrawable(
-                            ivAvatar.context,
-                            R.drawable.ic_avatar_default
-                        )
+                ivAvatar.setImageDrawable(
+                    getDrawable(
+                        root.context,
+                        R.drawable.ic_avatar_default
                     )
-                    .into(ivAvatar)
+                )
             }
 
             tvName.text = friendData.displayName

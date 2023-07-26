@@ -2,6 +2,7 @@ package com.example.baseproject.ui.home.messages.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
@@ -58,15 +59,19 @@ class RoomAdapter(
     override fun onBindViewHolder(holder: RoomHolder, position: Int) {
         val roomData = getItem(position)
         with(holder.binding) {
-            if(getItem(position).profilePicture.isNotEmpty()) {
-                Glide.with(ivAvatar.context)
-                    .load(getItem(position).profilePicture.toUri())
+            if(roomData.profilePicture.isNotEmpty()) {
+                Glide.with(root.context)
+                    .load(roomData.profilePicture.toUri())
+                    .placeholder(com.example.core.R.drawable.ic_avatar_default)
+                    .error(com.example.core.R.drawable.ic_avatar_default)
                     .into(ivAvatar)
-                    .onLoadStarted(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
             } else {
-                Glide.with(ivAvatar.context)
-                    .load(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
-                    .into(ivAvatar)
+                ivAvatar.setImageDrawable(
+                    getDrawable(
+                        root.context,
+                        com.example.core.R.drawable.ic_avatar_default
+                    )
+                )
             }
             tvName.text = roomData.name
             tvMessage.text = when(roomData.messageType) {
