@@ -2,13 +2,11 @@ package com.example.baseproject.ui.home.friends
 
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentFriendsBinding
+import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.friends.adapter.FriendsNavigationAdapter
@@ -23,7 +21,7 @@ import javax.inject.Inject
 class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R.layout.fragment_friends) {
     @Inject
     lateinit var appNavigation: AppNavigation
-    private val viewModel: FriendsViewModel by activityViewModels()
+    private val viewModel: FriendsViewModel by viewModels()
     override fun getVM() = viewModel
 
 
@@ -43,7 +41,7 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
             }
         }.attach()
 
-        viewModel.listFriend.observe(viewLifecycleOwner) {response ->
+        viewModel.listFriendLiveData.observe(viewLifecycleOwner) { response ->
             when(response) {
                 is Response.Failure -> {
                     binding.swipeRefreshLayout.isRefreshing = false

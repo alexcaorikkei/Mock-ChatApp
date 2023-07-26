@@ -3,7 +3,6 @@ package com.example.baseproject.ui.home.friends.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.content.res.AppCompatResources
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.net.toUri
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -16,16 +15,19 @@ import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.FriendState
 import com.example.baseproject.extension.gone
 import com.example.baseproject.extension.invisible
+import com.example.baseproject.extension.toViWithoutAccent
 import com.example.baseproject.extension.visible
 import com.example.baseproject.ui.home.friends.model.FriendItemModel
+import com.example.baseproject.ui.home.friends.model.SortType
+import com.example.baseproject.ui.home.friends.model.getFromListFriendModelSortBy
 import com.example.core.R
 import timber.log.Timber
 
 interface OnItemClickListener {
-    fun onItemClicked(position: Int, view: ItemFriendBinding)
-    fun onAcceptClicked(position: Int, view: ItemFriendBinding)
-    fun onCancelClicked(position: Int, view: ItemFriendBinding)
-    fun onAddNewFriendClicked(position: Int, view: ItemFriendBinding)
+    fun onItemClicked(friendData: FriendModel)
+    fun onAcceptClicked(friendData: FriendModel)
+    fun onCancelClicked(friendData: FriendModel)
+    fun onAddNewFriendClicked(friendData: FriendModel)
 }
 
 class FriendsRecycleViewHolder(
@@ -35,21 +37,22 @@ class FriendsRecycleViewHolder(
      fun bind(friendData: FriendModel) {
         binding.apply {
             root.setOnClickListener {
-                onItemClickListener.onItemClicked(adapterPosition, binding)
+                onItemClickListener.onItemClicked(friendData)
             }
 
             btnAccept.setOnClickListener {
-                onItemClickListener.onAcceptClicked(adapterPosition, binding)
+                onItemClickListener.onAcceptClicked(friendData)
             }
 
             btnCancel.setOnClickListener {
-                onItemClickListener.onCancelClicked(adapterPosition, binding)
+                onItemClickListener.onCancelClicked(friendData)
             }
 
             btnAddNewFriend.setOnClickListener {
-                onItemClickListener.onAddNewFriendClicked(adapterPosition, binding)
+                onItemClickListener.onAddNewFriendClicked(friendData)
             }
 
+            // load image avatar if display name is not empty
             if(friendData.displayName.isNotEmpty()) {
                 Glide.with(root.context)
                     .load(friendData.profilePicture.toUri())
@@ -58,7 +61,7 @@ class FriendsRecycleViewHolder(
                     .into(ivAvatar)
             } else {
                 ivAvatar.setImageDrawable(
-                    getDrawable(
+                    AppCompatResources.getDrawable(
                         root.context,
                         R.drawable.ic_avatar_default
                     )
@@ -122,15 +125,30 @@ object FriendItemDiffUtil : DiffUtil.ItemCallback<FriendItemModel>() {
 }
 
 class FriendsRecycleViewAdapter(
-    private val onItemClickListener: OnItemClickListener
+    private val onItemClickListener: OnItemClickListener,
+    private val _listFriend: List<FriendModel>,
+    private val sortType: SortType
 ) : ListAdapter<FriendItemModel, RecyclerView.ViewHolder>(FriendItemDiffUtil) {
 
     override fun submitList(list: List<FriendItemModel>?) {
         val result = arrayListOf<FriendItemModel>()
         list?.forEach {
-            result.add(it.copy())
+            result.add(it.clone())
         }
         super.submitList(result)
+    }
+
+    fun notifyChangeList() {
+        submitList(getFromListFriendModelSortBy(sortType, _listFriend))
+    }
+
+    fun filter(query: String) {
+        submitList(getFromListFriendModelSortBy(
+            sortType,
+            _listFriend.filter {
+                it.displayName.toViWithoutAccent().contains(query.toViWithoutAccent())
+            }
+        ))
     }
 
     override fun getItemViewType(position: Int): Int {
