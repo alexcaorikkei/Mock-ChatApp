@@ -9,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 
 class ProfileRepositoryImpl : ProfileRepository {
     private val database = FirebaseDatabase.getInstance()

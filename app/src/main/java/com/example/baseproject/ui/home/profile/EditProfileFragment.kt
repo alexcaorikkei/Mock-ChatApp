@@ -57,6 +57,15 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
                 }
             }
         }
+        viewModel.editResponse.observe(viewLifecycleOwner) {response ->
+            when(response) {
+                is Response.Failure -> {}
+                Response.Loading -> {}
+                is Response.Success -> {
+                    appNavigaiton.openEditProfileToProfileScreen()
+                }
+            }
+        }
         binding.apply {
             etName.validate { name ->
                 if(name.isEmpty()) {
@@ -91,7 +100,6 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
                     ),
                     imageProfileUri
                 )
-                appNavigaiton.openEditProfileToProfileScreen()
             }
             etBirthday.transformIntoDatePicker(requireContext(), "dd/MM/yyyy")
             btnBack.setOnClickListener {
