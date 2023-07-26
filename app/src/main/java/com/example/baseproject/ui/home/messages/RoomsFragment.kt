@@ -26,6 +26,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class RoomsFragment(private val position: Int) : BaseFragment<FragmentRoomsBinding, MessagesViewModel>(R.layout.fragment_rooms), OnRoomClickListener {
+    constructor() : this(0)
+
     @Inject
     lateinit var appNavigation: AppNavigation
     private val viewModel: MessagesViewModel by viewModels({requireParentFragment()})
