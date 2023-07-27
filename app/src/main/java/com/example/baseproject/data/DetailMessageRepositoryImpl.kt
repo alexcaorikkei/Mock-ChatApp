@@ -70,47 +70,4 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                     }
             }
         }
-
-    override suspend fun getInformationReceiver(idReceive: String): Response<FriendModel> {
-        return try {
-            val friend =
-                database.reference.child("users").child(idReceive).child("profile").get().await()
-            Response.Success(
-                FriendModel(
-                    friend.key.toString(),
-                    friend.child("display_name").value.toString(),
-                    friend.child("profile_picture").value.toString(),
-                )
-            )
-        } catch (e: Exception) {
-            Response.Failure(e)
-        }
-    }
-
-    override suspend fun getListMessage(idReceive: String): Response<List<ChatModel>> {
-        return try {
-            val messageListFirebase = mutableListOf<ChatModel>()
-
-            auth.uid?.let {
-                database.reference.child("room")
-                    .child(getIdRoom(it, idReceive))
-                    .addValueEventListener(object : ValueEventListener {
-                        override fun onDataChange(snapshot: DataSnapshot) {
-                            for (dataSnapshot in snapshot.children) {
-                                val message = dataSnapshot.getValue(ChatModel::class.java)
-                                if (message != null) {
-                                    messageListFirebase.add(message)
-                                }
-                            }
-                        }
-
-                        override fun onCancelled(error: DatabaseError) {
-                        }
-                    })
-            }
-            Response.Success(messageListFirebase)
-        } catch (e: Exception) {
-            Response.Failure(e)
-        }
-    }
 }

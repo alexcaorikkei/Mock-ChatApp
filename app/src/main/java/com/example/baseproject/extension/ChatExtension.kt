@@ -11,20 +11,31 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 
-const val RECEIVE_TEXT = 0
-const val SEND_TEXT = 1
-
-const val RECEIVE_PHOTOS = 2
-const val SEND_PHOTOS = 3
-
-const val RECEIVE_EMOJI = 4
-const val SEND_EMOJI = 5
-
-const val DATE = 6
+object Chat {
+    const val RECEIVE_TEXT = 0
+    const val SEND_TEXT = 1
+    const val RECEIVE_PHOTOS = 2
+    const val SEND_PHOTOS = 3
+    const val RECEIVE_EMOJI = 4
+    const val SEND_EMOJI = 5
+    const val DATE = 6
+}
 
 const val KEY_ID_RECEIVER = "KEY_ID_RECEIVER"
-private const val MILISECONDS_IN_A_MINUTE = 60000
 
+object Noti {
+    const val CHANNEL_ID_1 = "channel1"
+    const val CHANNEL_NAME_1 = "channel1"
+    const val TITLE = "title"
+    const val MESSAGE = "message"
+}
+
+object TypeLayoutChat {
+    const val ONE = "one"
+    const val START = "start"
+    const val BETWEEN = "between"
+    const val END = "end"
+}
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
 }
@@ -80,7 +91,7 @@ fun Context.getDate(date: Long): String {
 fun Context.getMinuteSecond(date: Long, dateBefore: Long): String {
     val dateFormat: DateFormat = SimpleDateFormat("hh:mm")
     val messageDate = Date(date)
-    return if (isMinute(date,dateBefore)) {
+    return if (isMinute(date, dateBefore)) {
         resources.getString(R.string.same_minute)
     } else {
         dateFormat.format(messageDate)

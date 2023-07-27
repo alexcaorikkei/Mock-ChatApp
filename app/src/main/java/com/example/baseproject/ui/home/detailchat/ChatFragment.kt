@@ -27,8 +27,7 @@ import com.example.baseproject.databinding.FragmentDetailChatBinding
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.*
 import com.example.baseproject.navigation.AppNavigation
-import com.example.baseproject.ui.home.detailchat.notification.Notification
-import com.example.baseproject.ui.home.detailchat.notification.channelID
+import com.example.baseproject.ui.home.detailchat.notification.*
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.utils.toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -71,6 +70,7 @@ class ChatFragment :
         setUpBottomSheetGalleryAndEmoji()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun setOnClick() {
         super.setOnClick()
 
@@ -108,28 +108,20 @@ class ChatFragment :
                     getTextSend(),
                     uidReceiver
                 )
-//                sendNotification()
             }
         }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)//từ ver 8.0
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelID,
-                "Notify Channel",
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
-            val notificationManager =
-                context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendNotification() {
-        context?.let { Notification.createNotification(1, it, "title", "message") }
+        val channel = NotificationChannel(
+            Noti.CHANNEL_ID_1,
+            Noti.CHANNEL_NAME_1,
+            NotificationManager.IMPORTANCE_DEFAULT
+        )
+        val notificationManager =
+            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.createNotificationChannel(channel)
     }
 
     override fun bindingStateView() {
@@ -197,6 +189,7 @@ class ChatFragment :
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun sendPhotoClicked() {
         viewModel.sendPhoto(photoListClicked[0].uri, uidReceiver)
         binding.apply {
@@ -252,6 +245,7 @@ class ChatFragment :
             emojiAdapter.notifyDataSetChanged()
 
             emojiAdapter.onClickListener = object : OnEmojiAdapterListener {
+                @RequiresApi(Build.VERSION_CODES.O)
                 override fun pickEmoji(position: Int) {
                     isOpenEmoji = !isOpenEmoji
 

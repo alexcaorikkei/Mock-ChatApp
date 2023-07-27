@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemEmojiBinding
-import com.example.baseproject.databinding.ItemPhotoBinding
 
 class EmojiAdapter(var emojiList: ArrayList<Emoji>) :
     RecyclerView.Adapter<EmojiAdapter.ChatVH>() {
@@ -30,14 +29,16 @@ class EmojiAdapter(var emojiList: ArrayList<Emoji>) :
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ChatVH, position: Int) {
         val emoji = emojiList[position]
-        Glide.with(holder.binding.ivItemEmoji)
-            .load(getEmoji(emoji.content))
-            .placeholder(R.drawable.ic_avatar_default)
-            .error(R.drawable.ic_avatar_default)
-            .into(holder.binding.ivItemEmoji)
+        with(holder.binding) {
+            Glide.with(ivItemEmoji)
+                .load(getEmoji(emoji.content))
+                .placeholder(R.drawable.ic_avatar_default)
+                .error(R.drawable.ic_avatar_default)
+                .into(ivItemEmoji)
 
-        holder.binding.root.setOnClickListener {
-            onClickListener?.pickEmoji(position)
+            root.setOnClickListener {
+                onClickListener?.pickEmoji(position)
+            }
         }
     }
 
