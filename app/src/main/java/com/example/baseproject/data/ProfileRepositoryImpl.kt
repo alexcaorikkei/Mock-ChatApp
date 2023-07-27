@@ -1,6 +1,7 @@
 package com.example.baseproject.data
 
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.ProfileRepository
 import com.example.baseproject.domain.model.UserModel
@@ -8,6 +9,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 
 class ProfileRepositoryImpl : ProfileRepository {
     private val database = FirebaseDatabase.getInstance()
@@ -34,20 +36,24 @@ class ProfileRepositoryImpl : ProfileRepository {
         }
     }
 
-    override suspend fun getProfile(): Response<UserModel> {
-        return try {
-            val snapshot = database.reference.child("users").child(auth.uid!!).child("profile").get().await()
-            val user = UserModel(
-                auth.uid!!,
-                snapshot.child("display_name").value.toString(),
-                snapshot.child("phone_number").value.toString(),
-                snapshot.child("birthday").value.toString(),
-                snapshot.child("email").value.toString(),
-                snapshot.child("profile_picture").value.toString()
-            )
-            Response.Success(user)
-        } catch (e: Exception) {
-            Response.Failure(e)
-        }
+    override fun getProfile(): MutableLiveData<Response<UserModel>> {
+        val profileResponse = MutableLiveData<Response<UserModel>>()
+        database.reference.child("users").child(auth.uid!!).child("profile").addValueEventListener(object : com.google.firebase.database.ValueEventListener {
+            override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
+                val user = UserModel(
+                    displayName = snapshot.child("display_name").value.toString(),
+                    email = snapshot.child("email").value.toString(),
+                    phoneNumber = snapshot.child("phone_number").value.toString(),
+                    birthday = snapshot.child("birthday").value.toString(),
+                    profilePicture = snapshot.child("profile_picture").value.toString()
+                )
+                profileResponse.postValue(Response.Success(user))
+            }
+
+            override fun onCancelled(error: com.google.firebase.database.DatabaseError) {
+                profileResponse.postValue(Response.Failure(error.toException()))
+            }
+        })
+        return profileResponse
     }
 }

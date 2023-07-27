@@ -2,13 +2,17 @@ package com.example.baseproject.ui.home.messages.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.core.net.toUri
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemRoomBinding
 import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.ui.home.friends.model.FriendItemModel
 import com.example.baseproject.ui.home.messages.model.RoomModel
 
 interface OnRoomClickListener {
@@ -25,9 +29,18 @@ class RoomHolder(var binding: ItemRoomBinding, private val onRoomClickListener: 
     }
 }
 
+object MessageDiffUtil : DiffUtil.ItemCallback<RoomModel>() {
+    override fun areContentsTheSame(oldItem: RoomModel, newItem: RoomModel) =
+        oldItem == newItem
+
+
+    override fun areItemsTheSame(oldItem: RoomModel, newItem: RoomModel) =
+        oldItem.id == newItem.id
+}
+
 class RoomAdapter(
-    private val listRoom: List<RoomModel>,
-    private val onRoomClickListener: OnRoomClickListener): RecyclerView.Adapter<RoomHolder>() {
+    private val onRoomClickListener: OnRoomClickListener
+): ListAdapter<RoomModel, RoomHolder>(MessageDiffUtil) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RoomHolder {
         return RoomHolder(
             ItemRoomBinding.inflate(LayoutInflater.from(parent.context), parent, false),
@@ -35,20 +48,30 @@ class RoomAdapter(
         )
     }
 
-    override fun getItemCount() = listRoom.size
+    override fun submitList(list: List<RoomModel>?) {
+        val result = arrayListOf<RoomModel>()
+        list?.forEach {
+            result.add(it.copy())
+        }
+        super.submitList(result)
+    }
 
     override fun onBindViewHolder(holder: RoomHolder, position: Int) {
-        val roomData = listRoom[position]
+        val roomData = getItem(position)
         with(holder.binding) {
-            if(listRoom[position].profilePicture.isNotEmpty()) {
-                Glide.with(ivAvatar.context)
-                    .load(listRoom[position].profilePicture.toUri())
+            if(roomData.profilePicture.isNotEmpty()) {
+                Glide.with(root.context)
+                    .load(roomData.profilePicture.toUri())
+                    .placeholder(com.example.core.R.drawable.ic_avatar_default)
+                    .error(com.example.core.R.drawable.ic_avatar_default)
                     .into(ivAvatar)
-                    .onLoadStarted(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
             } else {
-                Glide.with(ivAvatar.context)
-                    .load(getDrawable(ivAvatar.context, com.example.core.R.drawable.ic_avatar_default))
-                    .into(ivAvatar)
+                ivAvatar.setImageDrawable(
+                    getDrawable(
+                        root.context,
+                        com.example.core.R.drawable.ic_avatar_default
+                    )
+                )
             }
             tvName.text = roomData.name
             tvMessage.text = when(roomData.messageType) {
@@ -94,7 +117,7 @@ class RoomAdapter(
             } else {
                 tvMessage.setTextColor(tvMessage.context.getColor(android.R.color.black))
             }
-            if(position == listRoom.lastIndex) {
+            if(position == itemCount - 1) {
                 holder.binding.ivLine.visibility = android.view.View.GONE
             } else {
                 holder.binding.ivLine.visibility = android.view.View.VISIBLE

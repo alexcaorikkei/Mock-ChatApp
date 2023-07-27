@@ -30,22 +30,18 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    private var _profileResponse = MutableLiveData<Response<UserModel>>()
+    private var _profileResponse = profileRepository.getProfile()
     val profileResponse: LiveData<Response<UserModel>> = _profileResponse
-    fun getProfile() {
-        viewModelScope.launch {
-            _profileResponse.value = Response.Loading
-            _profileResponse.value = profileRepository.getProfile()
-        }
-    }
 
     fun updateProfile(user: UserModel, profilePictureUri: Uri?) {
         viewModelScope.launch {
-            _profileResponse.value = Response.Loading
-            profileRepository.updateProfile(user, profilePictureUri)
-            _profileResponse.value = profileRepository.getProfile()
+            _editResponse.postValue(Response.Loading)
+            _editResponse.postValue(profileRepository.updateProfile(user, profilePictureUri))
         }
     }
+
+    private var _editResponse = MutableLiveData<Response<Boolean>>()
+    val editResponse: MutableLiveData<Response<Boolean>> get() = _editResponse
 
     private var _validator: MutableLiveData<Boolean> = MutableLiveData()
     val validator: LiveData<Boolean> get() = _validator

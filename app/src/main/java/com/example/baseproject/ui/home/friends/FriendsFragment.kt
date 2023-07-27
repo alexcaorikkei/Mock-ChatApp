@@ -2,13 +2,11 @@ package com.example.baseproject.ui.home.friends
 
 
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.view.View
 import androidx.core.widget.addTextChangedListener
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentFriendsBinding
+import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.ui.home.friends.adapter.FriendsNavigationAdapter
@@ -23,8 +21,15 @@ import javax.inject.Inject
 class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R.layout.fragment_friends) {
     @Inject
     lateinit var appNavigation: AppNavigation
-    private val viewModel: FriendsViewModel by activityViewModels()
+    private val viewModel: FriendsViewModel by viewModels()
     override fun getVM() = viewModel
+
+
+    override fun initView(savedInstanceState: Bundle?) {
+        super.initView(savedInstanceState)
+        binding.swipeRefreshLayout.isEnabled = false
+    }
+
     override fun bindingStateView() {
         super.bindingStateView()
         binding.friendsViewPager.adapter = FriendsNavigationAdapter(this)
@@ -35,9 +40,22 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 else -> getString(R.string.request)
             }
         }.attach()
-        viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
 
-        viewModel.searchResponse.observe(viewLifecycleOwner) {response ->
+        viewModel.listFriendLiveData.observe(viewLifecycleOwner) { response ->
+            when(response) {
+                is Response.Failure -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+                is Response.Loading -> {
+                    binding.swipeRefreshLayout.isRefreshing = true
+                }
+                is Response.Success -> {
+                    binding.swipeRefreshLayout.isRefreshing = false
+                }
+            }
+        }
+
+        viewModel.friendStateResponse.observe(viewLifecycleOwner) { response ->
             when(response) {
                 is Response.Failure -> {
                     binding.swipeRefreshLayout.isRefreshing = false
@@ -62,14 +80,10 @@ class FriendsFragment : BaseFragment<FragmentFriendsBinding, FriendsViewModel>(R
                 timer = Timer()
                 timer.schedule(object : TimerTask() {
                     override fun run() {
-                        viewModel.searchAllUserWithCurrentAccount(it.toString())
+                        viewModel.searchFriend(it.toString())
                     }
                 }, 500)
             }
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            viewModel.searchAllUserWithCurrentAccount(viewModel.currentQuery)
         }
     }
 }

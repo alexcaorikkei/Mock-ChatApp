@@ -5,6 +5,7 @@ import android.net.Uri
 import android.view.View
 import androidx.core.net.toUri
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentEditProfileBinding
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileViewModel>(R.layout.fragment_edit_profile), BottomSheetListener {
     @Inject
     lateinit var appNavigaiton: AppNavigation
-    private val viewModel: ProfileViewModel by activityViewModels()
+    private val viewModel: ProfileViewModel by viewModels()
     private var imageProfileUri : Uri? = null
     override fun getVM() = viewModel
 
@@ -53,6 +54,15 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
                         }
                     }
                     setComponentState(true)
+                }
+            }
+        }
+        viewModel.editResponse.observe(viewLifecycleOwner) {response ->
+            when(response) {
+                is Response.Failure -> {}
+                Response.Loading -> {}
+                is Response.Success -> {
+                    appNavigaiton.openEditProfileToProfileScreen()
                 }
             }
         }
@@ -90,7 +100,6 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
                     ),
                     imageProfileUri
                 )
-                appNavigaiton.openEditProfileToProfileScreen()
             }
             etBirthday.transformIntoDatePicker(requireContext(), "dd/MM/yyyy")
             btnBack.setOnClickListener {
@@ -98,7 +107,7 @@ class EditProfileFragment : BaseFragment<FragmentEditProfileBinding, ProfileView
             }
             btnChangeAvatar.setOnClickListener {
                 val bottomSheetFragment = BottomSheetFragment(this@EditProfileFragment)
-                bottomSheetFragment.show(requireActivity().supportFragmentManager, "BottomSheetFragment")
+                bottomSheetFragment.show(childFragmentManager, "BottomSheetFragment")
             }
         }
     }
