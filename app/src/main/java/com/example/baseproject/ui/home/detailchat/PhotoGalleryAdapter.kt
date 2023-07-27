@@ -1,7 +1,6 @@
 package com.example.baseproject.ui.home.detailchat
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -29,14 +28,16 @@ class PhotoAdapter(private var photoList: List<Photo>) :
     @SuppressLint("NotifyDataSetChanged")
     override fun onBindViewHolder(holder: ChatVH, position: Int) {
         val photo = photoList[position]
-        holder.binding.cbItemClicked.isChecked = photo.isClicked
+        with(holder.binding) {
+            cbItemClicked.isChecked = photo.isClicked
 
-        Glide.with(holder.binding.ivItemPicture)
-            .load(photo.uri)
-            .into(holder.binding.ivItemPicture)
+            Glide.with(ivItemPicture)
+                .load(photo.uri)
+                .into(ivItemPicture)
 
-        holder.binding.root.setOnClickListener {
-            onClickListener?.pickPhoto(position)
+            root.setOnClickListener {
+                onClickListener?.pickPhoto(position)
+            }
         }
     }
 

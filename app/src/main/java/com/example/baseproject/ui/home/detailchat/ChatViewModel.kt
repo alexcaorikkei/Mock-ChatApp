@@ -1,7 +1,8 @@
 package com.example.baseproject.ui.home.detailchat
 
 import android.content.Context
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -14,6 +15,7 @@ import com.example.baseproject.extension.*
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.domain.model.UserModel
+import com.example.baseproject.ui.home.detailchat.notification.Notification
 import com.example.core.base.BaseViewModel
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
@@ -88,8 +90,6 @@ class ChatViewModel @Inject constructor(
                         oldItem.photo = message.photo
                         _messageListLiveData.value = messageList
                     } else handleAddMessage(message)
-
-//                    if (oldItem == null) handleAddMessage(message)
                 }
 
                 override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
@@ -139,11 +139,34 @@ class ChatViewModel @Inject constructor(
             message.date.toLong(),
             0
         )
+        if (positionBefore > 0) {
+            if (message.formatDate != context.getString(R.string.same_minute)) {
+                if (!(messageList[positionBefore].type == MessageType.TEXT && messageList[positionBefore].idSender == myUid)
+                    || messageList[positionBefore].formatDate != context.getString(R.string.same_minute)
+                ) {
+                    message.typeLayout = TypeLayoutChat.ONE
+                } else if (messageList[positionBefore].formatDate == context.getString(R.string.same_minute)) {
+                    if (message.type == MessageType.TEXT) {
+                        if (messageList[positionBefore].typeLayout == TypeLayoutChat.ONE) {
+                            messageList[positionBefore].typeLayout = TypeLayoutChat.START
+                        } else if (messageList[positionBefore].typeLayout == TypeLayoutChat.END) {
+                            messageList[positionBefore].typeLayout =TypeLayoutChat.BETWEEN
+                        }
+                        message.typeLayout = TypeLayoutChat.END
+                    } else if (message.type != MessageType.TEXT) {
+                        if (messageList[positionBefore - 1].type == MessageType.TEXT)
+                            message.typeLayout = TypeLayoutChat.END
+                        else message.typeLayout = TypeLayoutChat.ONE
+                    }
+                }
+
+            }
+        }
         messageList.add(message)
         _messageListLiveData.value = messageList
     }
 
-
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendEmoji(linkEmoji: String, idReceive: String) {
         val chatModel = myUid?.let {
             ChatModel(
@@ -160,10 +183,14 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendEmojiResponse.postValue(response)
+                sendNotification(
+                    _receiver.value?.displayName, context.getString(R.string.sent_a_emoji)
+                )
             }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendPhoto(uri: String, idReceive: String) {
         val chatModel = myUid?.let {
             ChatModel(
@@ -181,9 +208,13 @@ class ChatViewModel @Inject constructor(
                 val response = detailMessageRepository.sendPhoto(chatModel, idReceive)
                 _sendPhotoResponse.value = response
             }
+            sendNotification(
+                _receiver.value?.displayName, context.getString(R.string.sent_a_photo)
+            )
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun sendMessage(text: String, idReceive: String) {
         val chatModel = myUid?.let {
             ChatModel(
@@ -199,7 +230,15 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendMessageResponse.value = response
+                sendNotification(
+                    _receiver.value?.displayName, text
+                )
             }
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun sendNotification(displayName: String?, text: String) {
+        displayName?.let { Notification.createNotification(1, context, it, text) }
     }
 }

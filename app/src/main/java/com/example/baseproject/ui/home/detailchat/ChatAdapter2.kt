@@ -2,10 +2,12 @@ package com.example.baseproject.ui.home.detailchat
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.baseproject.R
 import com.example.baseproject.databinding.ItemChatDateBinding
 import com.example.baseproject.databinding.ItemChatReceiveBinding
 import com.example.baseproject.databinding.ItemChatSendBinding
@@ -37,7 +39,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         fun bind(item: ChatModel) {
             binding.apply {
                 tvItemchatMess.text = item.text
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -58,7 +60,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     )
                     .into(ivItemOnepicture)
 
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -71,8 +73,18 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
         fun bind(item: ChatModel) {
             binding.apply {
+                tvItemSendMess.background = ContextCompat.getDrawable(
+                    root.context,
+                    when (item.typeLayout) {
+                        TypeLayoutChat.BETWEEN -> R.drawable.bg_chat_bottom_top
+                        TypeLayoutChat.END -> R.drawable.bg_chat_top_right
+                        TypeLayoutChat.ONE -> R.drawable.bg_tv_send
+                        TypeLayoutChat.START -> R.drawable.bg_chat_bottom_right
+                        else -> R.drawable.bg_chat_bottom_right
+                    }
+                )
                 tvItemSendMess.text = item.text
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -93,7 +105,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                         (300 * ivItemOnepicture.resources.displayMetrics.density).toInt()
                     ).into(ivItemOnepicture)
 
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -110,7 +122,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     .load(item.emoji?.let { getEmoji(it.toInt()) })
                     .into(ivItemOnepicture)
 
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -127,7 +139,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     .load(item.emoji?.let { getEmoji(it.toInt()) })
                     .into(ivItemOnepicture)
 
-                if (item.formatDate != "empty") {
+                if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
@@ -153,7 +165,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
-            RECEIVE_TEXT -> {
+            Chat.RECEIVE_TEXT -> {
                 val binding =
                     ItemChatReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -163,7 +175,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatReceiveVH(binding)
             }
 
-            SEND_TEXT -> {
+            Chat.SEND_TEXT -> {
                 val binding =
                     ItemChatSendBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -173,7 +185,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatSendVH(binding)
             }
 
-            RECEIVE_PHOTOS -> {
+            Chat.RECEIVE_PHOTOS -> {
                 val binding =
                     ItemPhotoReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -183,7 +195,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatOnePhotoReceiveVH(binding)
             }
 
-            SEND_EMOJI -> {
+            Chat.SEND_EMOJI -> {
                 val binding =
                     ItemEmojiSendBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -193,7 +205,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatOneEmojiSendVH(binding)
             }
 
-            RECEIVE_EMOJI -> {
+            Chat.RECEIVE_EMOJI -> {
                 val binding =
                     ItemEmojiReceiveBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -203,7 +215,7 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                 return ItemChatOneEmojiReceiveVH(binding)
             }
 
-            DATE -> {
+            Chat.DATE -> {
                 val binding =
                     ItemChatDateBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -228,37 +240,37 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val chat = getItem(position)
         when (holder.itemViewType) {
-            RECEIVE_TEXT -> {
+            Chat.RECEIVE_TEXT -> {
                 val mHolder = holder as ItemChatReceiveVH
                 mHolder.bind(chat)
             }
 
-            SEND_TEXT -> {
+            Chat.SEND_TEXT -> {
                 val mHolder = holder as ItemChatSendVH
                 mHolder.bind(chat)
             }
 
-            RECEIVE_PHOTOS -> {
+            Chat.RECEIVE_PHOTOS -> {
                 val mHolder = holder as ItemChatOnePhotoReceiveVH
                 mHolder.bind(chat)
             }
 
-            SEND_PHOTOS -> {
+            Chat.SEND_PHOTOS -> {
                 val mHolder = holder as ItemChatOnePhotoSendVH
                 mHolder.bind(chat)
             }
 
-            RECEIVE_EMOJI -> {
+            Chat.RECEIVE_EMOJI -> {
                 val mHolder = holder as ItemChatOneEmojiReceiveVH
                 mHolder.bind(chat)
             }
 
-            SEND_EMOJI -> {
+            Chat.SEND_EMOJI -> {
                 val mHolder = holder as ItemChatOneEmojiSendVH
                 mHolder.bind(chat)
             }
 
-            DATE -> {
+            Chat.DATE -> {
                 val mHolder = holder as ItemChatDateVH
                 mHolder.bind(chat)
             }
@@ -267,23 +279,23 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
 
     override fun getItemViewType(position: Int): Int {
         val chat = getItem(position)
-        if (chat.type == MessageType.DATE) return DATE
+        if (chat.type == MessageType.DATE) return Chat.DATE
         else if (chat.idSender == user?.uid) {
             return when (chat.type) {
-                MessageType.PHOTO -> SEND_PHOTOS
+                MessageType.PHOTO -> Chat.SEND_PHOTOS
 
-                MessageType.TEXT -> SEND_TEXT
+                MessageType.TEXT -> Chat.SEND_TEXT
 
-                else -> SEND_EMOJI
+                else -> Chat.SEND_EMOJI
 
             }
         } else {
             return when (chat.type) {
-                MessageType.TEXT -> RECEIVE_TEXT
+                MessageType.TEXT -> Chat.RECEIVE_TEXT
 
-                MessageType.PHOTO -> RECEIVE_PHOTOS
+                MessageType.PHOTO -> Chat.RECEIVE_PHOTOS
 
-                else -> RECEIVE_EMOJI
+                else -> Chat.RECEIVE_EMOJI
             }
         }
     }

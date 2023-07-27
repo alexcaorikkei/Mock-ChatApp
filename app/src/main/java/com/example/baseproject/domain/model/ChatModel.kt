@@ -17,6 +17,7 @@ enum class MessageType {
                 else -> DATE
             }
         }
+
         fun fromString(value: String): MessageType {
             return when (value) {
                 "NONE" -> NONE
@@ -54,6 +55,7 @@ enum class MessageType {
 //            }
 //        }
 }
+
 data class ChatModel(
     val id: String,
     val idSender: String,
@@ -63,7 +65,8 @@ data class ChatModel(
     var photo: String? = null,
     var emoji: String? = null,
     var currentDate: String? = "",
-    var formatDate: String? = ""
+    var formatDate: String? = "",
+    var typeLayout: String? = ""
 ) {
     constructor () : this(
         "",
@@ -74,6 +77,7 @@ data class ChatModel(
         photo = "",
         emoji = "",
         currentDate = "",
-        formatDate = ""
+        formatDate = "",
+        typeLayout = ""
     )
 }
