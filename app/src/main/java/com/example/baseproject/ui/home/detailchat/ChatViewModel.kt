@@ -113,7 +113,7 @@ class ChatViewModel @Inject constructor(
     private fun handleAddMessage(message: ChatModel) {
         val messageList = _messageListLiveData.value ?: arrayListOf()
 
-        val mDate = getDateChat(message.date.toLong())
+        val mDate = context.getDateChat(message.date.toLong())
         val positionBefore = messageList.size - 1
 
         if (messageList.isEmpty() || messageList.find { it.currentDate == mDate } == null) {

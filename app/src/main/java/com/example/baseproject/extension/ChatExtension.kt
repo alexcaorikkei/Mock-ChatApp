@@ -107,7 +107,7 @@ fun getDateRoom(date: Long): String {
     }
 }
 
-fun getDateChat(date: Long): String {
+fun Context.getDateChat(date: Long): String {
     val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
     val today = Calendar.getInstance()
     today.set(
@@ -118,9 +118,9 @@ fun getDateChat(date: Long): String {
     )
     val messageDate = Date(date)
     return if (dateFormat.format(today.time) == dateFormat.format(messageDate)) {
-        R.string.today.toString()
+        resources.getString(R.string.today)
     } else if (today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
-        R.string.yesterday.toString()
+        resources.getString(R.string.yesterday)
     } else {
         dateFormat.format(messageDate)
     }
