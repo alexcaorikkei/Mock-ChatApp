@@ -10,6 +10,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.ui.custom.MyPasswordTransformationMethod
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
@@ -41,6 +42,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     appNavigation.openLoginToRegisterScreen()
                 })
             )
+
+            etPassword.transformationMethod = MyPasswordTransformationMethod()
         }
         lifecycleScope.launch {
             val email = rxPreferences.getEmail()
