@@ -150,13 +150,14 @@ class ChatViewModel @Inject constructor(
                         if (messageList[positionBefore].typeLayout == TypeLayoutChat.ONE) {
                             messageList[positionBefore].typeLayout = TypeLayoutChat.START
                         } else if (messageList[positionBefore].typeLayout == TypeLayoutChat.END) {
-                            messageList[positionBefore].typeLayout =TypeLayoutChat.BETWEEN
+                            messageList[positionBefore].typeLayout = TypeLayoutChat.BETWEEN
                         }
                         message.typeLayout = TypeLayoutChat.END
                     } else if (message.type != MessageType.TEXT) {
-                        if (messageList[positionBefore - 1].type == MessageType.TEXT)
-                            message.typeLayout = TypeLayoutChat.END
-                        else message.typeLayout = TypeLayoutChat.ONE
+                        if (positionBefore > 1) {
+                            if (messageList[positionBefore - 1].type == MessageType.TEXT)
+                                message.typeLayout = TypeLayoutChat.END
+                        } else message.typeLayout = TypeLayoutChat.ONE
                     }
                 }
 
