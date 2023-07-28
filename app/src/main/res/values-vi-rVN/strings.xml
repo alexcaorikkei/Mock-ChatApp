@@ -6,9 +6,9 @@
     <string name="login">Đăng nhập</string>
     <string name="policies_and_terms">Tôi đồng ý với các chính sách và điều khoản</string>
     <string name="registry">Đăng ký</string>
-    <string name="full_name">Họ và tên</string>
-    <string name="email">Email</string>
-    <string name="password">Mật khẩu</string>
+    <string name="full_name">Họ và tên <font color='#FF0000'>*</font></string>
+    <string name="email">Email <font color='#FF0000'>*</font></string>
+    <string name="password">Mật khẩu <font color='#FF0000'>*</font></string>
     <string name="phone_number">Số điện thoại</string>
     <string name="dont_have_an_account">Chưa có tài khoản? Đăng ký</string>
     <string name="policies">chính sách</string>

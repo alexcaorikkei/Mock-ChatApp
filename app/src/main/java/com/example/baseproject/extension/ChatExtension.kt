@@ -1,9 +1,12 @@
 package com.example.baseproject.extension
 
+import android.animation.ValueAnimator
 import android.app.Activity
 import android.content.Context
 import android.view.View
 import android.view.inputmethod.InputMethodManager
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.baseproject.R
 import java.text.DateFormat
@@ -21,6 +24,7 @@ object Chat {
     const val DATE = 6
 }
 
+const val MILISECONDS_IN_A_DAY = 86400000
 const val KEY_ID_RECEIVER = "KEY_ID_RECEIVER"
 
 object Noti {
@@ -36,6 +40,7 @@ object TypeLayoutChat {
     const val BETWEEN = "between"
     const val END = "end"
 }
+
 fun Fragment.hideKeyboard() {
     view?.let { activity?.hideKeyboard(it) }
 }
@@ -46,6 +51,19 @@ private fun Context.hideKeyboard(view: View) {
         view.windowToken,
         0
     )
+}
+
+fun View.setEdittextUsableWhenFullScreen() {
+    ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+        val animator =
+            ValueAnimator.ofInt(0, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
+        animator.addUpdateListener { valueAnimator ->
+            v.setPadding(0, 0, 0, valueAnimator.animatedValue as? Int ?: 0)
+        }
+        animator.duration = 200
+        animator.start()
+        insets
+    }
 }
 
 fun View.gone() {
@@ -70,9 +88,27 @@ fun convertDpToPixel(context: Context, dp: Int): Int {
     val px = dp * (metrics.densityDpi / 160f)
     return px.toInt()
 }
+fun getDateRoom(date: Long): String {
+    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
+    val hourFormat: DateFormat = SimpleDateFormat("HH:mm")
+    val today = Calendar.getInstance()
+    today.set(
+        today.get(Calendar.YEAR),
+        today.get(Calendar.MONTH),
+        today.get(Calendar.DAY_OF_MONTH),
+        0, 0, 0)
+    val messageDate = Date(date)
+    return if(dateFormat.format(today.time) == dateFormat.format(messageDate)) {
+        hourFormat.format(messageDate)
+    } else if(today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
+        R.string.yesterday.toString()
+    } else {
+        dateFormat.format(messageDate)
+    }
+}
 
-fun Context.getDate(date: Long): String {
-    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/YYYY")
+fun Context.getDateChat(date: Long): String {
+    val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
     val today = Calendar.getInstance()
     today.set(
         today.get(Calendar.YEAR),
@@ -83,6 +119,8 @@ fun Context.getDate(date: Long): String {
     val messageDate = Date(date)
     return if (dateFormat.format(today.time) == dateFormat.format(messageDate)) {
         resources.getString(R.string.today)
+    } else if (today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
+        resources.getString(R.string.yesterday)
     } else {
         dateFormat.format(messageDate)
     }

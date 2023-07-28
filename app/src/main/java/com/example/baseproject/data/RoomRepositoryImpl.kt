@@ -1,12 +1,12 @@
 package com.example.baseproject.data
 
 import androidx.lifecycle.MutableLiveData
-import com.example.baseproject.R
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.domain.repository.RoomRepository
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
+import com.example.baseproject.extension.getDateRoom
 import com.example.baseproject.extension.toViWithoutAccent
 import com.example.baseproject.ui.home.messages.model.RoomModel
 import com.google.firebase.auth.FirebaseAuth
@@ -19,14 +19,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
-import timber.log.Timber
-import java.sql.Time
-import java.text.DateFormat
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-
-private const val MILISECONDS_IN_A_DAY = 86400000
 
 class RoomRepositoryImpl : RoomRepository {
     private val coroutineScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -129,26 +121,6 @@ class RoomRepositoryImpl : RoomRepository {
         }
     }
 
-    private fun getDate(date: Long): String {
-        val dateFormat: DateFormat = SimpleDateFormat("dd/MM/yyyy")
-        val hourFormat: DateFormat = SimpleDateFormat("HH:mm")
-        val today = Calendar.getInstance()
-        today.set(
-            today.get(Calendar.YEAR),
-            today.get(Calendar.MONTH),
-            today.get(Calendar.DAY_OF_MONTH),
-            0, 0, 0)
-        val messageDate = Date(date)
-        return if(dateFormat.format(today.time) == dateFormat.format(messageDate)) {
-            hourFormat.format(messageDate)
-        } else if(today.time.time - messageDate.time < MILISECONDS_IN_A_DAY) {
-            R.string.yesterday.toString()
-        } else {
-            dateFormat.format(messageDate)
-        }
-
-    }
-
     private suspend fun getListRoom(snapshot: DataSnapshot): List<RoomModel>{
         val listRoom = mutableListOf<RoomModel>()
         for (room in snapshot.children) {
@@ -175,7 +147,7 @@ class RoomRepositoryImpl : RoomRepository {
         return listRoom.sortedBy {
             -it.time.toLong()
         }.map{
-            it.copy(time = getDate(it.time.toLong()))
+            it.copy(time = getDateRoom(it.time.toLong()))
         }.toList()
     }
 }
