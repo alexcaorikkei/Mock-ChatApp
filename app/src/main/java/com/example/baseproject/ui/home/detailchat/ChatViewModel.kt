@@ -15,7 +15,6 @@ import com.example.baseproject.extension.*
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.domain.model.UserModel
-import com.example.baseproject.ui.home.detailchat.notification.Notification
 import com.example.core.base.BaseViewModel
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
@@ -184,9 +183,9 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendEmojiResponse.postValue(response)
-                sendNotification(
-                    _receiver.value?.displayName, context.getString(R.string.sent_a_emoji)
-                )
+//                sendNotification(
+//                    _receiver.value?.displayName, context.getString(R.string.sent_a_emoji)
+//                )
             }
         }
     }
@@ -209,9 +208,9 @@ class ChatViewModel @Inject constructor(
                 val response = detailMessageRepository.sendPhoto(chatModel, idReceive)
                 _sendPhotoResponse.value = response
             }
-            sendNotification(
-                _receiver.value?.displayName, context.getString(R.string.sent_a_photo)
-            )
+//            sendNotification(
+//                _receiver.value?.displayName, context.getString(R.string.sent_a_photo)
+//            )
         }
     }
 
@@ -231,15 +230,15 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendMessageResponse.value = response
-                sendNotification(
-                    _receiver.value?.displayName, text
-                )
+//                sendNotification(
+//                    _receiver.value?.displayName, text
+//                )
             }
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun sendNotification(displayName: String?, text: String) {
-        displayName?.let { Notification.createNotification(1, context, it, text) }
-    }
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    private fun sendNotification(displayName: String?, text: String) {
+//        displayName?.let { Notification.createNotification(1, context, it, text) }
+//    }
 }
