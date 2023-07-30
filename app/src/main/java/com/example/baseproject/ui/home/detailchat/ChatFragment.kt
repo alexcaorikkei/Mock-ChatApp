@@ -27,7 +27,6 @@ import com.example.baseproject.databinding.FragmentDetailChatBinding
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.*
 import com.example.baseproject.navigation.AppNavigation
-import com.example.baseproject.ui.home.detailchat.notification.*
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.utils.toast
 import com.google.android.material.bottomsheet.BottomSheetBehavior

@@ -42,4 +42,8 @@ class AppPreferences @Inject constructor(
         putValue(PreferencesKeys.PREF_PARAM_EMAIL, email)
     }
 
+    override suspend fun saveNotificationToken(token: String) {
+        putValue(PreferencesKeys.PREF_PARAM_ACCESS_TOKEN, token)
+    }
+
 }
