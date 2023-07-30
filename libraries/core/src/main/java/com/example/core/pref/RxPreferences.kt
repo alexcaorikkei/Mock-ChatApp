@@ -13,4 +13,5 @@ interface RxPreferences : BasePreferences {
     fun getEmail(): Flow<String?>
     suspend fun setEmail(email: String)
     suspend fun saveNotificationToken(token: String)
+    fun getNotificationToken(): Flow<String?>
 }

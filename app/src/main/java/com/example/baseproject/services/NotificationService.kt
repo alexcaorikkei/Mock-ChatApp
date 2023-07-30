@@ -12,30 +12,23 @@ import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.example.baseproject.container.MainActivity
-import com.example.baseproject.data.NotificationRepositoryImpl
-import com.example.baseproject.domain.repository.NotificationRepository
 import com.example.core.pref.RxPreferences
-import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class NotificationService : FirebaseMessagingService() {
-
-    @Inject
-    lateinit var notificationRepository: NotificationRepository
-
     @Inject
     lateinit var rxPreferences: RxPreferences
 
     private val scope = CoroutineScope(Dispatchers.IO)
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         scope.launch {

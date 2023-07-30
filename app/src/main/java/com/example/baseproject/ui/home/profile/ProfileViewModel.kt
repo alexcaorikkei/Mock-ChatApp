@@ -19,7 +19,7 @@ import javax.inject.Inject
 class ProfileViewModel @Inject constructor(
     val savedStateHandle : SavedStateHandle,
     private val authRepository: AuthRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
 ) : BaseViewModel() {
     private var _logOutResponse = SingleLiveEvent<Response<Boolean>>()
     val logOutResponse: MutableLiveData<Response<Boolean>> = _logOutResponse

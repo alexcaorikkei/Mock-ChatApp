@@ -16,6 +16,7 @@ class AppPreferences @Inject constructor(
         val PREF_PARAM_ACCESS_TOKEN = stringPreferencesKey("PREF_PARAM_ACCESS_TOKEN")
         val PREF_PARAM_LANGUAGE = stringPreferencesKey("PREF_PARAM_LANGUAGE")
         val PREF_PARAM_EMAIL = stringPreferencesKey("PREF_PARAM_EMAIL")
+        val PREF_PARAM_NOTIFICATION_TOKEN = stringPreferencesKey("PREF_PARAM_NOTIFICATION_TOKEN")
     }
 
     override fun getToken(): Flow<String?> = getValue(PreferencesKeys.PREF_PARAM_ACCESS_TOKEN)
@@ -43,7 +44,10 @@ class AppPreferences @Inject constructor(
     }
 
     override suspend fun saveNotificationToken(token: String) {
-        putValue(PreferencesKeys.PREF_PARAM_ACCESS_TOKEN, token)
+        putValue(PreferencesKeys.PREF_PARAM_NOTIFICATION_TOKEN, token)
     }
 
+    override fun getNotificationToken(): Flow<String?> {
+        return getValue(PreferencesKeys.PREF_PARAM_NOTIFICATION_TOKEN)
+    }
 }

@@ -105,9 +105,13 @@ class AuthRepositoryImpl : AuthRepository {
             }
     }
 
-    override suspend fun firebaseLogin(email: String, password: String): Response<Boolean> {
+    override suspend fun firebaseLogin(email: String, password: String, notificationToken: String): Response<Boolean> {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
+            database.reference.child("users")
+                .child(auth.currentUser!!.uid)
+                .child("device-token")
+                .setValue(notificationToken).await()
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
@@ -125,6 +129,10 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun logOut(): Response<Boolean> {
         return try {
+            database.reference.child("users")
+                .child(auth.currentUser!!.uid)
+                .child("device-token")
+                .setValue(null).await()
             auth.signOut()
             Response.Success(true)
         } catch (e: Exception) {

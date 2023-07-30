@@ -137,11 +137,12 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
     override fun setOnClick() {
         binding.apply {
             btnLogin.setOnClickListener {
-                viewModel.signIn(
-                    etEmail.text.toString(),
-                    etPassword.text.toString()
-                )
                 lifecycleScope.launch {
+                    viewModel.signIn(
+                        etEmail.text.toString(),
+                        etPassword.text.toString(),
+                        rxPreferences.getNotificationToken().first().toString()
+                    )
                     rxPreferences.setEmail(binding.etEmail.text.toString())
                 }
             }
