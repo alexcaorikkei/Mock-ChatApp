@@ -112,7 +112,7 @@ class ChatViewModel @Inject constructor(
     private fun handleAddMessage(message: ChatModel) {
         val messageList = _messageListLiveData.value ?: arrayListOf()
 
-        val mDate = context.getDate(message.date.toLong())
+        val mDate = context.getDateChat(message.date.toLong())
         val positionBefore = messageList.size - 1
 
         if (messageList.isEmpty() || messageList.find { it.currentDate == mDate } == null) {
@@ -149,13 +149,14 @@ class ChatViewModel @Inject constructor(
                         if (messageList[positionBefore].typeLayout == TypeLayoutChat.ONE) {
                             messageList[positionBefore].typeLayout = TypeLayoutChat.START
                         } else if (messageList[positionBefore].typeLayout == TypeLayoutChat.END) {
-                            messageList[positionBefore].typeLayout =TypeLayoutChat.BETWEEN
+                            messageList[positionBefore].typeLayout = TypeLayoutChat.BETWEEN
                         }
                         message.typeLayout = TypeLayoutChat.END
                     } else if (message.type != MessageType.TEXT) {
-                        if (messageList[positionBefore - 1].type == MessageType.TEXT)
-                            message.typeLayout = TypeLayoutChat.END
-                        else message.typeLayout = TypeLayoutChat.ONE
+                        if (positionBefore > 1) {
+                            if (messageList[positionBefore - 1].type == MessageType.TEXT)
+                                message.typeLayout = TypeLayoutChat.END
+                        } else message.typeLayout = TypeLayoutChat.ONE
                     }
                 }
 

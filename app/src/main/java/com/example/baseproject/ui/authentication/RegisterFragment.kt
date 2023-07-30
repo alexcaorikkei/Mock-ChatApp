@@ -11,6 +11,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.ui.custom.MyPasswordTransformationMethod
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
@@ -35,25 +36,28 @@ class RegisterFragment() :
 
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
-        binding.tvPoliciesAndTerms.makeLink(
-            Pair(getString(R.string.policies), View.OnClickListener {
-                val dialogBuilder = AlertDialog.Builder(requireContext())
-                dialogBuilder.setMessage(getString(R.string.policies))
-                    .setCancelable(true)
-                    .show()
-            }),
-            Pair(getString(R.string.terms), View.OnClickListener {
-                val dialogBuilder = AlertDialog.Builder(requireContext())
-                dialogBuilder.setMessage(getString(R.string.terms))
-                    .setCancelable(true)
-                    .show()
-            })
-        )
-        binding.tvTitleHadAccount.makeLink(
-            Pair(getString(R.string.login), View.OnClickListener {
-                appNavigation.openRegisterToLoginScreen()
-            })
-        )
+        binding.apply {
+            etPassword.transformationMethod = MyPasswordTransformationMethod()
+            tvPoliciesAndTerms.makeLink(
+                Pair(getString(R.string.policies), View.OnClickListener {
+                    val dialogBuilder = AlertDialog.Builder(requireContext())
+                    dialogBuilder.setMessage(getString(R.string.policies))
+                        .setCancelable(true)
+                        .show()
+                }),
+                Pair(getString(R.string.terms), View.OnClickListener {
+                    val dialogBuilder = AlertDialog.Builder(requireContext())
+                    dialogBuilder.setMessage(getString(R.string.terms))
+                        .setCancelable(true)
+                        .show()
+                })
+            )
+            tvTitleHadAccount.makeLink(
+                Pair(getString(R.string.login), View.OnClickListener {
+                    appNavigation.openRegisterToLoginScreen()
+                })
+            )
+        }
     }
 
     override fun bindingAction() {
@@ -70,7 +74,8 @@ class RegisterFragment() :
                     is Response.Failure -> {
                         when (response.e) {
                             is FirebaseAuthUserCollisionException -> {
-                                resources.getString(R.string.email_already_exists).toast(requireContext())
+                                resources.getString(R.string.email_already_exists)
+                                    .toast(requireContext())
                             }
 
                             is IllegalArgumentException -> {

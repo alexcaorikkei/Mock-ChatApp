@@ -63,7 +63,7 @@ class ChatFragment :
         createNotificationChannel()
         uidReceiver = arguments?.getString(KEY_ID_RECEIVER).toString()
 
-        setEdittextUsableWhenFullScreen()
+        binding.viewChatParent.setEdittextUsableWhenFullScreen()
         setRecyclerViewChat()
         listenEdittextChat()
         setUpBottomSheetGalleryAndEmoji()
@@ -399,18 +399,6 @@ class ChatFragment :
         }
     }
 
-    private fun setEdittextUsableWhenFullScreen() {
-        ViewCompat.setOnApplyWindowInsetsListener(binding.viewChatParent) { v, insets ->
-            val animator =
-                ValueAnimator.ofInt(0, insets.getInsets(WindowInsetsCompat.Type.ime()).bottom)
-            animator.addUpdateListener { valueAnimator ->
-                v.setPadding(0, 0, 0, valueAnimator.animatedValue as? Int ?: 0)
-            }
-            animator.duration = 200
-            animator.start()
-            insets
-        }
-    }
 
     private fun setRecyclerViewChat() {
         binding.rvChat.apply {
