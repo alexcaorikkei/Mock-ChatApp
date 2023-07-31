@@ -42,7 +42,8 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                 .child("notification").setValue(
                     NotificationModel(
                         profile.child("display_name").value.toString(),
-                        chatModel.text,
+                        body = chatModel.text,
+                        profilePicture = profile.child("profile_picture").value.toString()
                     )
                 )
             Response.Success(true)
@@ -83,7 +84,8 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                                     .child("notification").setValue(
                                         NotificationModel(
                                             profile.child("display_name").value.toString(),
-                                            chatModel.photo,
+                                            image = chatModel.photo,
+                                            profilePicture = profile.child("profile_picture").value.toString()
                                         )
                                     )
                             }.addOnFailureListener { e ->
