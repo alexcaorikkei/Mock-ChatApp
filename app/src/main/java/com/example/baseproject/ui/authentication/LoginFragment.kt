@@ -144,7 +144,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     viewModel.signIn(
                         etEmail.text.toString(),
                         etPassword.text.toString(),
-                        rxPreferences.getNotificationToken().first().toString()
                     )
                     rxPreferences.setEmail(binding.etEmail.text.toString())
                 }
