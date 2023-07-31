@@ -6,6 +6,7 @@ import com.example.baseproject.domain.repository.DetailMessageRepository
 import com.example.baseproject.extension.*
 import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.FriendModel
+import com.example.baseproject.domain.model.NotificationModel
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -27,11 +28,23 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
         chatModel: ChatModel,
         idReceive: String
     ): Response<Boolean> {
-        database.reference.child("room")
-            .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
-            .child(chatModel.id).setValue(chatModel)
-
         return try {
+            database.reference.child("room")
+                .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+                .child(chatModel.id).setValue(chatModel)
+
+            val profile = database.reference.child("users")
+                .child(auth.currentUser?.uid.toString())
+                .child("profile").get().await()
+
+            database.reference.child("users")
+                .child(idReceive)
+                .child("notification").setValue(
+                    NotificationModel(
+                        profile.child("display_name").value.toString(),
+                        chatModel.text,
+                    )
+                )
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
@@ -42,8 +55,11 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
     override suspend fun sendPhoto(
         chatModel: ChatModel,
         idReceive: String
-    ): Response<Boolean> =
-        suspendCancellableCoroutine { emit ->
+    ): Response<Boolean>  {
+        val profile = database.reference.child("users")
+            .child(auth.currentUser?.uid.toString())
+            .child("profile").get().await()
+        return suspendCancellableCoroutine { emit ->
             chatModel.photo?.let {
                 storage.reference
                     .child("images/" + it.toUri().lastPathSegment)
@@ -62,6 +78,14 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                                     }.addOnFailureListener { e ->
                                         emit.resumeWithException(e)
                                     }
+                                database.reference.child("users")
+                                    .child(idReceive)
+                                    .child("notification").setValue(
+                                        NotificationModel(
+                                            profile.child("display_name").value.toString(),
+                                            chatModel.photo,
+                                        )
+                                    )
                             }.addOnFailureListener { e ->
                                 emit.resumeWithException(e)
                             }
@@ -70,4 +94,6 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                     }
             }
         }
+    }
+
 }

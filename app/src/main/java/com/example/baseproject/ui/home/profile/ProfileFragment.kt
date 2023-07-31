@@ -1,9 +1,9 @@
 package com.example.baseproject.ui.home.profile
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -11,6 +11,7 @@ import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentProfileBinding
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.services.AppNotificationService
 import com.example.baseproject.utils.Language
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
@@ -85,6 +86,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                 appNavigation.openHomeToEditProfileScreen()
             }
             llLogout.setOnClickListener() {
+                activity?.stopService(Intent(activity, AppNotificationService::class.java))
                 viewModel.logOut()
             }
             llLanguages.setOnClickListener {

@@ -126,6 +126,10 @@ class AuthRepositoryImpl : AuthRepository {
     override suspend fun logOut(): Response<Boolean> {
         return try {
             auth.signOut()
+            database.reference.child("users")
+                .child(auth.currentUser!!.uid)
+                .child("notification")
+                .setValue(null)
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
