@@ -18,8 +18,15 @@ class NotificationRepositoryImpl : NotificationRepository {
             .child("notification")
             .addValueEventListener(object : com.google.firebase.database.ValueEventListener {
                 override fun onDataChange(snapshot: com.google.firebase.database.DataSnapshot) {
-                    val notification = snapshot.getValue(NotificationModel::class.java)
-                    notification?.let { notificationLiveData.postValue(it) }
+                    val notification = NotificationModel(
+                        title = snapshot.child("title").value?.toString(),
+                        id = snapshot.child("id").value?.toString()?.replace(auth.currentUser!!.uid, ""),
+                        body = snapshot.child("body").value?.toString(),
+                        image = snapshot.child("image").value?.toString(),
+                        emoji = snapshot.child("emoji").value?.toString(),
+                        profilePicture = snapshot.child("profile_picture").value?.toString()
+                    )
+                    notificationLiveData.postValue(notification)
                 }
 
                 override fun onCancelled(error: com.google.firebase.database.DatabaseError) {

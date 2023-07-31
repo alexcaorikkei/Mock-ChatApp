@@ -24,6 +24,12 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
     private val auth = FirebaseAuth.getInstance()
     private val storage = FirebaseStorage.getInstance()
 
+    private suspend fun getProfile() =
+        database.reference.child("users")
+            .child(auth.currentUser!!.uid)
+            .child("profile")
+            .get().await()
+
     override suspend fun sendMessage(
         chatModel: ChatModel,
         idReceive: String
@@ -33,19 +39,18 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                 .child(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
                 .child(chatModel.id).setValue(chatModel)
 
-            val profile = database.reference.child("users")
-                .child(auth.currentUser?.uid.toString())
-                .child("profile").get().await()
+            val profile = getProfile()
 
             database.reference.child("users")
                 .child(idReceive)
-                .child("notification").setValue(
-                    NotificationModel(
-                        profile.child("display_name").value.toString(),
-                        body = chatModel.text,
-                        profilePicture = profile.child("profile_picture").value.toString()
-                    )
-                )
+                .child("notification").apply {
+                    child("title").setValue(profile.child("display_name").value.toString())
+                    child("body").setValue(chatModel.text)
+                    child("id").setValue(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+                    child("image").setValue(null)
+                    child("emoji").setValue(null)
+                    child("profile_picture").setValue(profile.child("profile_picture").value?.toString())
+                }
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
@@ -57,9 +62,7 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
         chatModel: ChatModel,
         idReceive: String
     ): Response<Boolean>  {
-        val profile = database.reference.child("users")
-            .child(auth.currentUser?.uid.toString())
-            .child("profile").get().await()
+        val profile = getProfile()
         return suspendCancellableCoroutine { emit ->
             chatModel.photo?.let {
                 storage.reference
@@ -81,13 +84,14 @@ class DetailMessageRepositoryImpl : DetailMessageRepository {
                                     }
                                 database.reference.child("users")
                                     .child(idReceive)
-                                    .child("notification").setValue(
-                                        NotificationModel(
-                                            profile.child("display_name").value.toString(),
-                                            image = chatModel.photo,
-                                            profilePicture = profile.child("profile_picture").value.toString()
-                                        )
-                                    )
+                                    .child("notification").apply {
+                                        child("title").setValue(profile.child("display_name").value.toString())
+                                        child("image").setValue(chatModel.photo)
+                                        child("id").setValue(getIdRoom(auth.currentUser?.uid.toString(), idReceive))
+                                        child("body").setValue(null)
+                                        child("emoji").setValue(null)
+                                        child("profile_picture").setValue(profile.child("profile_picture").value?.toString())
+                                    }
                             }.addOnFailureListener { e ->
                                 emit.resumeWithException(e)
                             }

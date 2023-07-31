@@ -1,29 +1,23 @@
 package com.example.baseproject.services
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.graphics.drawable.Drawable
 import android.media.RingtoneManager
-import android.os.Build
+import android.os.Bundle
 import androidx.core.app.NotificationCompat
-import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.Observer
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
+import androidx.navigation.NavDeepLinkBuilder
 import com.example.baseproject.R
 import com.example.baseproject.container.MainActivity
 import com.example.baseproject.domain.model.NotificationModel
 import com.example.baseproject.domain.repository.NotificationRepository
+import com.example.baseproject.extension.KEY_ID_RECEIVER
 import dagger.hilt.android.AndroidEntryPoint
 import timber.log.Timber
-import java.net.URL
 import javax.inject.Inject
 
 
@@ -41,7 +35,10 @@ class AppNotificationService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         notificationRepository.getNotification().observe(this, Observer {
-            sendNotification(it)
+            if(it?.id != null) {
+                Timber.d("Notification received: ${it.id}")
+                sendNotification(it)
+            }
         })
         Timber.d("Notification service started")
         return super.onStartCommand(intent, flags, startId)
@@ -52,13 +49,15 @@ class AppNotificationService : LifecycleService() {
             getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         val intent = Intent(this, MainActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-        val pendingIntent =
-            PendingIntent.getActivity(
-                this,
-                0,
-                intent,
-                PendingIntent.FLAG_IMMUTABLE
+        val pendingIntent = NavDeepLinkBuilder(this)
+            .setGraph(R.navigation.main_navigation)
+            .setDestination(R.id.chatFragment)
+            .setArguments(
+                Bundle().apply {
+                    putString(KEY_ID_RECEIVER, notification.id)
+                }
             )
+            .createPendingIntent()
         val defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val newMessageNotification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_logo)
@@ -66,8 +65,10 @@ class AppNotificationService : LifecycleService() {
             .setContentText(
                 if (notification.body != null)
                     notification.body
-                else
+                else if(notification.image != null)
                     "${notification.title} ${getString(R.string.sent_a_photo)}"
+                else
+                    "${notification.title} ${getString(R.string.sent_an_emoji)}"
             )
             .setLargeIcon(
                 BitmapFactory.decodeResource(

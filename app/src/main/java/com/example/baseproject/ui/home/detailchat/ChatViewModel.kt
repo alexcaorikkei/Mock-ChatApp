@@ -182,6 +182,16 @@ class ChatViewModel @Inject constructor(
 //            handleAddMessage(chatModel)
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
+                FirebaseDatabase.getInstance().reference
+                    .child(FirebaseAuth.getInstance().currentUser?.uid.toString())
+                    .child("notification").apply {
+                        child("id").setValue(getIdRoom(FirebaseAuth.getInstance().currentUser?.uid.toString(), idReceive))
+                        child("title").setValue(_receiver.value?.displayName)
+                        child("emoji").setValue(linkEmoji)
+                        child("profile_picture").setValue(_receiver.value?.profilePicture)
+                        child("image").setValue(null)
+                        child("body").setValue(null)
+                    }
                 _sendEmojiResponse.postValue(response)
 //                sendNotification(
 //                    _receiver.value?.displayName, context.getString(R.string.sent_a_emoji)

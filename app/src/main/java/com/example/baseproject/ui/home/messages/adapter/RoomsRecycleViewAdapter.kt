@@ -96,9 +96,9 @@ class RoomAdapter(
                 }
                 MessageType.EMOJI -> {
                     if(roomData.isSent) {
-                        "${tvMessage.context.getString(R.string.you)} ${tvMessage.context.getString(R.string.sent_a_emoji)}"
+                        "${tvMessage.context.getString(R.string.you)} ${tvMessage.context.getString(R.string.sent_an_emoji)}"
                     } else {
-                        "${roomData.name.split(" ").last()} ${tvMessage.context.getString(R.string.sent_a_emoji)}"
+                        "${roomData.name.split(" ").last()} ${tvMessage.context.getString(R.string.sent_an_emoji)}"
                     }
                 }
                 MessageType.DATE -> {""}

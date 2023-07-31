@@ -36,6 +36,11 @@ class AuthRepositoryImpl : AuthRepository {
     override suspend fun firebaseLogin(email: String, password: String): Response<Boolean> {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
+            database.reference
+                .child("users")
+                .child(auth.currentUser!!.uid)
+                .child("notification")
+                .setValue(null).await()
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
