@@ -1,5 +1,6 @@
 package com.example.baseproject.ui.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
@@ -10,11 +11,13 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentHomeBinding
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.services.AppNotificationService
 import com.example.baseproject.utils.Permission
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -29,10 +32,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding, HomeViewModel>(R.layout.f
     @Inject
     lateinit var rxPreferences: RxPreferences
     override fun getVM() = viewModel
-
-    override fun initView(savedInstanceState: Bundle?) {
-        super.initView(savedInstanceState)
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
