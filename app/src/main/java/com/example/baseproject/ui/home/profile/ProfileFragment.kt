@@ -93,9 +93,16 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                 val popupMenu = android.widget.PopupMenu(requireContext(), it, android.view.Gravity.END)
                 popupMenu.menuInflater.inflate(R.menu.language_drop, popupMenu.menu)
                 popupMenu.setOnMenuItemClickListener { item ->
-                    changeLanguage(Language.getLanguageByItemId(item.itemId).code)
-                    binding.tvLanguage.text = item.title
-                    getString(R.string.change_language_toast).toast(requireContext())
+                    lifecycleScope.launch {
+                        val currentLanguage = rxPreferences.getLanguage().first()
+                        val newLanguage = Language.getLanguageByItemId(item.itemId).code
+                        if (currentLanguage == newLanguage) {
+                            return@launch
+                        }
+                        changeLanguage(Language.getLanguageByItemId(item.itemId).code)
+                        binding.tvLanguage.text = item.title
+                        appNavigation.openHomeToLoginScreen()
+                    }
                     true
                 }
                 popupMenu.show()

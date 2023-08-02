@@ -142,13 +142,15 @@ class FriendsRecycleViewAdapter(
         submitList(getFromListFriendModelSortBy(sortType, _listFriend))
     }
 
-    fun filter(query: String) {
-        submitList(getFromListFriendModelSortBy(
-            sortType,
-            _listFriend.filter {
-                it.displayName.toViWithoutAccent().contains(query.toViWithoutAccent())
-            }
-        ))
+    fun filter(query: String): Boolean {
+        val newList = getFromListFriendModelSortBy(
+        sortType,
+        _listFriend.filter {
+            it.displayName.toViWithoutAccent().contains(query.toViWithoutAccent())
+        }
+        )
+        submitList(newList)
+        return newList.isNotEmpty()
     }
 
     override fun getItemViewType(position: Int): Int {

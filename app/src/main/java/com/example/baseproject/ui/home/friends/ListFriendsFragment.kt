@@ -103,7 +103,9 @@ class ListFriendsFragment(private var states: List<FriendState>) :
             }
         }
         viewModel.queryResponse.observe(viewLifecycleOwner) {query ->
-            friendsAdapter.filter(query)
+            val hasData = friendsAdapter.filter(query)
+            if(!hasData) binding.emptyResult.visibility = View.VISIBLE
+            else binding.emptyResult.visibility = View.INVISIBLE
         }
     }
 
