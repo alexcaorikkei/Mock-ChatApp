@@ -77,6 +77,14 @@
             app:destination="@id/loginFragment"
             app:popUpTo="@id/loginFragment"
             app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_chatFragment_to_photoFragment"
+            app:destination="@id/photoFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/photoFragment"
+        tools:layout="@layout/fragment_photo"
+        android:name="com.example.baseproject.ui.home.detailchat.PhotoFragment"
+        android:label="PhotoFragment" />
 
 </navigation>
