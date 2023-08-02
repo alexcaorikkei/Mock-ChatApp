@@ -71,6 +71,12 @@
         android:id="@+id/chatFragment"
         android:name="com.example.baseproject.ui.home.detailchat.ChatFragment"
         tools:layout="@layout/fragment_detail_chat"
-        android:label="ChatFragment" />
+        android:label="ChatFragment" >
+        <action
+            android:id="@+id/action_chatFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
 
 </navigation>

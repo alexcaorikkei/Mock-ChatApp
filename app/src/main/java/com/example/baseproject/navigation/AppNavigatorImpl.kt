@@ -42,7 +42,11 @@ class AppNavigatorImpl @Inject constructor() : BaseNavigatorImpl(),
     override fun openHomeToChatScreen(bundle: Bundle?) {
         openScreen(R.id.action_homeFragment_to_chatFragment, bundle)
     }
-    
+
+    override fun openChatToLoginScreen(bundle: Bundle?) {
+        openScreen(R.id.action_chatFragment_to_loginFragment, bundle)
+    }
+
     override fun openDemoViewPager(bundle: Bundle?) {
 
     }

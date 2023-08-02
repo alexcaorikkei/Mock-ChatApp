@@ -1,22 +1,17 @@
 package com.example.baseproject.container
 
-import android.content.Intent
 import android.os.Bundle
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.NavHostFragment
 import com.example.baseproject.R
 import com.example.baseproject.databinding.ActivityMainBinding
 import com.example.baseproject.navigation.AppNavigation
-import com.example.baseproject.services.NotificationService
-import com.example.baseproject.utils.Permission
 import com.example.core.base.activity.BaseActivityNotRequireViewModel
 import com.example.core.base.dialog.ConfirmDialogListener
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.NetworkConnectionManager
 import com.example.core.utils.setLanguage
 import com.example.core.utils.toast
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
@@ -38,6 +33,8 @@ class MainActivity : BaseActivityNotRequireViewModel<ActivityMainBinding>(), Con
     lateinit var rxPreferences: RxPreferences
 
     override val layoutId = R.layout.activity_main
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

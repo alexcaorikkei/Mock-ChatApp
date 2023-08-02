@@ -60,7 +60,10 @@ class ChatFragment :
     override fun initView(savedInstanceState: Bundle?) {
         super.initView(savedInstanceState)
 
-        createNotificationChannel()
+        if(!viewModel.canOpen()) {
+            appNavigation.openChatToLoginScreen()
+        }
+
         uidReceiver = arguments?.getString(KEY_ID_RECEIVER).toString()
 
         binding.viewChatParent.setEdittextUsableWhenFullScreen()
@@ -109,18 +112,6 @@ class ChatFragment :
                 )
             }
         }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)//từ ver 8.0
-    private fun createNotificationChannel() {
-        val channel = NotificationChannel(
-            Noti.CHANNEL_ID_1,
-            Noti.CHANNEL_NAME_1,
-            NotificationManager.IMPORTANCE_DEFAULT
-        )
-        val notificationManager =
-            context?.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
     }
 
     override fun bindingStateView() {

@@ -66,11 +66,10 @@
     <string name="today">Today</string>
     <string name="same_minute">empty</string>
     <string name="sent_a_photo">sent a photo</string>
-    <string name="sent_a_emoji">sent a emoji</string>
+    <string name="sent_an_emoji">sent a emoji</string>
     <string name="you">You</string>
     <string name="phone_number_is_invalid">Phone number is invalid</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="messages_matched">matched messages</string>
     <string name="not_friend">Not friend</string>
 </resources>

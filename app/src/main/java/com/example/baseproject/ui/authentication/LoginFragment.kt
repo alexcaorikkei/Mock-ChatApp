@@ -1,5 +1,7 @@
 package com.example.baseproject.ui.authentication
 
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -10,6 +12,7 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
+import com.example.baseproject.services.AppNotificationService
 import com.example.baseproject.ui.custom.MyPasswordTransformationMethod
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
@@ -20,7 +23,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import java.lang.IllegalArgumentException
 import javax.inject.Inject
 
@@ -105,6 +107,8 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                         binding.etPassword.isEnabled = true
                         binding.includeProgress.visibility = View.GONE
                         appNavigation.openLoginToHomeScreen()
+                        val intent = Intent(requireContext(), AppNotificationService::class.java)
+                        activity?.startService(intent)
                     }
                     is Response.Failure -> {
                         binding.btnLogin.isEnabled = true
@@ -144,7 +148,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     viewModel.signIn(
                         etEmail.text.toString(),
                         etPassword.text.toString(),
-                        rxPreferences.getNotificationToken().first().toString()
                     )
                     rxPreferences.setEmail(binding.etEmail.text.toString())
                 }

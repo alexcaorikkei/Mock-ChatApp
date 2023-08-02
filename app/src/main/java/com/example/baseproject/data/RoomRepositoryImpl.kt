@@ -125,7 +125,7 @@ class RoomRepositoryImpl : RoomRepository {
         val listRoom = mutableListOf<RoomModel>()
         for (room in snapshot.children) {
             val id = room.key.toString()
-            if(id.contains(auth.uid!!)) {
+            if(auth.uid != null && id.contains(auth.uid!!)) {
                 val friendId = id.replace(auth.uid!!, "")
                 val friendProfile = getFriendProfile(friendId)
                 val lastMessage = getLastMessage(room.key.toString())
@@ -139,7 +139,7 @@ class RoomRepositoryImpl : RoomRepository {
                         lastMessage.text?:"",
                         lastMessage.date,
                         false,
-                        lastMessage.idSender == auth.uid!!
+                        lastMessage.idSender == auth.uid
                     )
                 )
             }

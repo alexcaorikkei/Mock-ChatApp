@@ -33,85 +33,14 @@ class AuthRepositoryImpl : AuthRepository {
         }
     }
 
-    private fun createDemoData() {
-        database.reference.child("users")
-            .child(auth.currentUser!!.uid).apply {
-                child("friends").apply {
-                    child("001").apply {
-                        child("display_name").setValue("John Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("002").apply {
-                        child("display_name").setValue("Jane Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("003").apply {
-                        child("display_name").setValue("John Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("004").apply {
-                        child("display_name").setValue("Jane Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("005").apply {
-                        child("display_name").setValue("John Doe Jr.")
-                        child("profile_picture").setValue("")
-                    }
-                }
-                child("added").apply {
-                    child("006").apply {
-                        child("display_name").setValue("John Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("007").apply {
-                        child("display_name").setValue("Jane Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("008").apply {
-                        child("display_name").setValue("John Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("009").apply {
-                        child("display_name").setValue("Jane Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("010").apply {
-                        child("display_name").setValue("John Doe Jr.")
-                        child("profile_picture").setValue("")
-                    }
-                }
-                child("request").apply {
-                    child("011").apply {
-                        child("display_name").setValue("John Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("012").apply {
-                        child("display_name").setValue("Jane Doe")
-                        child("profile_picture").setValue("")
-                    }
-                    child("013").apply {
-                        child("display_name").setValue("John Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("014").apply {
-                        child("display_name").setValue("Jane Smith")
-                        child("profile_picture").setValue("")
-                    }
-                    child("015").apply {
-                        child("display_name").setValue("John Doe Jr.")
-                        child("profile_picture").setValue("")
-                    }
-                }
-            }
-    }
-
-    override suspend fun firebaseLogin(email: String, password: String, notificationToken: String): Response<Boolean> {
+    override suspend fun firebaseLogin(email: String, password: String): Response<Boolean> {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
-            database.reference.child("users")
+            database.reference
+                .child("users")
                 .child(auth.currentUser!!.uid)
-                .child("device-token")
-                .setValue(notificationToken).await()
+                .child("notification")
+                .setValue(null).await()
             Response.Success(true)
         } catch (e: Exception) {
             Response.Failure(e)
@@ -131,7 +60,7 @@ class AuthRepositoryImpl : AuthRepository {
         return try {
             database.reference.child("users")
                 .child(auth.currentUser!!.uid)
-                .child("device-token")
+                .child("notification")
                 .setValue(null).await()
             auth.signOut()
             Response.Success(true)
