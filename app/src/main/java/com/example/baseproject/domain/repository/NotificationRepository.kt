@@ -5,4 +5,5 @@ import com.example.baseproject.domain.model.NotificationModel
 
 interface NotificationRepository {
     fun getNotification(): LiveData<NotificationModel>
+    fun canOpenNotification(): Boolean
 }

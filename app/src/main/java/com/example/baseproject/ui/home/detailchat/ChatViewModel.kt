@@ -15,6 +15,7 @@ import com.example.baseproject.extension.*
 import com.example.baseproject.domain.model.FriendModel
 import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.domain.model.UserModel
+import com.example.baseproject.domain.repository.AuthRepository
 import com.example.core.base.BaseViewModel
 import com.google.firebase.auth.*
 import com.google.firebase.database.*
@@ -29,7 +30,8 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     val savedStateHandle: SavedStateHandle,
-    private var detailMessageRepository: DetailMessageRepository
+    private var detailMessageRepository: DetailMessageRepository,
+    private var authRepository: AuthRepository
 ) : BaseViewModel() {
 
     private var _sendMessageResponse: MutableLiveData<Response<Boolean>> = MutableLiveData()
@@ -246,6 +248,8 @@ class ChatViewModel @Inject constructor(
             }
         }
     }
+
+    fun canOpen() = authRepository.isLogin()
 
 //    @RequiresApi(Build.VERSION_CODES.O)
 //    private fun sendNotification(displayName: String?, text: String) {

@@ -36,4 +36,9 @@ class NotificationRepositoryImpl : NotificationRepository {
         return notificationLiveData
     }
 
+    override fun canOpenNotification(): Boolean {
+        return auth.currentUser != null
+    }
+
+
 }

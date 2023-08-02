@@ -3,12 +3,14 @@ package com.example.baseproject.services
 import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
+import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
@@ -17,6 +19,7 @@ import androidx.navigation.NavDeepLinkBuilder
 import com.example.baseproject.R
 import com.example.baseproject.container.MainActivity
 import com.example.baseproject.domain.model.NotificationModel
+import com.example.baseproject.domain.repository.AuthRepository
 import com.example.baseproject.domain.repository.NotificationRepository
 import com.example.baseproject.extension.KEY_ID_RECEIVER
 import dagger.hilt.android.AndroidEntryPoint
@@ -31,18 +34,6 @@ class AppNotificationService : LifecycleService() {
 
     companion object {
         const val CHANNEL_ID = "com.example.baseproject.hmm..."
-        const val NAME = "Base Project"
-
-        // Check if service is running
-        fun isServiceRunning(context: Context): Boolean {
-            val manager = context.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-            for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-                if (AppNotificationService::class.java.name == service.service.className) {
-                    return true
-                }
-            }
-            return false
-        }
     }
 
     @Inject
@@ -51,12 +42,17 @@ class AppNotificationService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        notificationRepository.getNotification().observe(this, Observer {
-            if(it?.id != null) {
+        notificationRepository.getNotification().observe(this) {
+            if (it?.id != null) {
                 Timber.d("Notification received: ${it.id}")
                 sendNotification(it)
             }
-        })
+        }
+        Timer().schedule(object : TimerTask() {
+            override fun run() {
+                Timber.d("Notification service running")
+            }
+        }, 10000, 1000)
         Timber.d("Notification service started")
         return START_STICKY
     }
