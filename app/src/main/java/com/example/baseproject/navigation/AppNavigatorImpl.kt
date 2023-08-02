@@ -47,6 +47,10 @@ class AppNavigatorImpl @Inject constructor() : BaseNavigatorImpl(),
         openScreen(R.id.action_chatFragment_to_loginFragment, bundle)
     }
 
+    override fun openChatToPhotoFragment(bundle: Bundle?) {
+        openScreen(R.id.action_chatFragment_to_photoFragment, bundle)
+    }
+
     override fun openDemoViewPager(bundle: Bundle?) {
 
     }

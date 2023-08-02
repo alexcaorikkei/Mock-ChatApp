@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentDetailChatBinding
+import com.example.baseproject.domain.model.ChatModel
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.*
 import com.example.baseproject.navigation.AppNavigation
@@ -35,7 +36,8 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatFragment :
-    BaseFragment<FragmentDetailChatBinding, ChatViewModel>(R.layout.fragment_detail_chat) {
+    BaseFragment<FragmentDetailChatBinding, ChatViewModel>(R.layout.fragment_detail_chat),
+    OnPhotoClickListener {
     @Inject
     lateinit var appNavigation: AppNavigation
     private val viewModel: ChatViewModel by viewModels()
@@ -393,8 +395,14 @@ class ChatFragment :
 
     private fun setRecyclerViewChat() {
         binding.rvChat.apply {
-            chatAdapter = ChatAdapter2()
+            chatAdapter = ChatAdapter2(this@ChatFragment)
             adapter = chatAdapter
         }
+    }
+
+    override fun onPhotoClick(chat: ChatModel) {
+        val bundle = Bundle()
+        bundle.putString("photo", chat.photo)
+        appNavigation.openChatToPhotoFragment(bundle)
     }
 }

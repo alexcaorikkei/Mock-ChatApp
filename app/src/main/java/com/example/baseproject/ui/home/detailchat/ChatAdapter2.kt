@@ -20,7 +20,11 @@ import com.example.baseproject.domain.model.MessageType
 import com.example.baseproject.extension.*
 import com.google.firebase.auth.FirebaseAuth
 
-class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
+interface OnPhotoClickListener {
+    fun onPhotoClick(chat: ChatModel)
+}
+
+class ChatAdapter2(private val onPhotoClickListener: OnPhotoClickListener) : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
     ExampleListDiffUtil()
 ) {
     private val user = FirebaseAuth.getInstance().currentUser
@@ -47,6 +51,8 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
         }
     }
 
+
+
     inner class ItemChatOnePhotoSendVH(private val binding: ItemPhotoSendBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
@@ -64,6 +70,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
+            }
+
+            binding.root.setOnClickListener {
+                onPhotoClickListener.onPhotoClick(getItem(adapterPosition))
             }
         }
     }
@@ -109,6 +119,10 @@ class ChatAdapter2 : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
                     tvDate.text = item.formatDate
                     tvDate.visible()
                 } else tvDate.gone()
+            }
+
+            binding.root.setOnClickListener {
+                onPhotoClickListener.onPhotoClick(getItem(adapterPosition))
             }
         }
     }
