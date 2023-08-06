@@ -1,7 +1,10 @@
 package com.example.baseproject.ui.home.profile
 
 import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import androidx.fragment.app.viewModels
@@ -16,11 +19,11 @@ import com.example.baseproject.utils.Language
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.setLanguage
-import com.example.core.utils.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R.layout.fragment_profile) {
@@ -106,6 +109,19 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                     true
                 }
                 popupMenu.show()
+            }
+
+            llNotifications.setOnClickListener {
+                val intent = Intent()
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    intent.setAction(Settings.ACTION_APP_NOTIFICATION_SETTINGS)
+                    intent.putExtra(Settings.EXTRA_APP_PACKAGE, requireContext().packageName)
+                } else {
+                    intent.setAction("android.settings.APP_NOTIFICATION_SETTINGS")
+                    intent.putExtra("app_package", requireContext().packageName)
+                    intent.putExtra("app_uid", requireContext().applicationInfo.uid)
+                }
+                requireContext().startActivity(intent)
             }
         }
     }
