@@ -1,25 +1,19 @@
 package com.example.baseproject.services
 
-import android.app.ActivityManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.media.RingtoneManager
 import android.os.Build
 import android.os.Bundle
-import android.os.IBinder
 import androidx.core.app.NotificationCompat
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.LifecycleService
-import androidx.lifecycle.Observer
 import androidx.navigation.NavDeepLinkBuilder
 import com.example.baseproject.R
 import com.example.baseproject.container.MainActivity
 import com.example.baseproject.domain.model.NotificationModel
-import com.example.baseproject.domain.repository.AuthRepository
 import com.example.baseproject.domain.repository.NotificationRepository
 import com.example.baseproject.extension.KEY_ID_RECEIVER
 import dagger.hilt.android.AndroidEntryPoint
@@ -113,5 +107,3 @@ class AppNotificationService : LifecycleService() {
     }
 
 }
-
-

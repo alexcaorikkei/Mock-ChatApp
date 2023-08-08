@@ -107,8 +107,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                         binding.etPassword.isEnabled = true
                         binding.includeProgress.visibility = View.GONE
                         appNavigation.openLoginToHomeScreen()
-                        val intent = Intent(requireContext(), AppNotificationService::class.java)
-                        activity?.startService(intent)
+                        startService()
                     }
                     is Response.Failure -> {
                         binding.btnLogin.isEnabled = true
@@ -138,6 +137,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
         }
         if(viewModel.isLogin) {
             appNavigation.openLoginToHomeScreen()
+            startService()
         }
     }
 
@@ -153,5 +153,10 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                 }
             }
         }
+    }
+
+    private fun startService() {
+        val intent = Intent(requireContext(), AppNotificationService::class.java)
+        activity?.startService(intent)
     }
 }
