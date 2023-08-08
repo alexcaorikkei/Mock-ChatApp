@@ -155,7 +155,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
         }
     }
 
-    fun startService() {
+    private fun startService() {
         val intent = Intent(requireContext(), AppNotificationService::class.java)
         activity?.startService(intent)
     }
