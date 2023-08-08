@@ -10,7 +10,6 @@
             android:id="@+id/cv_avatar"
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:layout_marginTop="24dp"
             app:cardCornerRadius="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" >
@@ -72,9 +71,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:paddingBottom="16dp"
             android:src="@drawable/line"
             app:layout_constraintTop_toBottomOf="@+id/cv_avatar" />
-
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
