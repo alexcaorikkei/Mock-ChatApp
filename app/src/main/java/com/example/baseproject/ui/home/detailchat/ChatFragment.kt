@@ -171,8 +171,14 @@ class ChatFragment :
 
             sendPhotoResponse.observe(viewLifecycleOwner) { response ->
                 when (response) {
-                    is Response.Loading -> {}
-                    is Response.Success -> {}
+                    is Response.Loading -> {
+                        chatAdapter.setLoadingPhoto(true)
+                    }
+
+                    is Response.Success -> {
+                        chatAdapter.setLoadingPhoto(false)
+                    }
+
                     is Response.Failure -> {
                         "Error Photo: ${response.e}".toast(requireContext())
                     }

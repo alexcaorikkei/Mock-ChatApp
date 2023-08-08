@@ -24,10 +24,15 @@ interface OnPhotoClickListener {
     fun onPhotoClick(chat: ChatModel)
 }
 
-class ChatAdapter2(private val onPhotoClickListener: OnPhotoClickListener) : ListAdapter<ChatModel, RecyclerView.ViewHolder>(
-    ExampleListDiffUtil()
-) {
+class ChatAdapter2(private val onPhotoClickListener: OnPhotoClickListener) :
+    ListAdapter<ChatModel, RecyclerView.ViewHolder>(
+        ExampleListDiffUtil()
+    ) {
+    private var mLoading = true
     private val user = FirebaseAuth.getInstance().currentUser
+    fun setLoadingPhoto(loading: Boolean) {
+        mLoading = loading
+    }
 
     override fun submitList(list: MutableList<ChatModel>?) {
         val result = arrayListOf<ChatModel>()
@@ -52,12 +57,18 @@ class ChatAdapter2(private val onPhotoClickListener: OnPhotoClickListener) : Lis
     }
 
 
-
     inner class ItemChatOnePhotoSendVH(private val binding: ItemPhotoSendBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        private fun loadPhoto(item: ChatModel) {
+            binding.progress.visible()
+            binding.ivItemOnepicture.gone()
+        }
 
-        fun bind(item: ChatModel) {
+        private fun displayPhoto(item: ChatModel) {
             binding.apply {
+                progress.gone()
+                ivItemOnepicture.visible()
+
                 Glide.with(ivItemOnepicture)
                     .load(item.photo)
                     .override(
@@ -65,7 +76,13 @@ class ChatAdapter2(private val onPhotoClickListener: OnPhotoClickListener) : Lis
                         (300 * ivItemOnepicture.resources.displayMetrics.density).toInt()
                     )
                     .into(ivItemOnepicture)
+            }
+        }
 
+        fun bind(item: ChatModel) {
+//            if (mLoading) loadPhoto(item) else
+            displayPhoto(item)
+            binding.apply {
                 if (item.formatDate != tvDate.context.getString(R.string.same_minute)) {
                     tvDate.text = item.formatDate
                     tvDate.visible()

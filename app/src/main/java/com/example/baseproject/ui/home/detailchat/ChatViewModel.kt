@@ -161,7 +161,6 @@ class ChatViewModel @Inject constructor(
                         } else message.typeLayout = TypeLayoutChat.ONE
                     }
                 }
-
             }
         }
         messageList.add(message)
@@ -195,9 +194,6 @@ class ChatViewModel @Inject constructor(
                         child("body").setValue(null)
                     }
                 _sendEmojiResponse.postValue(response)
-//                sendNotification(
-//                    _receiver.value?.displayName, context.getString(R.string.sent_a_emoji)
-//                )
             }
         }
     }
@@ -218,11 +214,9 @@ class ChatViewModel @Inject constructor(
             handleAddMessage(chatModel)
             viewModelScope.launch {
                 val response = detailMessageRepository.sendPhoto(chatModel, idReceive)
+                _sendPhotoResponse.value = Response.Loading
                 _sendPhotoResponse.value = response
             }
-//            sendNotification(
-//                _receiver.value?.displayName, context.getString(R.string.sent_a_photo)
-//            )
         }
     }
 
@@ -242,17 +236,9 @@ class ChatViewModel @Inject constructor(
             viewModelScope.launch {
                 val response = detailMessageRepository.sendMessage(chatModel, idReceive)
                 _sendMessageResponse.value = response
-//                sendNotification(
-//                    _receiver.value?.displayName, text
-//                )
             }
         }
     }
 
     fun canOpen() = authRepository.isLogin()
-
-//    @RequiresApi(Build.VERSION_CODES.O)
-//    private fun sendNotification(displayName: String?, text: String) {
-//        displayName?.let { Notification.createNotification(1, context, it, text) }
-//    }
 }
