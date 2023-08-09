@@ -12,16 +12,21 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.baseproject.R
 import com.example.baseproject.databinding.FragmentProfileBinding
+import com.example.baseproject.domain.model.MessageModel
+import com.example.baseproject.domain.model.NotiModel
+import com.example.baseproject.domain.model.Notification
 import com.example.baseproject.domain.model.Response
 import com.example.baseproject.navigation.AppNavigation
 import com.example.baseproject.services.AppNotificationService
 import com.example.baseproject.utils.Language
+import com.example.baseproject.utils.MessageRetrofitUtil
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.setLanguage
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 
@@ -89,7 +94,7 @@ class ProfileFragment : BaseFragment<FragmentProfileBinding, ProfileViewModel>(R
                 appNavigation.openHomeToEditProfileScreen()
             }
             llLogout.setOnClickListener() {
-                activity?.stopService(Intent(activity, AppNotificationService::class.java))
+//                activity?.stopService(Intent(activity, AppNotificationService::class.java))
                 viewModel.logOut()
             }
             llLanguages.setOnClickListener {

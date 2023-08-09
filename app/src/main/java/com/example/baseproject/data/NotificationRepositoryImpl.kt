@@ -2,11 +2,12 @@ package com.example.baseproject.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.example.baseproject.domain.repository.NotificationRepository
 import com.example.baseproject.domain.model.NotificationModel
+import com.example.baseproject.domain.repository.NotificationRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import timber.log.Timber
+import java.io.FileInputStream
 
 class NotificationRepositoryImpl : NotificationRepository {
     private val database = FirebaseDatabase.getInstance()
@@ -39,6 +40,4 @@ class NotificationRepositoryImpl : NotificationRepository {
     override fun canOpenNotification(): Boolean {
         return auth.currentUser != null
     }
-
-
 }

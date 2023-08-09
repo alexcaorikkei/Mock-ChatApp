@@ -19,10 +19,10 @@ class LoginViewModel @Inject constructor(
     private var _signInResponse: MutableLiveData<Response<Boolean>> = MutableLiveData()
     val signInResponse: LiveData<Response<Boolean>> get() = _signInResponse
 
-    fun signIn(email: String, password: String) {
+    fun signIn(email: String, password: String, notificationToken: String) {
         viewModelScope.launch {
             _signInResponse.value = Response.Loading
-            _signInResponse.value = authRepository.firebaseLogin(email, password)
+            _signInResponse.value = authRepository.firebaseLogin(email, password, notificationToken)
         }
     }
 

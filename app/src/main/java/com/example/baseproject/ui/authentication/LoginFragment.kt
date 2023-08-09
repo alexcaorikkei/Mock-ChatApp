@@ -1,7 +1,5 @@
 package com.example.baseproject.ui.authentication
 
-import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.viewModels
@@ -12,19 +10,21 @@ import com.example.baseproject.domain.model.Response
 import com.example.baseproject.extension.makeLink
 import com.example.baseproject.extension.validate
 import com.example.baseproject.navigation.AppNavigation
-import com.example.baseproject.services.AppNotificationService
 import com.example.baseproject.ui.custom.MyPasswordTransformationMethod
 import com.example.core.base.fragment.BaseFragment
 import com.example.core.pref.RxPreferences
 import com.example.core.utils.toast
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthInvalidUserException
+import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.lang.IllegalArgumentException
+import timber.log.Timber
 import javax.inject.Inject
+
 
 @AndroidEntryPoint
 class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layout.fragment_login) {
@@ -54,7 +54,15 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                 viewModel.setValidState(isValidEmail = true)
             }
         }
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@OnCompleteListener
+            }
 
+            // Get new FCM registration token
+            val token = task.result
+            Timber.d("token: $token")
+        })
     }
 
     override fun bindingStateView() {
@@ -148,6 +156,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
                     viewModel.signIn(
                         etEmail.text.toString(),
                         etPassword.text.toString(),
+                        rxPreferences.getNotificationToken().first().toString()
                     )
                     rxPreferences.setEmail(binding.etEmail.text.toString())
                 }
@@ -156,7 +165,10 @@ class LoginFragment : BaseFragment<FragmentLoginBinding, LoginViewModel>(R.layou
     }
 
     private fun startService() {
-        val intent = Intent(requireContext(), AppNotificationService::class.java)
-        activity?.startService(intent)
+//        val intent = Intent(requireContext(), AppNotificationService::class.java)
+//        activity?.startService(intent)
+//
+//        val intent2 = Intent(requireContext(), FirebaseNotificationService::class.java)
+//        activity?.startService(intent2)
     }
 }
