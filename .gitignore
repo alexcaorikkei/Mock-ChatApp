@@ -17,3 +17,4 @@ local.properties
 /.idea
 /features/home/build/
 /features/login/build/
+*/google-services.json
